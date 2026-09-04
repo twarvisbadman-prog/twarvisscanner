@@ -3,150 +3,74 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Document Scanner Pro</title>
+    <title>📸 CuteScan - Document Scanner</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
     <!-- ============================================
-    TOP BAR
+    CUTE LANDING PAGE
     ============================================ -->
-    <div class="top-bar">
-        <button id="backBtn" class="icon-btn">✕</button>
-        <span class="app-title">📄 Document Scanner</span>
-        <button id="settingsBtn" class="icon-btn">⚙️</button>
-    </div>
-
-    <!-- ============================================
-    CAMERA VIEW
-    ============================================ -->
-    <div class="camera-container">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        
-        <!-- Scanner Guide Overlay -->
-        <div class="scanner-overlay" id="scannerOverlay">
-            <div class="guide-frame">
-                <div class="guide-corner tl"></div>
-                <div class="guide-corner tr"></div>
-                <div class="guide-corner bl"></div>
-                <div class="guide-corner br"></div>
-            </div>
-            <div class="guide-text">Position document inside the frame</div>
-        </div>
-
-        <!-- Manual Crop Overlay (drag to adjust) -->
-        <div class="crop-overlay" id="cropOverlay" style="display:none;">
-            <div class="crop-box" id="cropBox">
-                <div class="crop-handle nw" data-handle="nw"></div>
-                <div class="crop-handle ne" data-handle="ne"></div>
-                <div class="crop-handle sw" data-handle="sw"></div>
-                <div class="crop-handle se" data-handle="se"></div>
-                <div class="crop-handle n" data-handle="n"></div>
-                <div class="crop-handle s" data-handle="s"></div>
-                <div class="crop-handle w" data-handle="w"></div>
-                <div class="crop-handle e" data-handle="e"></div>
+    <div class="landing">
+        <div class="landing-bg">
+            <div class="floating-shapes">
+                <span class="shape">📄</span>
+                <span class="shape">✨</span>
+                <span class="shape">📸</span>
+                <span class="shape">💖</span>
+                <span class="shape">📑</span>
             </div>
         </div>
 
-        <!-- Loading -->
-        <div class="loading-overlay" id="loadingOverlay" style="display:none;">
-            <div class="spinner"></div>
-            <p>Processing...</p>
-        </div>
-    </div>
+        <div class="landing-content">
+            <div class="logo-big">📸</div>
+            <h1 class="landing-title">Cute<span class="highlight">Scan</span></h1>
+            <p class="landing-subtitle">The cutest document scanner ever! ✨</p>
+            <p class="landing-desc">
+                Scan unlimited pages • Auto-crop • Make PDFs • All on your device
+            </p>
 
-    <!-- ============================================
-    BOTTOM CONTROLS
-    ============================================ -->
-    <div class="bottom-controls">
-        <div class="controls-row">
-            <button id="flashBtn" class="control-btn" disabled>
-                <span class="icon">💡</span>
-                <span class="label">Flash</span>
-            </button>
-            
-            <button id="captureBtn" class="capture-btn" disabled>
-                <div class="capture-ring">
-                    <div class="capture-inner"></div>
+            <div class="landing-badges">
+                <span class="badge-cute">🔒 100% Private</span>
+                <span class="badge-cute">📱 No Uploads</span>
+                <span class="badge-cute">⚡ Instant</span>
+                <span class="badge-cute">💖 Free</span>
+            </div>
+
+            <div class="landing-buttons">
+                <a href="scanner.html" class="btn-cute btn-primary">
+                    📸 Start Scanning
+                    <span class="btn-sparkle">✨</span>
+                </a>
+                <a href="pdf-maker.html" class="btn-cute btn-secondary">
+                    📄 Make PDF from Images
+                </a>
+            </div>
+
+            <div class="landing-features">
+                <div class="feature-mini">
+                    <span>✂️</span>
+                    <span>Auto-Crop</span>
                 </div>
-            </button>
-            
-            <button id="galleryBtn" class="control-btn">
-                <span class="icon">🖼️</span>
-                <span class="label">Gallery</span>
-            </button>
-        </div>
-        
-        <div class="tools-row" id="toolsRow" style="display:none;">
-            <button class="tool-btn" data-filter="none">Original</button>
-            <button class="tool-btn" data-filter="grayscale">⚫ Grayscale</button>
-            <button class="tool-btn" data-filter="enhance">✨ Enhance</button>
-            <button class="tool-btn" data-filter="bright">☀️ Bright</button>
-            <button class="tool-btn" data-filter="contrast">🎯 Contrast</button>
-        </div>
-    </div>
-
-    <!-- ============================================
-    RESULT PANEL (slides up after scan)
-    ============================================ -->
-    <div class="result-panel" id="resultPanel">
-        <div class="result-handle"></div>
-        
-        <div class="result-header">
-            <h3>✅ Scanned Document</h3>
-            <div class="result-actions">
-                <button id="retakeBtn" class="icon-btn">↺</button>
-                <button id="closeResultBtn" class="icon-btn">✕</button>
-            </div>
-        </div>
-
-        <div class="result-content">
-            <div class="result-scroll">
-                <img id="previewImage" class="result-preview" alt="Scanned document" />
-            </div>
-            
-            <div class="result-tools">
-                <button id="cropAdjustBtn" class="tool-action-btn">✂️ Adjust Crop</button>
-                <button id="rotateBtn" class="tool-action-btn">🔄 Rotate</button>
-                <button id="ocrBtn" class="tool-action-btn">📝 OCR Text</button>
-            </div>
-
-            <div class="ocr-result" id="ocrResult" style="display:none;">
-                <h4>Extracted Text</h4>
-                <pre id="ocrText"></pre>
-            </div>
-
-            <div class="download-section">
-                <h4>💾 Save As</h4>
-                <div class="download-grid">
-                    <button class="download-btn" data-format="png">📷 PNG</button>
-                    <button class="download-btn" data-format="jpeg">📷 JPEG</button>
-                    <button class="download-btn" data-format="pdf">📄 PDF</button>
-                    <button class="download-btn" data-format="txt">📝 Text</button>
-                    <button class="download-btn" data-format="pdf-multi">📚 Multi-Page PDF</button>
+                <div class="feature-mini">
+                    <span>📚</span>
+                    <span>Multi-Page</span>
                 </div>
-            </div>
-
-            <div class="page-indicator" id="pageIndicator">
-                <span>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
-                <div class="page-nav">
-                    <button id="prevPageBtn" class="icon-btn-small">◀</button>
-                    <button id="nextPageBtn" class="icon-btn-small">▶</button>
+                <div class="feature-mini">
+                    <span>🎨</span>
+                    <span>Filters</span>
+                </div>
+                <div class="feature-mini">
+                    <span>💾</span>
+                    <span>Save Offline</span>
                 </div>
             </div>
         </div>
+
+        <div class="landing-footer">
+            <p>💖 Made with love • All processing is local • No data leaves your device</p>
+        </div>
     </div>
 
-    <!-- ============================================
-    LIBRARIES
-    ============================================ -->
-    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- ============================================
-    MAIN APP
-    ============================================ -->
     <script src="js/app.js"></script>
 </body>
 </html>
