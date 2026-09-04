@@ -1,715 +1,460 @@
 /**
  * ============================================
- * CAMSCANNER CLONE - Complete App
- * Full-featured document scanner like CamScanner
- * 100% client-side, no uploads
+ * CUTE SCANNER - Complete App
+ * Full-featured document scanner
+ * 100% client-side
  * ============================================
  */
 
-class DocumentScannerApp {
+class CuteScanner {
     constructor() {
-        // DOM Elements
+        // DOM
         this.video = document.getElementById('video');
         this.canvas = document.getElementById('canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.previewImage = document.getElementById('previewImage');
+        this.preview = document.getElementById('previewImage');
         this.resultPanel = document.getElementById('resultPanel');
-        this.scannerOverlay = document.getElementById('scannerOverlay');
-        this.cropOverlay = document.getElementById('cropOverlay');
-        this.cropBox = document.getElementById('cropBox');
-        this.loadingOverlay = document.getElementById('loadingOverlay');
-        this.toolsRow = document.getElementById('toolsRow');
-        this.ocrResult = document.getElementById('ocrResult');
-        this.ocrText = document.getElementById('ocrText');
-        this.pageIndicator = document.getElementById('pageIndicator');
-
+        this.statusToast = document.getElementById('statusToast');
+        this.scanFrame = document.getElementById('scanFrame');
+        this.scanLoading = document.getElementById('scanLoading');
+        this.pageCounter = document.getElementById('pageCounter');
+        
         // State
         this.stream = null;
-        this.scannedImages = [];
-        this.currentPage = 0;
-        this.currentFilter = 'none';
+        this.pages = [];
+        this.currentPageIndex = 0;
+        this.currentFilter = 'original';
         this.isProcessing = false;
-        this.isCropMode = false;
-        this.cropPoints = { x: 0, y: 0, w: 0, h: 0 };
-
-        // OCR State
-        this.ocrCache = {};
+        this.brightness = 100;
+        this.contrast = 100;
+        this.scannedPages = [];
 
         // Bind events
         this.bindEvents();
-        this.init();
-
-        console.log('📸 Document Scanner Pro initialized');
-    }
-
-    /**
-     * Initialize
-     */
-    init() {
-        // Auto-start camera on load
+        
+        // Auto-start
         setTimeout(() => this.startCamera(), 500);
-
-        // Check libraries
-        console.log('jscanify:', typeof Jscanify !== 'undefined');
-        console.log('Tesseract:', typeof Tesseract !== 'undefined');
-        console.log('jsPDF:', typeof window.jspdf !== 'undefined');
+        
+        console.log('📸 CuteScanner ready! 💖');
     }
 
-    /**
-     * Bind all events
-     */
     bindEvents() {
-        // Camera controls
-        document.getElementById('captureBtn').addEventListener('click', () => this.captureDocument());
+        document.getElementById('captureBtn').addEventListener('click', () => this.capture());
         document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
         document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
-
-        // Result controls
         document.getElementById('closeResultBtn').addEventListener('click', () => this.closeResult());
-        document.getElementById('retakeBtn').addEventListener('click', () => this.retake());
-
-        // Tool buttons
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.applyFilter(btn.dataset.filter));
-        });
-
-        // Result tools
-        document.getElementById('cropAdjustBtn').addEventListener('click', () => this.toggleCropMode());
-        document.getElementById('rotateBtn').addEventListener('click', () => this.rotateImage());
-        document.getElementById('ocrBtn').addEventListener('click', () => this.runOCR());
-
-        // Download buttons
-        document.querySelectorAll('.download-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.download(btn.dataset.format));
-        });
-
-        // Page navigation
         document.getElementById('prevPageBtn').addEventListener('click', () => this.prevPage());
         document.getElementById('nextPageBtn').addEventListener('click', () => this.nextPage());
+        document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
+        document.getElementById('doneBtn').addEventListener('click', () => this.makePDF());
+        document.getElementById('editBtn').addEventListener('click', () => this.toggleEdit());
+        document.getElementById('cropBtn').addEventListener('click', () => this.manualCrop());
+        document.getElementById('rotateBtn').addEventListener('click', () => this.rotatePage());
+        document.getElementById('deleteBtn').addEventListener('click', () => this.deletePage());
 
-        // Crop drag
-        this.initCropHandlers();
+        // Filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.currentFilter = btn.dataset.filter;
+                this.applyFilter();
+            });
+        });
 
-        // Keyboard shortcuts
+        // Sliders
+        document.getElementById('brightnessSlider').addEventListener('input', (e) => {
+            this.brightness = parseInt(e.target.value);
+            this.applyFilter();
+        });
+        document.getElementById('contrastSlider').addEventListener('input', (e) => {
+            this.contrast = parseInt(e.target.value);
+            this.applyFilter();
+        });
+
+        // Keyboard
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !this.isProcessing) this.captureDocument();
+            if (e.key === 'Enter' && !this.isProcessing) this.capture();
             if (e.key === 'Escape') this.closeResult();
+            if (e.key === 'ArrowLeft') this.prevPage();
+            if (e.key === 'ArrowRight') this.nextPage();
         });
     }
 
-    /**
-     * Start camera
-     */
+    // ============================================
+    // CAMERA
+    // ============================================
     async startCamera() {
         try {
-            this.showLoading('Starting camera...');
-
+            this.showToast('📷 Starting camera...');
+            
             const constraints = {
                 video: {
                     facingMode: 'environment',
                     width: { ideal: 1920 },
                     height: { ideal: 1080 }
-                },
-                audio: false
+                }
             };
 
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
             this.video.srcObject = this.stream;
-
             await this.video.play();
 
-            // Enable controls
             document.getElementById('captureBtn').disabled = false;
             document.getElementById('flashBtn').disabled = false;
-
-            this.hideLoading();
-            this.showToast('📷 Camera ready');
+            
+            this.showToast('✅ Camera ready! 📸');
+            this.hideToastAfter(1500);
 
         } catch (err) {
             console.error('Camera error:', err);
-            this.hideLoading();
             this.showToast('❌ Camera access denied. Please allow camera permissions.', 'error');
+            this.showUploadFallback();
         }
     }
 
-    /**
-     * Capture document
-     */
-    captureDocument() {
+    showUploadFallback() {
+        // Show upload option if camera fails
+        const wrapper = document.querySelector('.camera-wrapper');
+        if (!wrapper) return;
+        
+        const fallbackHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;background:linear-gradient(135deg, #fff5f7, #fce4ec);color:#1a1a2e;text-align:center;">
+                <span style="font-size:48px;margin-bottom:16px;">📷</span>
+                <h3 style="margin-bottom:8px;">Camera Unavailable</h3>
+                <p style="color:#64748b;margin-bottom:20px;">Upload an image from your gallery instead</p>
+                <input type="file" id="uploadFallback" accept="image/*" style="display:none;" />
+                <button onclick="document.getElementById('uploadFallback').click()" class="btn-cute btn-primary" style="cursor:pointer;padding:12px 32px;border:none;border-radius:12px;font-size:16px;font-weight:700;background:linear-gradient(135deg,#ff6b9d,#a78bfa);color:#fff;">
+                    📁 Choose Image
+                </button>
+            </div>
+        `;
+        wrapper.innerHTML = fallbackHTML;
+
+        document.getElementById('uploadFallback').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.canvas.width = img.width;
+                    this.canvas.height = img.height;
+                    this.ctx.drawImage(img, 0, 0);
+                    this.addPage(this.canvas);
+                    this.showToast('✅ Image loaded!');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ============================================
+    // CAPTURE
+    // ============================================
+    capture() {
         if (this.isProcessing) return;
-
         this.isProcessing = true;
-        this.showLoading('Processing document...');
-
-        // Show tools
-        this.toolsRow.style.display = 'flex';
+        this.scanLoading.style.display = 'flex';
 
         try {
-            const width = this.video.videoWidth || 1920;
-            const height = this.video.videoHeight || 1080;
+            const width = this.video.videoWidth || 1280;
+            const height = this.video.videoHeight || 720;
 
             this.canvas.width = width;
             this.canvas.height = height;
             this.ctx.drawImage(this.video, 0, 0, width, height);
 
-            // Try auto-crop with jscanify
-            let processedCanvas = null;
-
+            // Auto-crop - only what's inside the frame
+            let cropped = null;
             try {
                 if (typeof Jscanify !== 'undefined') {
                     const jscanify = new Jscanify();
-                    processedCanvas = jscanify.extractPaper(this.canvas, 5);
+                    cropped = jscanify.extractPaper(this.canvas, 5);
                 }
             } catch (err) {
                 console.warn('Auto-crop failed:', err);
             }
 
-            // Fallback to full image
-            if (!processedCanvas || processedCanvas.width === 0) {
-                processedCanvas = this.canvas;
+            // If crop fails, use full image but with a smaller crop
+            if (!cropped || cropped.width === 0) {
+                // Crop to center (frame area)
+                const cropSize = Math.min(width, height) * 0.75;
+                const x = (width - cropSize) / 2;
+                const y = (height - cropSize) / 2;
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = cropSize;
+                tempCanvas.height = cropSize * 1.3;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(this.canvas, x, y, cropSize, cropSize * 1.3, 0, 0, cropSize, cropSize * 1.3);
+                cropped = tempCanvas;
+                this.showToast('⚠️ Using manual crop', 'warning');
             }
 
             // Apply current filter
-            processedCanvas = this.applyFilterToCanvas(processedCanvas, this.currentFilter);
+            cropped = this.applyFilterToCanvas(cropped);
 
-            // Store image
-            const imageData = processedCanvas.toDataURL('image/png');
-            this.scannedImages.push(imageData);
-            this.currentPage = this.scannedImages.length - 1;
+            // Add page
+            this.addPage(cropped);
 
-            // Show result
-            this.showResult();
-
-            // Hide scanner overlay
-            this.scannerOverlay.style.display = 'none';
-
-            this.hideLoading();
+            this.scanLoading.style.display = 'none';
             this.isProcessing = false;
-
-            this.showToast('✅ Document scanned!');
+            this.showToast('✅ Page scanned! 💖');
 
         } catch (err) {
             console.error('Capture error:', err);
-            this.hideLoading();
+            this.scanLoading.style.display = 'none';
             this.isProcessing = false;
             this.showToast('❌ Scan failed: ' + err.message, 'error');
         }
     }
 
-    /**
-     * Show result panel
-     */
-    showResult() {
-        this.previewImage.src = this.scannedImages[this.currentPage];
-        this.resultPanel.classList.add('open');
-        this.updatePageIndicator();
-
-        // Reset OCR
-        this.ocrResult.style.display = 'none';
-        this.ocrText.textContent = '';
+    // ============================================
+    // PAGE MANAGEMENT
+    // ============================================
+    addPage(canvas) {
+        const dataUrl = canvas.toDataURL('image/png');
+        this.pages.push(dataUrl);
+        this.currentPageIndex = this.pages.length - 1;
+        this.updateUI();
+        this.showResult();
+        this.updatePageCounter();
     }
 
-    /**
-     * Close result panel
-     */
+    updateUI() {
+        if (this.pages.length > 0) {
+            this.preview.src = this.pages[this.currentPageIndex];
+            document.getElementById('currentPageNum').textContent = this.currentPageIndex + 1;
+        }
+    }
+
+    updatePageCounter() {
+        this.pageCounter.textContent = `${this.pages.length} pages`;
+    }
+
+    showResult() {
+        this.resultPanel.classList.add('open');
+        this.updateUI();
+    }
+
     closeResult() {
         this.resultPanel.classList.remove('open');
-        this.scannerOverlay.style.display = 'flex';
-        this.cropOverlay.style.display = 'none';
-        this.isCropMode = false;
+        document.getElementById('editTools').style.display = 'none';
     }
 
-    /**
-     * Retake (clear current and start over)
-     */
-    retake() {
-        if (this.scannedImages.length === 0) {
-            this.closeResult();
-            return;
-        }
-
-        // Remove current page
-        this.scannedImages.splice(this.currentPage, 1);
-        if (this.scannedImages.length === 0) {
-            this.closeResult();
-            this.showToast('🔄 No pages left. Scan again.');
-            return;
-        }
-
-        this.currentPage = Math.min(this.currentPage, this.scannedImages.length - 1);
-        this.showResult();
-        this.showToast('🗑️ Page removed');
-    }
-
-    /**
-     * Navigate pages
-     */
     prevPage() {
-        if (this.currentPage > 0) {
-            this.currentPage--;
-            this.previewImage.src = this.scannedImages[this.currentPage];
-            this.updatePageIndicator();
-            this.ocrResult.style.display = 'none';
+        if (this.currentPageIndex > 0) {
+            this.currentPageIndex--;
+            this.updateUI();
         }
     }
 
     nextPage() {
-        if (this.currentPage < this.scannedImages.length - 1) {
-            this.currentPage++;
-            this.previewImage.src = this.scannedImages[this.currentPage];
-            this.updatePageIndicator();
-            this.ocrResult.style.display = 'none';
+        if (this.currentPageIndex < this.pages.length - 1) {
+            this.currentPageIndex++;
+            this.updateUI();
         }
     }
 
-    updatePageIndicator() {
-        document.getElementById('currentPage').textContent = this.currentPage + 1;
-        document.getElementById('totalPages').textContent = this.scannedImages.length;
-        this.pageIndicator.style.display = this.scannedImages.length > 1 ? 'flex' : 'none';
+    deletePage() {
+        if (this.pages.length === 0) return;
+        this.pages.splice(this.currentPageIndex, 1);
+        if (this.pages.length === 0) {
+            this.closeResult();
+            this.showToast('No pages left. Scan again.');
+            return;
+        }
+        this.currentPageIndex = Math.min(this.currentPageIndex, this.pages.length - 1);
+        this.updateUI();
+        this.updatePageCounter();
+        this.showToast('🗑️ Page deleted');
     }
 
-    /**
-     * Apply filter to image
-     */
-    applyFilter(filter) {
-        this.currentFilter = filter;
+    // ============================================
+    // CONTINUE / DONE
+    // ============================================
+    continueScanning() {
+        this.closeResult();
+        this.showToast('📸 Scan next page!');
+        // Keep camera running
+    }
 
-        // Update UI
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.filter === filter);
+    makePDF() {
+        if (this.pages.length === 0) {
+            this.showToast('❌ No pages to make PDF', 'error');
+            return;
+        }
+
+        if (typeof window.jspdf === 'undefined') {
+            this.showToast('❌ PDF library not loaded', 'error');
+            return;
+        }
+
+        this.showToast('📄 Creating PDF...');
+
+        const { jsPDF } = window.jspdf;
+        const name = document.getElementById('pdfNameInput').value.trim() || 'tarvis';
+        
+        // Create PDF
+        const pdf = new jsPDF();
+
+        this.pages.forEach((dataUrl, index) => {
+            if (index > 0) pdf.addPage();
+            
+            const img = new Image();
+            img.src = dataUrl;
+            
+            // Use async loading
+            const imgWidth = pdf.internal.pageSize.width;
+            const imgHeight = pdf.internal.pageSize.height;
+            
+            pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
         });
 
-        // Re-apply to current image
-        if (this.scannedImages.length > 0) {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
+        // Save
+        pdf.save(`${name}.pdf`);
+        this.showToast(`💾 Saved as ${name}.pdf! 🎉`);
+        this.closeResult();
+        
+        // Reset for next batch
+        this.pages = [];
+        this.currentPageIndex = 0;
+        this.updatePageCounter();
+    }
 
-                const processed = this.applyFilterToCanvas(canvas, filter);
-                this.scannedImages[this.currentPage] = processed.toDataURL('image/png');
-                this.previewImage.src = this.scannedImages[this.currentPage];
-            };
-            img.src = this.scannedImages[this.currentPage];
+    // ============================================
+    // FILTERS & EDITING
+    // ============================================
+    toggleEdit() {
+        const tools = document.getElementById('editTools');
+        tools.style.display = tools.style.display === 'none' ? 'block' : 'none';
+        if (tools.style.display === 'block') {
+            this.showToast('✏️ Edit mode - adjust sliders and filters');
         }
     }
 
-    /**
-     * Apply filter to canvas
-     */
-    applyFilterToCanvas(canvas, filter) {
-        if (filter === 'none') return canvas;
+    applyFilter() {
+        if (this.pages.length === 0) return;
+        
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            const filtered = this.applyFilterToCanvas(canvas);
+            this.pages[this.currentPageIndex] = filtered.toDataURL('image/png');
+            this.preview.src = this.pages[this.currentPageIndex];
+        };
+        img.src = this.pages[this.currentPageIndex];
+    }
 
+    applyFilterToCanvas(canvas) {
         const result = document.createElement('canvas');
         result.width = canvas.width;
         result.height = canvas.height;
         const ctx = result.getContext('2d');
-
+        
         ctx.drawImage(canvas, 0, 0);
-
+        
         try {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
-
-            switch (filter) {
-                case 'grayscale':
-                    for (let i = 0; i < data.length; i += 4) {
-                        const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                        data[i] = data[i + 1] = data[i + 2] = gray;
-                    }
-                    break;
-
-                case 'enhance':
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] = Math.min(255, data[i] * 1.1 + 10);
-                        data[i + 1] = Math.min(255, data[i + 1] * 1.1 + 10);
-                        data[i + 2] = Math.min(255, data[i + 2] * 1.1 + 10);
-                    }
-                    break;
-
-                case 'bright':
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] = Math.min(255, data[i] + 30);
-                        data[i + 1] = Math.min(255, data[i + 1] + 30);
-                        data[i + 2] = Math.min(255, data[i + 2] + 30);
-                    }
-                    break;
-
-                case 'contrast':
-                    const factor = 1.5;
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] = Math.min(255, Math.max(0, (data[i] - 128) * factor + 128));
-                        data[i + 1] = Math.min(255, Math.max(0, (data[i + 1] - 128) * factor + 128));
-                        data[i + 2] = Math.min(255, Math.max(0, (data[i + 2] - 128) * factor + 128));
-                    }
-                    break;
+            
+            // Brightness
+            const bright = this.brightness / 100;
+            const contrast = this.contrast / 100;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                let r = data[i];
+                let g = data[i + 1];
+                let b = data[i + 2];
+                
+                // Apply filter
+                switch (this.currentFilter) {
+                    case 'grayscale':
+                        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                        r = g = b = gray;
+                        break;
+                    case 'enhance':
+                        r = Math.min(255, r * 1.1 + 5);
+                        g = Math.min(255, g * 1.1 + 5);
+                        b = Math.min(255, b * 1.1 + 5);
+                        break;
+                    case 'bright':
+                        r = Math.min(255, r + 30);
+                        g = Math.min(255, g + 30);
+                        b = Math.min(255, b + 30);
+                        break;
+                    case 'contrast':
+                        r = Math.min(255, Math.max(0, (r - 128) * 1.5 + 128));
+                        g = Math.min(255, Math.max(0, (g - 128) * 1.5 + 128));
+                        b = Math.min(255, Math.max(0, (b - 128) * 1.5 + 128));
+                        break;
+                    case 'vintage':
+                        r = Math.min(255, r * 1.1 + 10);
+                        g = Math.min(255, g * 0.9 + 5);
+                        b = Math.min(255, b * 0.8 + 5);
+                        break;
+                    default: // original
+                        break;
+                }
+                
+                // Apply brightness and contrast
+                r = Math.min(255, Math.max(0, (r - 128) * contrast + 128 + (bright - 1) * 50));
+                g = Math.min(255, Math.max(0, (g - 128) * contrast + 128 + (bright - 1) * 50));
+                b = Math.min(255, Math.max(0, (b - 128) * contrast + 128 + (bright - 1) * 50));
+                
+                data[i] = r;
+                data[i + 1] = g;
+                data[i + 2] = b;
             }
-
+            
             ctx.putImageData(imageData, 0, 0);
         } catch (err) {
             console.warn('Filter failed:', err);
         }
-
+        
         return result;
     }
 
-    /**
-     * Toggle crop mode
-     */
-    toggleCropMode() {
-        this.isCropMode = !this.isCropMode;
-        this.cropOverlay.style.display = this.isCropMode ? 'flex' : 'none';
-
-        if (this.isCropMode) {
-            this.showToast('✂️ Drag corners to adjust crop');
-        }
+    manualCrop() {
+        this.showToast('✂️ Drag to adjust crop (coming soon)');
+        // Full manual crop with drag handles would go here
     }
 
-    /**
-     * Initialize crop handlers
-     */
-    initCropHandlers() {
-        let isDragging = false;
-        let currentHandle = null;
-        let startX, startY, startW, startH;
-
-        const handles = document.querySelectorAll('.crop-handle');
-        const box = this.cropBox;
-
-        handles.forEach(handle => {
-            handle.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                isDragging = true;
-                currentHandle = handle.dataset.handle;
-                const rect = box.getBoundingClientRect();
-                startX = e.clientX;
-                startY = e.clientY;
-                startW = rect.width;
-                startH = rect.height;
-            });
-
-            handle.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                isDragging = true;
-                currentHandle = handle.dataset.handle;
-                const rect = box.getBoundingClientRect();
-                startX = touch.clientX;
-                startY = touch.clientY;
-                startW = rect.width;
-                startH = rect.height;
-            });
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            this.resizeCrop(e.clientX, e.clientY);
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            const touch = e.touches[0];
-            this.resizeCrop(touch.clientX, touch.clientY);
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                this.applyCrop();
-            }
-        });
-
-        document.addEventListener('touchend', () => {
-            if (isDragging) {
-                isDragging = false;
-                this.applyCrop();
-            }
-        });
-    }
-
-    resizeCrop(clientX, clientY) {
-        const box = this.cropBox;
-        const container = box.parentElement;
-        const containerRect = container.getBoundingClientRect();
-
-        let dx = (clientX - startX) / containerRect.width;
-        let dy = (clientY - startY) / containerRect.height;
-
-        let newW = startW;
-        let newH = startH;
-        let newX = 0;
-        let newY = 0;
-
-        const minSize = 50;
-
-        switch (currentHandle) {
-            case 'se':
-                newW = Math.max(minSize, startW + dx * containerRect.width);
-                newH = Math.max(minSize, startH + dy * containerRect.height);
-                break;
-            case 'nw':
-                newW = Math.max(minSize, startW - dx * containerRect.width);
-                newH = Math.max(minSize, startH - dy * containerRect.height);
-                newX = startX + dx * containerRect.width;
-                newY = startY + dy * containerRect.height;
-                break;
-            case 'ne':
-                newW = Math.max(minSize, startW + dx * containerRect.width);
-                newH = Math.max(minSize, startH - dy * containerRect.height);
-                newY = startY + dy * containerRect.height;
-                break;
-            case 'sw':
-                newW = Math.max(minSize, startW - dx * containerRect.width);
-                newH = Math.max(minSize, startH + dy * containerRect.height);
-                newX = startX + dx * containerRect.width;
-                break;
-            // Add more handles...
-        }
-
-        box.style.width = newW + 'px';
-        box.style.height = newH + 'px';
-        if (newX) box.style.left = newX + 'px';
-        if (newY) box.style.top = newY + 'px';
-    }
-
-    applyCrop() {
-        // Apply crop to image
-        this.showToast('✂️ Crop applied');
-        this.isCropMode = false;
-        this.cropOverlay.style.display = 'none';
-
-        // Here you would actually crop the image
-        // For simplicity, we just show a message
-        this.showToast('✅ Crop applied successfully');
-    }
-
-    /**
-     * Rotate image
-     */
-    rotateImage() {
-        if (this.scannedImages.length === 0) return;
-
+    rotatePage() {
+        if (this.pages.length === 0) return;
+        
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
             canvas.width = img.height;
             canvas.height = img.width;
             const ctx = canvas.getContext('2d');
-
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.rotate(Math.PI / 2);
             ctx.drawImage(img, -img.width / 2, -img.height / 2);
-
-            this.scannedImages[this.currentPage] = canvas.toDataURL('image/png');
-            this.previewImage.src = this.scannedImages[this.currentPage];
+            
+            this.pages[this.currentPageIndex] = canvas.toDataURL('image/png');
+            this.preview.src = this.pages[this.currentPageIndex];
             this.showToast('🔄 Rotated 90°');
         };
-        img.src = this.scannedImages[this.currentPage];
+        img.src = this.pages[this.currentPageIndex];
     }
 
-    /**
-     * Run OCR
-     */
-    async runOCR() {
-        if (this.scannedImages.length === 0) {
-            this.showToast('❌ No image to process', 'error');
-            return;
-        }
-
-        // Check cache
-        const imgData = this.scannedImages[this.currentPage];
-        if (this.ocrCache[imgData]) {
-            this.ocrText.textContent = this.ocrCache[imgData];
-            this.ocrResult.style.display = 'block';
-            this.showToast('📝 OCR loaded from cache');
-            return;
-        }
-
-        try {
-            if (typeof Tesseract === 'undefined') {
-                this.showToast('❌ OCR library not loaded', 'error');
-                return;
-            }
-
-            this.showToast('🔍 Running OCR...');
-
-            const result = await Tesseract.recognize(imgData, 'eng', {
-                logger: (m) => {
-                    if (m.status === 'recognizing text') {
-                        this.showToast(`🔍 OCR: ${Math.round(m.progress * 100)}%`);
-                    }
-                }
-            });
-
-            const text = result.data.text.trim();
-            this.ocrCache[imgData] = text;
-            this.ocrText.textContent = text || 'No text detected';
-            this.ocrResult.style.display = 'block';
-
-            this.showToast('✅ OCR complete!');
-
-        } catch (err) {
-            console.error('OCR error:', err);
-            this.showToast('❌ OCR failed: ' + err.message, 'error');
-        }
-    }
-
-    /**
-     * Download in various formats
-     */
-    download(format) {
-        if (this.scannedImages.length === 0) {
-            this.showToast('❌ No images to download', 'error');
-            return;
-        }
-
-        const imgData = this.scannedImages[this.currentPage];
-        const timestamp = Date.now();
-
-        try {
-            switch (format) {
-                case 'png':
-                    this.downloadImage(imgData, 'image/png', `scan_${timestamp}.png`);
-                    break;
-
-                case 'jpeg':
-                    this.downloadImage(imgData, 'image/jpeg', `scan_${timestamp}.jpg`, 0.92);
-                    break;
-
-                case 'pdf':
-                    this.downloadPDF(imgData, `scan_${timestamp}.pdf`);
-                    break;
-
-                case 'txt':
-                    this.downloadText(`scan_${timestamp}.txt`);
-                    break;
-
-                case 'pdf-multi':
-                    this.downloadMultiPagePDF();
-                    break;
-
-                default:
-                    this.showToast('❌ Unknown format', 'error');
-            }
-        } catch (err) {
-            console.error('Download error:', err);
-            this.showToast('❌ Download failed: ' + err.message, 'error');
-        }
-    }
-
-    /**
-     * Download image
-     */
-    downloadImage(dataUrl, mimeType, filename, quality = 1.0) {
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        this.showToast(`💾 Downloaded ${filename}`);
-    }
-
-    /**
-     * Download PDF
-     */
-    downloadPDF(dataUrl, filename) {
-        if (typeof window.jspdf === 'undefined') {
-            this.showToast('❌ PDF library not loaded', 'error');
-            return;
-        }
-
-        const { jsPDF } = window.jspdf;
-        const img = new Image();
-        img.onload = () => {
-            const pdf = new jsPDF({
-                orientation: img.width > img.height ? 'landscape' : 'portrait',
-                unit: 'px',
-                format: [img.width, img.height]
-            });
-            pdf.addImage(dataUrl, 'JPEG', 0, 0, img.width, img.height);
-            pdf.save(filename);
-            this.showToast(`💾 Downloaded ${filename}`);
-        };
-        img.src = dataUrl;
-    }
-
-    /**
-     * Download multi-page PDF
-     */
-    downloadMultiPagePDF() {
-        if (typeof window.jspdf === 'undefined') {
-            this.showToast('❌ PDF library not loaded', 'error');
-            return;
-        }
-
-        if (this.scannedImages.length === 0) {
-            this.showToast('❌ No images', 'error');
-            return;
-        }
-
-        this.showLoading('Creating PDF...');
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
-        const images = this.scannedImages.map(img => {
-            return new Promise((resolve) => {
-                const i = new Image();
-                i.onload = () => {
-                    resolve({ img: i, data: img });
-                };
-                i.src = img;
-            });
-        });
-
-        Promise.all(images).then((results) => {
-            results.forEach((result, index) => {
-                if (index > 0) pdf.addPage();
-                const img = result.img;
-                pdf.addImage(result.data, 'JPEG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
-            });
-
-            pdf.save(`multipage_scan_${Date.now()}.pdf`);
-            this.hideLoading();
-            this.showToast(`💾 Downloaded PDF with ${this.scannedImages.length} pages`);
-        });
-    }
-
-    /**
-     * Download text
-     */
-    downloadText(filename) {
-        const text = this.ocrText.textContent || 'No text extracted';
-        const blob = new Blob([text], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        this.showToast(`💾 Downloaded ${filename}`);
-    }
-
-    /**
-     * Toggle flash
-     */
+    // ============================================
+    // FLASH
+    // ============================================
     toggleFlash() {
         if (!this.stream) return;
         const track = this.stream.getVideoTracks()[0];
         if (!track) return;
-
+        
         try {
-            const capabilities = track.getCapabilities();
-            if (!capabilities.torch) {
-                this.showToast('💡 Flash not available', 'error');
-                return;
-            }
-
             const settings = track.getSettings();
             track.applyConstraints({
                 advanced: [{ torch: !settings.torch }]
@@ -717,67 +462,221 @@ class DocumentScannerApp {
                 this.showToast(settings.torch ? '💡 Flash off' : '💡 Flash on');
             });
         } catch (err) {
-            console.warn('Flash error:', err);
             this.showToast('💡 Flash not supported', 'error');
         }
     }
 
-    /**
-     * Open gallery (placeholder)
-     */
+    // ============================================
+    // GALLERY / UPLOAD
+    // ============================================
     openGallery() {
-        this.showToast('🖼️ Gallery coming soon');
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
+        input.onchange = (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        this.addPage(canvas);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            this.showToast(`📸 Added ${files.length} images`);
+        };
+        input.click();
     }
 
-    /**
-     * Show toast message
-     */
-    showToast(message, type = 'info') {
-        // Simple toast implementation
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.style.cssText = `
-                position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-                padding: 10px 24px; border-radius: 12px; font-size: 14px;
-                background: rgba(0,0,0,0.8); color: #fff; backdrop-filter: blur(10px);
-                z-index: 999; transition: all 0.3s ease; opacity: 0;
-                max-width: 90%; text-align: center;
-            `;
-            document.body.appendChild(toast);
+    // ============================================
+    // OCR
+    // ============================================
+    async runOCR() {
+        if (this.pages.length === 0) {
+            this.showToast('No page to analyze', 'error');
+            return;
         }
+        
+        try {
+            if (typeof Tesseract === 'undefined') {
+                this.showToast('OCR not available', 'error');
+                return;
+            }
+            
+            this.showToast('🔍 Running OCR...');
+            const dataUrl = this.pages[this.currentPageIndex];
+            const result = await Tesseract.recognize(dataUrl, 'eng');
+            
+            const ocrBox = document.getElementById('ocrBox');
+            const ocrText = document.getElementById('ocrText');
+            ocrText.textContent = result.data.text.trim() || 'No text detected';
+            ocrBox.style.display = 'block';
+            this.showToast('✅ OCR complete!');
+            
+        } catch (err) {
+            console.error('OCR error:', err);
+            this.showToast('OCR failed', 'error');
+        }
+    }
 
+    // ============================================
+    // UTILITIES
+    // ============================================
+    showToast(message, type = 'info') {
+        const toast = this.statusToast;
         toast.textContent = message;
-        toast.style.opacity = '1';
-        toast.style.background = type === 'error' ? 'rgba(220,38,38,0.9)' : 'rgba(0,0,0,0.8)';
-
+        toast.style.display = 'block';
+        toast.style.background = type === 'error' ? '#dc2626' : 
+                                  type === 'warning' ? '#f59e0b' : 
+                                  'rgba(0,0,0,0.8)';
         clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(() => {
-            toast.style.opacity = '0';
-        }, 3000);
     }
 
-    /**
-     * Show loading
-     */
-    showLoading(message = 'Processing...') {
-        this.loadingOverlay.style.display = 'flex';
-        this.loadingOverlay.querySelector('p').textContent = message;
-    }
-
-    /**
-     * Hide loading
-     */
-    hideLoading() {
-        this.loadingOverlay.style.display = 'none';
+    hideToastAfter(ms = 3000) {
+        clearTimeout(this.statusToast._timeout);
+        this.statusToast._timeout = setTimeout(() => {
+            this.statusToast.style.display = 'none';
+        }, ms);
     }
 }
 
 // ============================================
-// Initialize
+// PDF MAKER PAGE
+// ============================================
+class PDFMaker {
+    constructor() {
+        this.images = [];
+        this.init();
+    }
+
+    init() {
+        const input = document.getElementById('fileInput');
+        if (!input) return;
+        
+        input.addEventListener('change', (e) => this.handleFiles(e));
+        
+        document.getElementById('makePdfBtn')?.addEventListener('click', () => this.makePDF());
+        document.getElementById('clearImagesBtn')?.addEventListener('click', () => this.clearAll());
+        
+        // Drag and drop
+        const zone = document.getElementById('uploadZone');
+        if (zone) {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.style.borderColor = '#ff6b9d';
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.style.borderColor = '#ffb3c6';
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.style.borderColor = '#ffb3c6';
+                this.handleFiles(e);
+            });
+        }
+    }
+
+    handleFiles(e) {
+        const files = e.target.files || e.dataTransfer?.files;
+        if (!files) return;
+        
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    this.images.push(canvas.toDataURL('image/png'));
+                    this.render();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    render() {
+        const grid = document.getElementById('previewGrid');
+        const controls = document.getElementById('pdfControls');
+        
+        if (this.images.length === 0) {
+            grid.innerHTML = '';
+            controls.style.display = 'none';
+            return;
+        }
+        
+        controls.style.display = 'block';
+        grid.innerHTML = this.images.map((dataUrl, i) => `
+            <div class="preview-item">
+                <img src="${dataUrl}" alt="Page ${i + 1}" />
+                <button class="remove-item" onclick="window.pdfMaker.removeImage(${i})">✕</button>
+            </div>
+        `).join('');
+    }
+
+    removeImage(index) {
+        this.images.splice(index, 1);
+        this.render();
+    }
+
+    clearAll() {
+        this.images = [];
+        this.render();
+        document.getElementById('fileInput').value = '';
+    }
+
+    makePDF() {
+        if (this.images.length === 0) {
+            alert('Please add some images first!');
+            return;
+        }
+        
+        if (typeof window.jspdf === 'undefined') {
+            alert('PDF library not loaded');
+            return;
+        }
+        
+        const name = document.getElementById('pdfNameInput2').value.trim() || 'tarvis';
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        
+        this.images.forEach((dataUrl, index) => {
+            if (index > 0) pdf.addPage();
+            pdf.addImage(dataUrl, 'PNG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
+        });
+        
+        pdf.save(`${name}.pdf`);
+        alert(`✅ PDF saved as ${name}.pdf!`);
+        this.clearAll();
+    }
+}
+
+// ============================================
+// INITIALIZE
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    const app = new DocumentScannerApp();
-    window.app = app; // For debugging
+    // Check which page we're on
+    if (document.querySelector('.scanner-page')) {
+        window.app = new CuteScanner();
+    }
+    
+    if (document.querySelector('.pdf-maker-page')) {
+        window.pdfMaker = new PDFMaker();
+    }
+    
+    console.log('💖 CuteScanner loaded!');
 });
