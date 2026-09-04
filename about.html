@@ -1,178 +1,830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About - Smart Document Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Student Hub - About</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== RED RAIN CANVAS ===== */
+        #rain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: #0a0a0a;
+        }
+
+        .glow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.03) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .glass-overlay {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.08);
+            padding: 12px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ff0000;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .logo i {
+            color: #ff0000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 0, 0, 0.3);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #ff0000;
+            background: rgba(255, 0, 0, 0.05);
+        }
+
+        .nav-links a i {
+            margin-right: 6px;
+        }
+
+        /* ===== GLASSY LOADING MODAL ===== */
+        #loadingModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loadingModal.active {
+            display: flex;
+        }
+
+        .loading-box {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 0, 0, 0.08);
+            border-radius: 30px;
+            padding: 50px 40px 40px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+            animation: glassPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.03);
+        }
+
+        @keyframes glassPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(255, 0, 0, 0.02);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(255, 0, 0, 0.06);
+                transform: scale(1.01);
+            }
+        }
+
+        .loading-box .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 0, 0, 0.05);
+            border-top-color: #ff0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-box .loading-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .loading-box h3 {
+            color: #ff0000;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .loading-box p {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .loading-box .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 0, 0, 0.05);
+            border-radius: 2px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .loading-box .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            border-radius: 2px;
+            animation: fillProgress 10s ease-in-out forwards;
+        }
+
+        @keyframes fillProgress {
+            0% {
+                width: 0%;
+            }
+            20% {
+                width: 15%;
+            }
+            40% {
+                width: 35%;
+            }
+            60% {
+                width: 55%;
+            }
+            80% {
+                width: 75%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* ===== ABOUT CONTENT ===== */
+        .about-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        .about-container h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ff0000;
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 0 0 40px rgba(255, 0, 0, 0.1);
+        }
+
+        .about-container .subtitle {
+            text-align: center;
+            color: rgba(255, 0, 0, 0.2);
+            font-size: 1rem;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 0, 0, 0.06);
+            border-radius: 24px;
+            padding: 30px 32px;
+            margin-bottom: 24px;
+            transition: 0.3s;
+        }
+
+        .about-card:hover {
+            border-color: rgba(255, 0, 0, 0.12);
+        }
+
+        .about-card h2 {
+            color: #ff0000;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .about-card h2 i {
+            opacity: 0.6;
+        }
+
+        .about-card p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .about-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .about-card ul li {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .about-card ul li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: #ff0000;
+            opacity: 0.3;
+        }
+
+        .about-card ul li strong {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== COMING SOON BADGE ===== */
+        .coming-soon {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 0, 0, 0.08);
+            color: #ff0000;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: pulse 2s ease-in-out infinite;
+            margin-top: 8px;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ===== CONTACT CARDS ===== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 0, 0, 0.05);
+            border-radius: 14px;
+            text-decoration: none;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .contact-item:hover {
+            background: rgba(255, 0, 0, 0.04);
+            border-color: rgba(255, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .contact-item .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .contact-item .icon.instagram {
+            background: rgba(228, 64, 95, 0.12);
+            color: #e4405f;
+        }
+        .contact-item .icon.whatsapp {
+            background: rgba(37, 211, 102, 0.12);
+            color: #25d366;
+        }
+        .contact-item .icon.linkedin {
+            background: rgba(10, 102, 194, 0.12);
+            color: #0a66c2;
+        }
+        .contact-item .icon.email {
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffd700;
+        }
+        .contact-item .icon.web {
+            background: rgba(0, 180, 216, 0.12);
+            color: #00b4d8;
+        }
+        .contact-item .icon.cyber {
+            background: rgba(0, 255, 65, 0.05);
+            color: #00ff41;
+        }
+
+        .contact-item .info .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .contact-item .info .detail {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-direct {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 0, 0, 0.15);
+            background: rgba(255, 0, 0, 0.03);
+            color: #ff0000;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-direct:hover {
+            background: rgba(255, 0, 0, 0.08);
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-direct i {
+            font-size: 1.1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: rgba(255, 0, 0, 0.05);
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255, 0, 0, 0.02);
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .about-container {
+                padding: 24px 16px 40px;
+            }
+            .about-container h1 {
+                font-size: 1.8rem;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-card {
+                padding: 20px;
+            }
+            .header-content {
+                flex-direction: column;
+                gap: 8px;
+                padding: 0 16px;
+            }
+            .logo {
+                font-size: 1rem;
+            }
+            .nav-links {
+                gap: 12px;
+            }
+            .nav-links a {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-direct {
+                justify-content: center;
+            }
+            .loading-box {
+                padding: 40px 24px 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about-container h1 {
+                font-size: 1.5rem;
+            }
+            .contact-item {
+                padding: 12px 14px;
+            }
+            .contact-item .icon {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">📄 SmartScanner</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="scanner.html">Scanner</a></li>
-                <li><a href="about.html" class="active">About</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <main>
+    <!-- RED RAIN CANVAS -->
+    <canvas id="rain-canvas"></canvas>
+    <div class="glow-overlay"></div>
+
+    <!-- GLASSY LOADING MODAL -->
+    <div id="loadingModal">
+        <div class="loading-box">
+            <div class="loading-icon">📚</div>
+            <div class="spinner"></div>
+            <h3>Connecting to Notes Zone</h3>
+            <p>Waking up the server...</p>
+            <div class="progress-bar">
+                <div class="fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-overlay">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    STUDENT HUB
+                </div>
+                <div class="nav-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <a href="scanner.html"><i class="fas fa-camera"></i> Scanner</a>
+                    <a href="about.html" class="active"><i class="fas fa-info-circle"></i> About</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABOUT CONTENT -->
         <div class="about-container">
-            <h1>ℹ️ About SmartScanner</h1>
-            
-            <section class="about-section">
-                <h2>What is SmartScanner?</h2>
+
+            <h1>⚡ About Student Hub</h1>
+            <p class="subtitle">Connecting Students Through Smart Tools</p>
+
+            <!-- What We Do -->
+            <div class="about-card">
+                <h2><i class="fas fa-rocket"></i> What We Do</h2>
                 <p>
-                    SmartScanner is a <strong>100% client-side</strong> document scanning application.
-                    It uses your device's camera to capture documents, automatically crops them,
-                    enhances image quality, and optionally extracts text using OCR — all without
-                    ever sending your data to any server.
+                    <strong>Student Hub</strong> is an ecosystem of smart tools designed for students.
+                    We provide a <strong>100% client-side</strong> document scanner that works entirely
+                    on your device — no uploads, no servers, complete privacy.
                 </p>
-            </section>
+                <p style="margin-top:10px;">
+                    Our mission is to make student life easier by providing <strong>free, accessible,
+                    and private</strong> tools that help you study, organize, and share knowledge.
+                </p>
+            </div>
 
-            <section class="about-section">
-                <h2>🔒 Privacy First</h2>
-                <div class="privacy-grid">
-                    <div class="privacy-item">
-                        <span class="privacy-icon">✅</span>
-                        <p><strong>No Uploads:</strong> Everything stays on your device</p>
-                    </div>
-                    <div class="privacy-item">
-                        <span class="privacy-icon">✅</span>
-                        <p><strong>No Servers:</strong> No backend infrastructure</p>
-                    </div>
-                    <div class="privacy-item">
-                        <span class="privacy-icon">✅</span>
-                        <p><strong>No Tracking:</strong> No cookies or analytics</p>
-                    </div>
-                    <div class="privacy-item">
-                        <span class="privacy-icon">✅</span>
-                        <p><strong>No Account:</strong> No login required</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="about-section">
-                <h2>🛠️ How It Works</h2>
-                <ol class="how-it-works">
-                    <li>
-                        <strong>Camera Access:</strong> Uses the <code>getUserMedia()</code> API
-                        to access your camera.
-                    </li>
-                    <li>
-                        <strong>Auto-Crop:</strong> Uses <code>jscanify</code> to automatically
-                        detect and crop document edges.
-                    </li>
-                    <li>
-                        <strong>Image Enhancement:</strong> Applies contrast and brightness
-                        adjustments for clarity.
-                    </li>
-                    <li>
-                        <strong>OCR (Optional):</strong> Uses <code>Tesseract.js</code> to
-                        extract text from the scanned image.
-                    </li>
-                    <li>
-                        <strong>Download:</strong> Saves the document to your device as
-                        PNG, JPEG, PDF, or text file.
-                    </li>
-                </ol>
-            </section>
-
-            <section class="about-section">
-                <h2>📋 Requirements</h2>
-                <ul class="requirements">
-                    <li>🌐 Modern browser (Chrome, Firefox, Safari, Edge)</li>
-                    <li>📷 Camera (built-in or external)</li>
-                    <li>🌍 Internet connection for initial load (libraries from CDN)</li>
-                    <li>💾 Works offline after first visit (can be installed as PWA)</li>
+            <!-- Privacy -->
+            <div class="about-card">
+                <h2><i class="fas fa-lock"></i> Privacy First</h2>
+                <ul>
+                    <li><strong>✅ No Uploads:</strong> Everything stays on your device</li>
+                    <li><strong>✅ No Servers:</strong> No backend infrastructure</li>
+                    <li><strong>✅ No Tracking:</strong> No cookies or analytics</li>
+                    <li><strong>✅ No Account:</strong> No login required</li>
+                    <li><strong>✅ 100% Local:</strong> All processing happens on your phone</li>
                 </ul>
-            </section>
+            </div>
 
-            <section class="about-section">
-                <h2>📦 Technologies Used</h2>
-                <div class="tech-grid">
-                    <div class="tech-item">
-                        <span class="tech-icon">🖥️</span>
-                        <h4>HTML5 + CSS3</h4>
-                        <p>Structure and styling</p>
-                    </div>
-                    <div class="tech-item">
-                        <span class="tech-icon">⚡</span>
-                        <h4>Vanilla JavaScript</h4>
-                        <p>No frameworks needed</p>
-                    </div>
-                    <div class="tech-item">
-                        <span class="tech-icon">✂️</span>
-                        <h4>jscanify</h4>
-                        <p>Document edge detection</p>
-                    </div>
-                    <div class="tech-item">
-                        <span class="tech-icon">🔍</span>
-                        <h4>Tesseract.js</h4>
-                        <p>Client-side OCR</p>
-                    </div>
-                    <div class="tech-item">
-                        <span class="tech-icon">📄</span>
-                        <h4>jsPDF</h4>
-                        <p>PDF generation</p>
-                    </div>
-                </div>
-            </section>
+            <!-- Features -->
+            <div class="about-card">
+                <h2><i class="fas fa-star"></i> Features</h2>
+                <ul>
+                    <li><strong>📸 Live Scan:</strong> Camera-based document scanning</li>
+                    <li><strong>✂️ Auto-Crop:</strong> Automatic edge detection</li>
+                    <li><strong>📚 Multi-Page:</strong> Scan unlimited pages</li>
+                    <li><strong>🎨 Filters:</strong> B&amp;W, Enhance, Vintage</li>
+                    <li><strong>📄 PDF Export:</strong> Create and download PDFs</li>
+                    <li><strong>🖼️ Gallery Upload:</strong> Use existing images</li>
+                    <li><strong>📂 Notes Zone:</strong> Upload and download study materials</li>
+                </ul>
+            </div>
 
-            <section class="about-section">
-                <h2>📱 Browser Support</h2>
-                <table class="browser-table">
-                    <thead>
-                        <tr>
-                            <th>Browser</th>
-                            <th>Version</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Chrome</td><td>80+</td><td>✅ Full Support</td></tr>
-                        <tr><td>Firefox</td><td>75+</td><td>✅ Full Support</td></tr>
-                        <tr><td>Safari</td><td>13+</td><td>✅ Full Support</td></tr>
-                        <tr><td>Edge</td><td>80+</td><td>✅ Full Support</td></tr>
-                        <tr><td>iOS Safari</td><td>13+</td><td>✅ Full Support</td></tr>
-                        <tr><td>Android Chrome</td><td>80+</td><td>✅ Full Support</td></tr>
-                    </tbody>
-                </table>
-            </section>
+            <!-- Our Projects -->
+            <div class="about-card">
+                <h2><i class="fas fa-project-diagram"></i> Our Projects</h2>
+                <ul>
+                    <li>
+                        <strong>📄 Student Hub Scanner:</strong>
+                        Document scanner for students
+                    </li>
+                    <li>
+                        <strong>📚 Twarvis School Notes Zone:</strong>
+                        <a href="#" onclick="goToNotes(event)" style="color:#ff0000;text-decoration:none;">
+                            Upload and download study materials
+                        </a>
+                        <span style="color:rgba(255,255,255,0.1);font-size:0.7rem;display:block;">
+                            (Render server may take 10-15 seconds to wake up)
+                        </span>
+                    </li>
+                    <li>
+                        <strong>🔐 CyberCraft:</strong>
+                        <a href="https://cybercraft.twarvistech.workers.dev/" target="_blank" style="color:#00ff41;text-decoration:none;">
+                            Encode · Decode · Encrypt · Decrypt
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            <section class="about-section">
-                <h2>🧑‍🎓 For Students</h2>
-                <div class="student-tips">
-                    <h4>Tips for best results:</h4>
-                    <ul>
-                        <li>📐 Place your document on a flat, well-lit surface</li>
-                        <li>📏 Ensure the entire document is visible in frame</li>
-                        <li>📱 Hold your phone steady while scanning</li>
-                        <li>📄 Use a dark background for better edge detection</li>
-                        <li>☀️ Avoid glare and shadows on the document</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section class="about-section">
-                <h2>🤝 Contributing</h2>
+            <!-- Coming Soon -->
+            <div class="about-card" style="border-color:rgba(255,0,0,0.1);">
+                <h2><i class="fas fa-gem"></i> Coming Soon</h2>
                 <p>
-                    This is an open-source project. Feel free to fork, modify, and use it
-                    for your own purposes. Contributions are welcome!
+                    <strong>🌍 Connect Students Across Universities</strong>
                 </p>
-                <a href="https://github.com" class="btn btn-primary">View on GitHub →</a>
-            </section>
-        </div>
-    </main>
+                <p style="margin-top:8px;">
+                    A new platform connecting students from different universities across Tanzania.
+                    Share knowledge, collaborate on projects, and build a stronger academic community.
+                </p>
+                <span class="coming-soon">✦ Coming Soon ✦</span>
+            </div>
 
-    <footer>
-        <div class="footer-container">
-            <p>&copy; 2026 SmartScanner — 100% local. No data stored. No servers.</p>
-        </div>
-    </footer>
+            <!-- Direct Links -->
+            <div class="about-card">
+                <h2><i class="fas fa-link"></i> Quick Access</h2>
+                <div class="btn-group">
+                    <button class="btn-direct" onclick="goToNotes(event)">
+                        <i class="fas fa-book"></i> Notes Zone
+                    </button>
+                    <a href="https://cybercraft.twarvistech.workers.dev/" target="_blank" class="btn-direct" style="border-color:rgba(0,255,65,0.1);color:#00ff41;">
+                        <i class="fas fa-shield-alt"></i> CyberCraft
+                    </a>
+                </div>
+                <p style="margin-top:12px;font-size:0.75rem;color:rgba(255,255,255,0.1);">
+                    Notes Zone is hosted on Render — may take 10-15 seconds to wake up
+                </p>
+            </div>
 
-    <script src="js/about.js"></script>
+            <!-- Contact -->
+            <div class="about-card">
+                <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+                <div class="contact-grid">
+                    <a href="https://www.instagram.com/twarvis_?igsi=aXF5YzA0enRwM2kx&utm_source=qr" target="_blank" class="contact-item">
+                        <div class="icon instagram"><i class="fab fa-instagram"></i></div>
+                        <div class="info">
+                            <div class="name">@twarvis_</div>
+                            <div class="detail">Instagram</div>
+                        </div>
+                    </a>
+                    <a href="https://wa.me/255740706007" target="_blank" class="contact-item">
+                        <div class="icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+                        <div class="info">
+                            <div class="name">+255 740 706 007</div>
+                            <div class="detail">WhatsApp</div>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/twarvis-davinc-7a7066431?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="contact-item">
+                        <div class="icon linkedin"><i class="fab fa-linkedin-in"></i></div>
+                        <div class="info">
+                            <div class="name">Twarvis Davinc</div>
+                            <div class="detail">LinkedIn</div>
+                        </div>
+                    </a>
+                    <a href="mailto:twarvistech@gmail.com" class="contact-item">
+                        <div class="icon email"><i class="fas fa-envelope"></i></div>
+                        <div class="info">
+                            <div class="name">twarvistech@gmail.com</div>
+                            <div class="detail">Email</div>
+                        </div>
+                    </a>
+                    <a href="https://twarvis-school.onrender.com/browse/" target="_blank" class="contact-item">
+                        <div class="icon web"><i class="fas fa-book-open"></i></div>
+                        <div class="info">
+                            <div class="name">Twarvis School</div>
+                            <div class="detail">Notes Zone</div>
+                        </div>
+                    </a>
+                    <a href="https://cybercraft.twarvistech.workers.dev/" target="_blank" class="contact-item">
+                        <div class="icon cyber"><i class="fas fa-shield-alt"></i></div>
+                        <div class="info">
+                            <div class="name">CyberCraft</div>
+                            <div class="detail">Encode · Decode · Encrypt · Decrypt</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <span>✦</span> 2026 Student Hub — All processing is local. No data leaves your device. <span>✦</span>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================
+        // RED RAIN EFFECT
+        // ============================================
+        (function() {
+            const canvas = document.getElementById('rain-canvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            class RedDrop {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.speed = Math.random() * 4 + 2;
+                    this.size = Math.random() * 14 + 10;
+                    this.opacity = Math.random() * 0.3 + 0.1;
+                    this.char = chars[Math.floor(Math.random() * chars.length)];
+                }
+                fall() {
+                    this.y += this.speed;
+                    if (this.y > canvas.height + 20) { this.reset();
+                        this.y = -20; }
+                }
+                draw() {
+                    ctx.font = `${this.size}px monospace`;
+                    ctx.fillStyle = `rgba(255, 0, 0, ${this.opacity})`;
+                    ctx.shadowColor = `rgba(255, 0, 0, ${this.opacity * 0.3})`;
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(this.char, this.x, this.y);
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            const drops = Array.from({ length: 150 }, () => new RedDrop());
+
+            function drawRain() {
+                ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drops.forEach(d => { d.draw();
+                    d.fall(); });
+                requestAnimationFrame(drawRain);
+            }
+            drawRain();
+        })();
+
+        // ============================================
+        // GLASSY LOADING MODAL
+        // ============================================
+        let loadingTimeout = null;
+
+        function showLoading() {
+            const modal = document.getElementById('loadingModal');
+            modal.classList.add('active');
+
+            // Reset progress bar animation
+            const fill = document.querySelector('.progress-bar .fill');
+            fill.style.animation = 'none';
+            void fill.offsetHeight; // trigger reflow
+            fill.style.animation = 'fillProgress 10s ease-in-out forwards';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.remove('active');
+            clearTimeout(loadingTimeout);
+        }
+
+        // ============================================
+        // GO TO NOTES ZONE WITH LOADING
+        // ============================================
+        function goToNotes(e) {
+            if (e) e.preventDefault();
+
+            // Show loading modal
+            showLoading();
+
+            // Wait 10 seconds (Render wake-up time), then redirect
+            loadingTimeout = setTimeout(function() {
+                hideLoading();
+                window.open('https://twarvis-school.onrender.com/browse/', '_blank');
+            }, 10000);
+
+            // Also allow user to close if they want
+            // Click on modal background to cancel
+            document.getElementById('loadingModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    hideLoading();
+                    clearTimeout(loadingTimeout);
+                }
+            });
+        }
+
+        console.log('🔥 Student Hub - About Page');
+        console.log('📚 Notes Zone: https://twarvis-school.onrender.com/browse/');
+        console.log('🔐 CyberCraft: https://cybercraft.twarvistech.workers.dev/');
+        console.log('📧 Email: twarvistech@gmail.com');
+        console.log('🌍 New Project: Connecting Students Across Universities - Coming Soon!');
+    </script>
+
 </body>
 </html>
