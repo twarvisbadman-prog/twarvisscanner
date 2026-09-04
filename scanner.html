@@ -319,7 +319,7 @@
             margin: 12px auto 0;
         }
 
-        /* ===== FOUR OPTIONS SCREEN ===== */
+        /* ===== OPTIONS SCREEN ===== */
         .step-options {
             padding: 20px 24px 24px;
         }
@@ -414,7 +414,7 @@
             align-items: center;
             gap: 4px;
             text-align: center;
-            min-height: 80px;
+            min-height: 76px;
             justify-content: center;
         }
 
@@ -427,7 +427,6 @@
             opacity: 0.6;
         }
 
-        /* CONTINUE - Golden */
         .btn-continue {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             color: #0a0a0a;
@@ -439,9 +438,6 @@
             box-shadow: 0 8px 50px rgba(255, 215, 0, 0.35);
         }
 
-        .btn-continue:active { transform: scale(0.97); }
-
-        /* DONE - Bold Red */
         .btn-done {
             background: linear-gradient(135deg, #ff1a1a, #cc0000);
             color: #fff;
@@ -453,9 +449,6 @@
             box-shadow: 0 8px 50px rgba(255, 26, 26, 0.35);
         }
 
-        .btn-done:active { transform: scale(0.97); }
-
-        /* RESCAN - Blue/Cyan */
         .btn-rescan {
             background: linear-gradient(135deg, #00b4d8, #0077b6);
             color: #fff;
@@ -467,9 +460,6 @@
             box-shadow: 0 8px 50px rgba(0, 180, 216, 0.25);
         }
 
-        .btn-rescan:active { transform: scale(0.97); }
-
-        /* CROP - White/Green outline */
         .btn-crop {
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
@@ -488,7 +478,7 @@
             box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
         }
 
-        .btn-crop:active { transform: scale(0.97); }
+        .btn-option:active { transform: scale(0.97); }
 
         /* Page Navigation */
         .options-nav {
@@ -566,7 +556,7 @@
             color: #fff;
         }
 
-        /* ===== STEP 2: EDIT SCREEN ===== */
+        /* ===== EDIT SCREEN ===== */
         .step-edit {
             display: none;
             padding: 16px 24px 24px;
@@ -627,7 +617,7 @@
             object-fit: contain;
         }
 
-        /* ===== EDIT TOOLBAR - DIFFERENT COLORS ===== */
+        /* ===== EDIT TOOLBAR ===== */
         .edit-toolbar {
             display: flex;
             gap: 6px;
@@ -828,7 +818,7 @@
             .btn-option {
                 padding: 12px 8px;
                 font-size: 0.8rem;
-                min-height: 70px;
+                min-height: 66px;
             }
 
             .btn-option .icon-big { font-size: 1.3rem; }
@@ -864,10 +854,12 @@
     </style>
 </head>
 <body>
+    <!-- Matrix Golden Rain Canvas -->
     <canvas id="rain-canvas"></canvas>
     <div class="glow-overlay"></div>
     
     <div class="glass-overlay">
+        <!-- ===== HEADER ===== -->
         <div class="header">
             <div class="header-content">
                 <div class="logo">
@@ -883,8 +875,10 @@
             </div>
         </div>
 
+        <!-- ===== TOAST ===== -->
         <div class="toast" id="toast"></div>
 
+        <!-- ===== SCANNER ===== -->
         <div class="scanner-area">
             <div class="camera-wrapper">
                 <video id="video" autoplay playsinline></video>
@@ -906,6 +900,7 @@
                 </div>
             </div>
 
+            <!-- ===== CONTROLS ===== -->
             <div class="scanner-controls">
                 <div class="controls-row">
                     <button class="ctrl-btn" id="flashBtn" disabled>
@@ -929,7 +924,7 @@
         <div class="result-panel" id="resultPanel">
             <div class="result-handle"></div>
 
-            <!-- ===== FOUR OPTIONS SCREEN ===== -->
+            <!-- ===== OPTIONS SCREEN ===== -->
             <div class="step-options" id="stepOptions">
                 <div class="preview-mini" id="previewWrapper">
                     <img id="optionsPreview" alt="Scanned page" />
@@ -1002,17 +997,17 @@
                     <img id="editPreview" alt="Scanned document" />
                 </div>
 
-                <!-- Toolbar - DIFFERENT COLORS -->
+                <!-- Toolbar -->
                 <div class="edit-toolbar">
-                    <button class="active" data-filter="original" style="border-color:rgba(255,215,0,0.2);color:#ffd700;">Original</button>
-                    <button data-filter="grayscale" style="border-color:rgba(200,200,200,0.1);color:#aaa;">⚫ B&amp;W</button>
-                    <button data-filter="enhance" style="border-color:rgba(0,255,255,0.1);color:#00ffff;">✨ Enhance</button>
-                    <button data-filter="bright" style="border-color:rgba(255,200,0,0.1);color:#ffcc00;">☀️ Bright</button>
-                    <button data-filter="contrast" style="border-color:rgba(255,100,0,0.1);color:#ff6b00;">🎯 Contrast</button>
-                    <button data-filter="vintage" style="border-color:rgba(200,150,100,0.1);color:#d4a373;">📻 Vintage</button>
-                    <button id="rotateEditBtn" style="border-color:rgba(100,100,255,0.1);color:#6666ff;">🔄 Rotate</button>
-                    <button id="deleteEditBtn" style="border-color:rgba(255,0,0,0.1);color:#ff4444;">🗑️ Delete</button>
-                    <button id="saveEditBtn" class="btn-save-changes" style="margin-left:auto;">
+                    <button class="active" data-filter="original">Original</button>
+                    <button data-filter="grayscale">⚫ B&amp;W</button>
+                    <button data-filter="enhance">✨ Enhance</button>
+                    <button data-filter="bright">☀️ Bright</button>
+                    <button data-filter="contrast">🎯 Contrast</button>
+                    <button data-filter="vintage">📻 Vintage</button>
+                    <button id="rotateEditBtn">🔄 Rotate</button>
+                    <button id="deleteEditBtn" class="danger">🗑️ Delete</button>
+                    <button id="saveEditBtn" class="btn-save-changes">
                         💾 Save Changes
                     </button>
                 </div>
@@ -1020,23 +1015,23 @@
                 <!-- Sliders -->
                 <div class="edit-sliders">
                     <div class="slider-group">
-                        <label style="color:rgba(255,200,0,0.4);">☀️ Brightness</label>
-                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" style="background:rgba(255,200,0,0.06);" />
+                        <label>☀️ Brightness</label>
+                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
                     </div>
                     <div class="slider-group">
-                        <label style="color:rgba(255,100,0,0.4);">🎯 Contrast</label>
-                        <input type="range" id="contrastSlider" min="0" max="200" value="100" style="background:rgba(255,100,0,0.06);" />
+                        <label>🎯 Contrast</label>
+                        <input type="range" id="contrastSlider" min="0" max="200" value="100" />
                     </div>
                 </div>
 
                 <!-- PDF Naming -->
                 <div class="pdf-naming">
-                    <label style="color:rgba(255,215,0,0.3);"><i class="fas fa-file-pdf"></i> Name:</label>
+                    <label><i class="fas fa-file-pdf"></i> Name:</label>
                     <input type="text" id="pdfName" value="twarvis" />
                     <span class="ext">.pdf</span>
                 </div>
 
-                <!-- Create PDF Button - GREEN -->
+                <!-- Create PDF Button -->
                 <button class="btn-create-pdf" id="createPdfBtn">
                     <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
                 </button>
@@ -1107,7 +1102,7 @@
         })();
 
         // ============================================
-        // STUDENT HUB SCANNER - FULLY FIXED
+        // STUDENT HUB SCANNER - COMPLETE
         // ============================================
 
         class StudentHubScanner {
@@ -1154,7 +1149,7 @@
                 // Check for gallery mode
                 this.checkGalleryMode();
 
-                // Auto-start
+                // Auto-start camera
                 setTimeout(() => this.startCamera(), 500);
 
                 console.log('📸 Student Hub Scanner ready');
@@ -1210,7 +1205,7 @@
                 // Create PDF
                 document.getElementById('createPdfBtn').addEventListener('click', () => this.makePDF());
 
-                // Keyboard
+                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !this.isProcessing) this.capture();
                     if (e.key === 'Escape') {
@@ -1227,17 +1222,60 @@
             }
 
             // ============================================
-            // GALLERY MODE
+            // GALLERY MODE - DIRECT IMAGE LOADING
             // ============================================
             checkGalleryMode() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const mode = urlParams.get('mode');
                 
                 if (mode === 'gallery') {
-                    setTimeout(() => {
-                        this.openGallery();
-                        this.showToast('🖼️ Select images from your gallery');
-                    }, 800);
+                    // Check sessionStorage for images from home page
+                    const storedImages = sessionStorage.getItem('galleryImages');
+                    
+                    if (storedImages) {
+                        const images = JSON.parse(storedImages);
+                        sessionStorage.removeItem('galleryImages');
+                        
+                        if (images && images.length > 0) {
+                            let loaded = 0;
+                            images.forEach(dataUrl => {
+                                const img = new Image();
+                                img.onload = () => {
+                                    let maxDim = 2000;
+                                    let w = img.width;
+                                    let h = img.height;
+                                    if (w > maxDim || h > maxDim) {
+                                        const ratio = Math.min(maxDim / w, maxDim / h);
+                                        w = w * ratio;
+                                        h = h * ratio;
+                                    }
+                                    
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = w;
+                                    canvas.height = h;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, w, h);
+                                    
+                                    this.addPage(canvas);
+                                    loaded++;
+                                    
+                                    if (loaded === images.length) {
+                                        this.showToast(`📸 Added ${images.length} images from gallery`);
+                                        // Auto go to edit mode
+                                        setTimeout(() => {
+                                            this.goToEditMode();
+                                        }, 500);
+                                    }
+                                };
+                                img.src = dataUrl;
+                            });
+                        }
+                    } else {
+                        // Fallback: open gallery directly
+                        setTimeout(() => {
+                            this.openGallery();
+                        }, 500);
+                    }
                 }
             }
 
@@ -1454,7 +1492,7 @@
             }
 
             // ============================================
-            // CROP MODE - FIXED
+            // CROP MODE
             // ============================================
             toggleCropMode() {
                 if (this.isCropMode) {
@@ -1606,20 +1644,17 @@
                 const dataUrl = this.pages[this.currentIndex];
                 const img = new Image();
                 img.onload = () => {
-                    // Calculate crop in image coordinates
                     const cropX = this.cropData.x * img.width;
                     const cropY = this.cropData.y * img.height;
                     const cropW = this.cropData.w * img.width;
                     const cropH = this.cropData.h * img.height;
 
-                    // Create cropped canvas
                     const canvas = document.createElement('canvas');
                     canvas.width = cropW;
                     canvas.height = cropH;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
-                    // Update page
                     this.pages[this.currentIndex] = canvas.toDataURL('image/png');
                     this.updateOptionsView();
                     this.updateEditView();
@@ -1792,23 +1827,7 @@
             }
 
             // ============================================
-            // FLASH
-            // ============================================
-            toggleFlash() {
-                if (!this.stream) return;
-                const track = this.stream.getVideoTracks()[0];
-                if (!track) return;
-                try {
-                    const settings = track.getSettings();
-                    track.applyConstraints({ advanced: [{ torch: !settings.torch }] })
-                        .then(() => this.showToast(settings.torch ? '💡 Flash off' : '💡 Flash on'));
-                } catch (err) {
-                    this.showToast('💡 Flash not supported', 'error');
-                }
-            }
-
-            // ============================================
-            // GALLERY - FIXED
+            // GALLERY - Direct from scanner
             // ============================================
             openGallery() {
                 const input = document.createElement('input');
@@ -1825,7 +1844,6 @@
                         reader.onload = (event) => {
                             const img = new Image();
                             img.onload = () => {
-                                // Scale image if too large
                                 let maxDim = 2000;
                                 let w = img.width;
                                 let h = img.height;
@@ -1842,8 +1860,13 @@
                                 ctx.drawImage(img, 0, 0, w, h);
                                 this.addPage(canvas);
                                 loaded++;
+                                
                                 if (loaded === files.length) {
                                     this.showToast(`📸 Added ${files.length} images from gallery`);
+                                    // Auto go to edit mode
+                                    setTimeout(() => {
+                                        this.goToEditMode();
+                                    }, 500);
                                 }
                             };
                             img.src = event.target.result;
@@ -1852,6 +1875,22 @@
                     });
                 };
                 input.click();
+            }
+
+            // ============================================
+            // FLASH
+            // ============================================
+            toggleFlash() {
+                if (!this.stream) return;
+                const track = this.stream.getVideoTracks()[0];
+                if (!track) return;
+                try {
+                    const settings = track.getSettings();
+                    track.applyConstraints({ advanced: [{ torch: !settings.torch }] })
+                        .then(() => this.showToast(settings.torch ? '💡 Flash off' : '💡 Flash on'));
+                } catch (err) {
+                    this.showToast('💡 Flash not supported', 'error');
+                }
             }
 
             // ============================================
@@ -1865,8 +1904,6 @@
                 if (type === 'error') toast.classList.add('error');
                 if (type === 'success') toast.classList.add('success');
                 clearTimeout(toast._timeout);
-                
-                // Auto-hide after 3 seconds
                 this.hideToastAfter(3000);
             }
 
