@@ -1,239 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simple Scanner</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: black;
-            color: white;
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-        #video {
-            width: 100%;
-            height: 70vh;
-            object-fit: cover;
-            background: #222;
-            border-radius: 20px;
-            border: 2px solid #ffd700;
-        }
-        .controls {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 60px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #ffd700;
-            color: black;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        }
-        button:active {
-            transform: scale(0.9);
-        }
-        button:disabled {
-            opacity: 0.3;
-            transform: scale(1);
-        }
-        #status {
-            margin-top: 10px;
-            color: #ffd700;
-            font-size: 14px;
-            text-align: center;
-            padding: 0 20px;
-        }
-        #result {
-            display: none;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 500px;
-        }
-        #result img {
-            width: 100%;
-            border-radius: 12px;
-            border: 2px solid #ffd700;
-        }
-        .download-btn {
-            background: #00ff41;
-            color: black;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Simple Scanner (Photo Mode)</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #status {
+      margin: 10px;
+      color: #ffd700;
+      font-size: 14px;
+    }
+    .controls {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 60px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #ffd700;
+      color: black;
+    }
+    #result {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+    #result img {
+      width: 100%;
+      border-radius: 12px;
+      border: 2px solid #ffd700;
+    }
+    .download-btn {
+      background: #00ff41;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
-    <video id="video" autoplay playsinline></video>
-    <div id="status">📷 Starting camera...</div>
+  <div id="status">📷 Ready to scan...</div>
 
-    <div class="controls">
-        <button id="captureBtn" disabled>📸 Scan</button>
-        <button id="resetBtn">🔄 Reset</button>
-    </div>
+  <div class="controls">
+    <button id="captureBtn">📸 Scan Page</button>
+    <button id="resetBtn">🔄 Reset</button>
+  </div>
 
-    <div id="result">
-        <img id="previewImage" />
-        <button class="download-btn" id="downloadBtn">💾 Download PNG</button>
-    </div>
+  <div id="result">
+    <img id="previewImage" />
+    <button class="download-btn" id="downloadBtn">💾 Download PNG</button>
+  </div>
 
-    <script>
-        // ============================================
-        // SIMPLE SCANNER - WORKS 100%
-        // ============================================
+  <script>
+    const statusDiv = document.getElementById('status');
+    const captureBtn = document.getElementById('captureBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultDiv = document.getElementById('result');
+    const previewImage = document.getElementById('previewImage');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-        const video = document.getElementById('video');
-        const statusDiv = document.getElementById('status');
-        const captureBtn = document.getElementById('captureBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const resultDiv = document.getElementById('result');
-        const previewImage = document.getElementById('previewImage');
-        const downloadBtn = document.getElementById('downloadBtn');
+    let capturedImageData = null;
 
-        let stream = null;
-        let capturedImageData = null;
+    async function capturePhoto() {
+      try {
+        statusDiv.textContent = '⏳ Opening camera...';
 
-        // ===== START CAMERA =====
-        async function startCamera() {
-            try {
-                statusDiv.textContent = '⏳ Requesting camera...';
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
 
-                const constraints = {
-                    video: {
-                        facingMode: 'environment',
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    },
-                    audio: false
-                };
+        // Create a hidden video element to grab a frame
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        await video.play();
 
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                await video.play();
+        await new Promise(resolve => video.onloadedmetadata = resolve);
 
-                statusDiv.textContent = '✅ Camera ready! Tap "Scan"';
-                captureBtn.disabled = false;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            } catch (err) {
-                console.error('Camera error:', err);
-                statusDiv.textContent = '❌ ERROR: ' + err.message + ' - Please allow camera access.';
-                statusDiv.style.color = '#ff4444';
-                
-                // Show retry button
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = '🔄 Retry Camera';
-                retryBtn.style.cssText = 'margin-top:10px;padding:10px 20px;background:#444;color:white;border:none;border-radius:30px;font-size:14px;';
-                retryBtn.onclick = () => {
-                    retryBtn.remove();
-                    startCamera();
-                };
-                document.body.appendChild(retryBtn);
-            }
-        }
+        // Stop the camera after capture
+        stream.getTracks().forEach(track => track.stop());
 
-        // ===== CAPTURE =====
-        function capture() {
-            if (!stream) return;
+        capturedImageData = canvas.toDataURL('image/png');
+        previewImage.src = capturedImageData;
+        resultDiv.style.display = 'block';
 
-            // Create a canvas to draw the video frame
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        statusDiv.textContent = '✅ Page scanned!';
+        statusDiv.style.color = '#00ff41';
+      } catch (err) {
+        console.error(err);
+        statusDiv.textContent = '❌ ERROR: ' + err.message;
+        statusDiv.style.color = '#ff4444';
+      }
+    }
 
-            // Try auto-crop if jscanify is available
-            let finalCanvas = canvas;
-            try {
-                if (typeof Jscanify !== 'undefined') {
-                    const jscanify = new Jscanify();
-                    const cropped = jscanify.extractPaper(canvas, 5);
-                    if (cropped && cropped.width > 10) {
-                        finalCanvas = cropped;
-                    }
-                }
-            } catch (e) {
-                console.log('Auto-crop not available, using full image.');
-            }
+    function downloadImage() {
+      if (!capturedImageData) return;
+      const link = document.createElement('a');
+      link.download = 'scan_' + Date.now() + '.png';
+      link.href = capturedImageData;
+      link.click();
+      statusDiv.textContent = '💾 Downloaded!';
+    }
 
-            // Store the image
-            capturedImageData = finalCanvas.toDataURL('image/png');
-            previewImage.src = capturedImageData;
-            resultDiv.style.display = 'block';
+    function resetScanner() {
+      resultDiv.style.display = 'none';
+      capturedImageData = null;
+      statusDiv.textContent = '📷 Ready to scan again.';
+      statusDiv.style.color = '#ffd700';
+    }
 
-            statusDiv.textContent = '✅ Scanned! Download your image.';
-            statusDiv.style.color = '#00ff41';
-        }
-
-        // ===== DOWNLOAD =====
-        function downloadImage() {
-            if (!capturedImageData) return;
-            const link = document.createElement('a');
-            link.download = 'scan_' + Date.now() + '.png';
-            link.href = capturedImageData;
-            link.click();
-            statusDiv.textContent = '💾 Downloaded!';
-        }
-
-        // ===== RESET =====
-        function resetScanner() {
-            resultDiv.style.display = 'none';
-            capturedImageData = null;
-            statusDiv.textContent = '📷 Ready to scan again.';
-            statusDiv.style.color = '#ffd700';
-        }
-
-        // ===== EVENT LISTENERS =====
-        captureBtn.addEventListener('click', capture);
-        downloadBtn.addEventListener('click', downloadImage);
-        resetBtn.addEventListener('click', resetScanner);
-
-        // ===== LOAD LIBRARIES =====
-        function loadScript(src) {
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                document.head.appendChild(script);
-            });
-        }
-
-        async function init() {
-            // Try to load jscanify for auto-crop
-            try {
-                await loadScript('https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js');
-                console.log('✅ jscanify loaded');
-            } catch (e) {
-                console.log('jscanify not loaded, will use full image.');
-            }
-
-            // Start the camera
-            startCamera();
-        }
-
-        // ===== START =====
-        init();
-
-        console.log('📱 Simple Scanner Loaded');
-        console.log('🔴 If camera doesn\'t work, check browser permissions.');
-    </script>
+    captureBtn.addEventListener('click', capturePhoto);
+    downloadBtn.addEventListener('click', downloadImage);
+    resetBtn.addEventListener('click', resetScanner);
+  </script>
 
 </body>
 </html>
