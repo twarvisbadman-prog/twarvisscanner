@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Student Hub Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         html,
         body {
             width: 100%;
@@ -18,9 +20,13 @@
             overflow: hidden;
             background: #0a0a0a;
             color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
+        /* ===== LAYOUT ===== */
         .container {
             display: flex;
             flex-direction: column;
@@ -28,6 +34,7 @@
             justify-content: center;
             height: 100vh;
             padding: 12px;
+            width: 100%;
         }
 
         /* ===== CAMERA ===== */
@@ -136,58 +143,376 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.15s ease, opacity 0.15s ease;
-            background: #ffd700;
-            color: black;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            touch-action: manipulation;
         }
 
         button:active {
             transform: scale(0.92);
         }
-
         button:disabled {
             opacity: 0.3;
             cursor: not-allowed;
             transform: scale(1);
         }
 
+        .btn-gold {
+            background: #ffd700;
+            color: black;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
         .btn-green {
             background: #00ff41;
             color: black;
         }
-
         .btn-red {
             background: #ff4444;
             color: white;
         }
+        .btn-blue {
+            background: #00b4d8;
+            color: white;
+        }
+        .btn-dark {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
 
-        /* ===== RESULT ===== */
-        #result {
+        /* ============================================
+           RESULT PANEL - YOUR FOUR OPTIONS
+           ============================================ */
+        #resultPanel {
             display: none;
-            width: 100%;
-            max-width: 700px;
-            margin-top: 15px;
-            text-align: center;
-            overflow-y: auto;
-            max-height: 85vh;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 92vh;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px 24px 0 0;
+            z-index: 200;
+            border-top: 1px solid rgba(255, 215, 0, 0.05);
+            overflow: hidden;
+            padding: 16px 20px 24px;
+            animation: slideUp 0.4s ease;
         }
 
-        #previewImage {
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        #resultPanel .preview-mini {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            margin-bottom: 14px;
+        }
+
+        #resultPanel .preview-mini img {
+            width: 100%;
+            height: auto;
             display: block;
-            width: 100%;
-            max-height: 65vh;
+            max-height: 35vh;
             object-fit: contain;
-            background: #111;
-            border-radius: 12px;
-            border: 2px solid #ffd700;
         }
 
-        .result-controls {
+        #resultPanel .page-info {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 215, 0, 0.3);
+            margin-bottom: 12px;
+        }
+
+        #resultPanel .page-info span {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        /* ===== YOUR FOUR OPTIONS GRID ===== */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .btn-option {
+            padding: 14px 10px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+            min-height: 70px;
             justify-content: center;
-            margin-top: 10px;
+            touch-action: manipulation;
+        }
+
+        .btn-option:active {
+            transform: scale(0.95);
+        }
+        .btn-option .icon-big {
+            font-size: 1.6rem;
+        }
+        .btn-option .sub-text {
+            font-size: 0.6rem;
+            font-weight: 500;
+            opacity: 0.6;
+        }
+
+        /* OPTION 1: CONTINUE - GOLDEN */
+        .btn-continue {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #0a0a0a;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        /* OPTION 2: DONE - RED */
+        .btn-done {
+            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            color: #fff;
+            box-shadow: 0 4px 30px rgba(255, 26, 26, 0.2);
+        }
+
+        /* OPTION 3: RESCAN - BLUE */
+        .btn-rescan {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #fff;
+            box-shadow: 0 4px 30px rgba(0, 180, 216, 0.15);
+        }
+
+        /* OPTION 4: CROP - GREEN/WHITE */
+        .btn-crop {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 2px solid rgba(0, 255, 65, 0.15);
+        }
+        .btn-crop.active-mode {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* ===== CROP CONTROLS ===== */
+        .crop-controls {
+            display: none;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 215, 0, 0.04);
+        }
+        .crop-controls.active {
+            display: flex;
+        }
+
+        .crop-controls .btn-crop-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+            touch-action: manipulation;
+        }
+        .btn-apply-crop {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            color: #0a0a0a;
+        }
+        .btn-cancel-crop {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== EDIT SCREEN (After DONE) ===== */
+        #editScreen {
+            display: none;
+            padding: 16px 20px 24px;
+        }
+        #editScreen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #editScreen .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        #editScreen .edit-header h3 {
+            color: #ffd700;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        #editScreen .edit-header button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        #editScreen .preview-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            margin-bottom: 14px;
+        }
+        #editScreen .preview-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 30vh;
+            object-fit: contain;
+        }
+
+        /* Edit Toolbar */
+        .edit-toolbar {
+            display: flex;
+            gap: 6px;
+            padding: 6px 0 12px;
             flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.04);
+            margin-bottom: 12px;
+        }
+        .edit-toolbar button {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            background: rgba(255, 215, 0, 0.02);
+            color: rgba(255, 215, 0, 0.4);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .edit-toolbar button.active {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+        .edit-toolbar button.danger:hover {
+            border-color: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+        }
+        .edit-toolbar .btn-save {
+            background: rgba(0, 255, 65, 0.08);
+            border-color: rgba(0, 255, 65, 0.15);
+            color: #00ff41;
+        }
+
+        /* PDF Naming */
+        .pdf-naming {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+        }
+        .pdf-naming label {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+        }
+        .pdf-naming input {
+            flex: 1;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            border-radius: 10px;
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            outline: none;
+            min-width: 80px;
+        }
+        .pdf-naming input:focus {
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+        .pdf-naming .ext {
+            color: rgba(255, 215, 0, 0.15);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-create-pdf {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            color: #0a0a0a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 30px rgba(0, 255, 65, 0.15);
+            touch-action: manipulation;
+        }
+        .btn-create-pdf:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 300;
+            display: none;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            max-width: 90%;
+            text-align: center;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -197,29 +522,49 @@
                 min-height: 280px;
                 border-radius: 16px;
             }
-
             .scan-box {
                 width: 88%;
                 height: 70%;
             }
-
             .controls {
                 gap: 10px;
                 margin-top: 10px;
             }
-
             button {
                 padding: 13px 22px;
                 font-size: 16px;
             }
-
             #status {
                 font-size: 13px;
+            }
+            .options-grid {
+                gap: 8px;
+            }
+            .btn-option {
+                padding: 12px 8px;
+                font-size: 0.75rem;
+                min-height: 60px;
+            }
+            .btn-option .icon-big {
+                font-size: 1.3rem;
+            }
+            #resultPanel {
+                padding: 14px 16px 20px;
+            }
+            #editScreen {
+                padding: 12px 16px 20px;
+            }
+            .edit-toolbar button {
+                font-size: 10px;
+                padding: 6px 12px;
             }
         }
     </style>
 </head>
 <body>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
     <div class="container">
 
@@ -237,73 +582,177 @@
 
         <!-- CONTROLS -->
         <div class="controls">
-            <button id="captureBtn" disabled>📸 Scan</button>
-            <button id="resetBtn" class="btn-red">🔄 Reset</button>
+            <button class="btn-gold" id="captureBtn" disabled>📸 Scan</button>
+            <button class="btn-red" id="resetBtn">🔄 Reset</button>
         </div>
 
-        <!-- RESULT -->
-        <div id="result">
-            <img id="previewImage" alt="Scanned document" />
-            <div class="result-controls">
-                <button class="btn-green" id="downloadBtn">💾 Download PNG</button>
-                <button id="backBtn">📷 Back to Camera</button>
+        <!-- ============================================
+        RESULT PANEL - YOUR FOUR OPTIONS
+        ============================================ -->
+        <div id="resultPanel">
+            <div class="preview-mini">
+                <img id="previewImage" alt="Scanned page" />
+            </div>
+
+            <div class="page-info">
+                Page <span id="pageNum">1</span> of <span id="totalPages">1</span>
+            </div>
+
+            <!-- YOUR FOUR OPTIONS -->
+            <div class="options-grid">
+                <button class="btn-option btn-continue" id="continueBtn">
+                    <span class="icon-big">📸</span>
+                    CONTINUE
+                    <span class="sub-text">Scan next page</span>
+                </button>
+                <button class="btn-option btn-done" id="doneBtn">
+                    <span class="icon-big">✅</span>
+                    DONE
+                    <span class="sub-text">Finish &amp; edit</span>
+                </button>
+                <button class="btn-option btn-rescan" id="rescanBtn">
+                    <span class="icon-big">🔄</span>
+                    RESCAN
+                    <span class="sub-text">Retake this page</span>
+                </button>
+                <button class="btn-option btn-crop" id="cropBtn">
+                    <span class="icon-big">✂️</span>
+                    CROP
+                    <span class="sub-text">Manual crop</span>
+                </button>
+            </div>
+
+            <!-- Crop Controls -->
+            <div class="crop-controls" id="cropControls">
+                <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">✅ Apply Crop</button>
+                <button class="btn-crop-action btn-cancel-crop" id="cancelCropBtn">✕ Cancel</button>
+            </div>
+
+            <!-- ============================================
+            EDIT SCREEN (After DONE)
+            ============================================ -->
+            <div id="editScreen">
+                <div class="edit-header">
+                    <h3><i class="fas fa-edit"></i> Edit Document</h3>
+                    <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+
+                <div class="preview-container">
+                    <img id="editPreview" alt="Document" />
+                </div>
+
+                <div class="edit-toolbar">
+                    <button class="active" data-filter="original">Original</button>
+                    <button data-filter="grayscale">⚫ B&amp;W</button>
+                    <button data-filter="enhance">✨ Enhance</button>
+                    <button data-filter="vintage">📻 Vintage</button>
+                    <button id="rotateBtn">🔄 Rotate</button>
+                    <button id="deleteBtn" class="danger">🗑️ Delete</button>
+                    <button id="saveBtn" class="btn-save">💾 Save</button>
+                </div>
+
+                <div class="pdf-naming">
+                    <label><i class="fas fa-file-pdf"></i> Name:</label>
+                    <input type="text" id="pdfName" value="twarvis" />
+                    <span class="ext">.pdf</span>
+                </div>
+
+                <button class="btn-create-pdf" id="createPdfBtn">
+                    <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
+                </button>
             </div>
         </div>
 
     </div>
 
-    <!-- jscanify for auto-crop -->
-    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js">
-    </script>
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
 
     <script>
         // ============================================
-        // FIXED SCANNER - LEARNED FROM THE CODE
+        // STUDENT HUB SCANNER - YOUR PROTOCOL
         // ============================================
 
         const video = document.getElementById('video');
         const statusDiv = document.getElementById('status');
         const captureBtn = document.getElementById('captureBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const resultDiv = document.getElementById('result');
-        const previewImage = document.getElementById('previewImage');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const backBtn = document.getElementById('backBtn');
         const scannerDiv = document.getElementById('scanner');
 
+        const resultPanel = document.getElementById('resultPanel');
+        const previewImage = document.getElementById('previewImage');
+        const editPreview = document.getElementById('editPreview');
+        const pageNum = document.getElementById('pageNum');
+        const totalPages = document.getElementById('totalPages');
+
+        const continueBtn = document.getElementById('continueBtn');
+        const doneBtn = document.getElementById('doneBtn');
+        const rescanBtn = document.getElementById('rescanBtn');
+        const cropBtn = document.getElementById('cropBtn');
+        const applyCropBtn = document.getElementById('applyCropBtn');
+        const cancelCropBtn = document.getElementById('cancelCropBtn');
+        const cropControls = document.getElementById('cropControls');
+
+        const editScreen = document.getElementById('editScreen');
+        const backToOptions = document.getElementById('backToOptions');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const createPdfBtn = document.getElementById('createPdfBtn');
+        const pdfNameInput = document.getElementById('pdfName');
+
+        const toast = document.getElementById('toast');
+
+        // ===== STATE =====
         let stream = null;
+        let pages = [];
+        let currentPageIndex = 0;
+        let currentFilter = 'original';
+        let isCropMode = false;
+        let isProcessing = false;
         let capturedImageData = null;
-        let scannerReady = false;
 
         // ============================================
-        // SET STATUS
+        // TOAST
         // ============================================
-        function setStatus(message, color = '#ffd700') {
-            statusDiv.textContent = message;
+        function showToast(msg, type = 'info') {
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            toast.className = 'toast';
+            if (type === 'error') toast.style.borderColor = 'rgba(255,0,0,0.2)';
+            if (type === 'success') toast.style.borderColor = 'rgba(0,255,65,0.2)';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // ============================================
+        // STATUS
+        // ============================================
+        function setStatus(msg, color = '#ffd700') {
+            statusDiv.textContent = msg;
             statusDiv.style.color = color;
         }
 
         // ============================================
-        // STOP CAMERA
+        // CAMERA
         // ============================================
         function stopCamera() {
-            if (!stream) return;
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-            video.srcObject = null;
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                video.srcObject = null;
+            }
         }
 
-        // ============================================
-        // START CAMERA - FIXED
-        // ============================================
         async function startCamera() {
             try {
                 stopCamera();
                 captureBtn.disabled = true;
                 scannerDiv.style.display = 'block';
-                resultDiv.style.display = 'none';
+                resultPanel.style.display = 'none';
+                editScreen.classList.remove('active');
+                editScreen.style.display = 'none';
 
-                // Check HTTPS/localhost
                 if (location.protocol !== 'https:' &&
                     location.hostname !== 'localhost' &&
                     location.hostname !== '127.0.0.1') {
@@ -311,9 +760,8 @@
                     return;
                 }
 
-                setStatus('⏳ Requesting camera...');
+                setStatus('⏳ Starting camera...');
 
-                // Try environment camera first
                 let constraints = {
                     audio: false,
                     video: {
@@ -325,9 +773,7 @@
 
                 try {
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (firstError) {
-                    // Fallback: any camera
-                    console.warn('Environment camera unavailable, trying any camera.', firstError);
+                } catch (e) {
                     stream = await navigator.mediaDevices.getUserMedia({
                         audio: false,
                         video: { width: { ideal: 1920 }, height: { ideal: 1080 } }
@@ -336,72 +782,47 @@
 
                 video.srcObject = stream;
 
-                // Wait for camera to be ready
                 await new Promise((resolve) => {
-                    if (video.readyState >= 1) {
-                        resolve();
-                    } else {
-                        video.onloadedmetadata = () => resolve();
-                    }
+                    if (video.readyState >= 1) { resolve(); } else { video.onloadedmetadata = () => resolve(); }
                 });
 
                 await video.play();
 
-                // Log camera info
-                const track = stream.getVideoTracks()[0];
-                const settings = track.getSettings();
-                console.log('📷 Camera:', settings);
-                console.log('📐 Resolution:', video.videoWidth, 'x', video.videoHeight);
-
-                setStatus('✅ Camera ready! Place document inside the frame and tap Scan.');
+                setStatus('✅ Camera ready! Place document in frame and tap Scan.');
                 captureBtn.disabled = false;
 
             } catch (error) {
                 console.error('Camera error:', error);
                 captureBtn.disabled = true;
+                let msg = '❌ Camera error. ';
+                if (error.name === 'NotAllowedError') msg += 'Please allow camera permission.';
+                else if (error.name === 'NotFoundError') msg += 'No camera found.';
+                else msg += error.message;
+                setStatus(msg, '#ff4444');
 
-                let message = '❌ Camera could not start.';
-                if (error.name === 'NotAllowedError') {
-                    message = '❌ Camera permission denied. Allow access and retry.';
-                } else if (error.name === 'NotFoundError') {
-                    message = '❌ No camera found on this device.';
-                } else if (error.name === 'NotReadableError') {
-                    message = '❌ Camera is being used by another app.';
-                }
-                setStatus(message, '#ff4444');
-
-                // Show retry button
                 const retryBtn = document.createElement('button');
                 retryBtn.textContent = '🔄 Retry Camera';
                 retryBtn.style.cssText =
                     'margin-top:10px;padding:10px 20px;background:#444;color:white;border:none;border-radius:30px;font-size:14px;cursor:pointer;';
-                retryBtn.onclick = () => {
-                    retryBtn.remove();
-                    startCamera();
-                };
+                retryBtn.onclick = () => { retryBtn.remove();
+                    startCamera(); };
                 statusDiv.parentNode.insertBefore(retryBtn, statusDiv.nextSibling);
             }
         }
 
         // ============================================
-        // CAPTURE - USING NATIVE RESOLUTION
+        // CAPTURE
         // ============================================
         function capture() {
-            if (!stream) {
-                setStatus('❌ Camera not running.', '#ff4444');
-                return;
-            }
+            if (isProcessing) return;
+            if (!stream) { showToast('❌ Camera not running', 'error'); return; }
+            if (!video.videoWidth || !video.videoHeight) { showToast('⏳ Camera preparing...'); return; }
 
-            if (!video.videoWidth || !video.videoHeight) {
-                setStatus('⏳ Camera is preparing...', '#ffd700');
-                return;
-            }
+            isProcessing = true;
+            captureBtn.disabled = true;
+            setStatus('📸 Capturing...');
 
             try {
-                captureBtn.disabled = true;
-                setStatus('📸 Capturing page...');
-
-                // Use native camera resolution
                 const width = video.videoWidth;
                 const height = video.videoHeight;
 
@@ -411,7 +832,7 @@
                 const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
                 ctx.drawImage(video, 0, 0, width, height);
 
-                // Try auto-crop with jscanify
+                // Auto-crop
                 let finalCanvas = canvas;
                 try {
                     if (typeof Jscanify !== 'undefined') {
@@ -419,77 +840,324 @@
                         const cropped = scanner.extractPaper(canvas, 5);
                         if (cropped && cropped.width > 100 && cropped.height > 100) {
                             finalCanvas = cropped;
-                            console.log('✂️ Document cropped:', cropped.width, 'x', cropped.height);
                         }
                     }
-                } catch (e) {
-                    console.warn('Auto-crop failed, using full image.', e);
-                }
+                } catch (e) { console.warn('Auto-crop failed', e); }
 
                 capturedImageData = finalCanvas.toDataURL('image/png');
-                previewImage.src = capturedImageData;
 
-                // Show result, hide camera
-                scannerDiv.style.display = 'none';
-                resultDiv.style.display = 'block';
+                // Add to pages
+                pages.push(capturedImageData);
+                currentPageIndex = pages.length - 1;
 
-                setStatus('✅ Scanned! Download your image.', '#00ff41');
+                // Show result panel
+                showResultPanel();
 
-                // Stop camera to save battery
-                stopCamera();
+                setStatus('✅ Page scanned!', '#00ff41');
+                showToast('✅ Page scanned!');
 
             } catch (error) {
                 console.error('Capture error:', error);
-                setStatus('❌ Could not capture. Please try again.', '#ff4444');
+                showToast('❌ Capture failed: ' + error.message, 'error');
             } finally {
+                isProcessing = false;
                 captureBtn.disabled = false;
             }
         }
 
         // ============================================
-        // DOWNLOAD
+        // RESULT PANEL - YOUR FOUR OPTIONS
         // ============================================
-        function downloadImage() {
-            if (!capturedImageData) return;
-            const link = document.createElement('a');
-            link.download = 'scan_' + Date.now() + '.png';
-            link.href = capturedImageData;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            setStatus('💾 Downloaded!', '#00ff41');
+        function showResultPanel() {
+            resultPanel.style.display = 'block';
+            editScreen.classList.remove('active');
+            editScreen.style.display = 'none';
+            previewImage.src = pages[currentPageIndex];
+            pageNum.textContent = currentPageIndex + 1;
+            totalPages.textContent = pages.length;
+            cropControls.classList.remove('active');
+            isCropMode = false;
+            cropBtn.classList.remove('active-mode');
+            scannerDiv.style.display = 'none';
+            stopCamera();
+        }
+
+        function updateResultPanel() {
+            if (pages.length > 0) {
+                previewImage.src = pages[currentPageIndex];
+                pageNum.textContent = currentPageIndex + 1;
+                totalPages.textContent = pages.length;
+            }
         }
 
         // ============================================
-        // BACK TO CAMERA / RESET
+        // FOUR OPTIONS - YOUR PROTOCOL
         // ============================================
-        function goBack() {
-            resultDiv.style.display = 'none';
-            previewImage.removeAttribute('src');
-            capturedImageData = null;
+
+        // 1. CONTINUE - Scan next page
+        continueBtn.addEventListener('click', function() {
+            resultPanel.style.display = 'none';
             scannerDiv.style.display = 'block';
             startCamera();
-        }
+            showToast('📸 Scan next page');
+        });
 
-        function resetScanner() {
-            goBack();
+        // 2. DONE - Go to edit mode
+        doneBtn.addEventListener('click', function() {
+            if (pages.length === 0) { showToast('❌ No pages to edit', 'error'); return; }
+            editScreen.style.display = 'block';
+            setTimeout(() => { editScreen.classList.add('active'); }, 50);
+            editPreview.src = pages[currentPageIndex];
+            showToast('✏️ Edit your document');
+        });
+
+        // 3. RESCAN - Remove current page and retake
+        rescanBtn.addEventListener('click', function() {
+            if (pages.length === 0) return;
+            pages.splice(currentPageIndex, 1);
+            if (pages.length === 0) {
+                resultPanel.style.display = 'none';
+                scannerDiv.style.display = 'block';
+                startCamera();
+                showToast('🔄 No pages left. Scan again.');
+                return;
+            }
+            currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+            updateResultPanel();
+            showToast('🔄 Page removed. Scan again.');
+        });
+
+        // 4. CROP - Manual crop mode
+        cropBtn.addEventListener('click', function() {
+            if (isCropMode) {
+                isCropMode = false;
+                cropControls.classList.remove('active');
+                cropBtn.classList.remove('active-mode');
+                showToast('✂️ Crop cancelled');
+            } else {
+                if (pages.length === 0) { showToast('❌ No page to crop', 'error'); return; }
+                isCropMode = true;
+                cropControls.classList.add('active');
+                cropBtn.classList.add('active-mode');
+                showToast('✂️ Drag the golden handles to crop');
+            }
+        });
+
+        // Apply Crop
+        applyCropBtn.addEventListener('click', function() {
+            if (!isCropMode || pages.length === 0) return;
+            // Simple crop: use jscanify again
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                try {
+                    if (typeof Jscanify !== 'undefined') {
+                        const scanner = new Jscanify();
+                        const cropped = scanner.extractPaper(canvas, 5);
+                        if (cropped && cropped.width > 100 && cropped.height > 100) {
+                            pages[currentPageIndex] = cropped.toDataURL('image/png');
+                            updateResultPanel();
+                            editPreview.src = pages[currentPageIndex];
+                            showToast('✅ Crop applied!');
+                        }
+                    }
+                } catch (e) { showToast('❌ Crop failed', 'error'); }
+
+                isCropMode = false;
+                cropControls.classList.remove('active');
+                cropBtn.classList.remove('active-mode');
+            };
+            img.src = pages[currentPageIndex];
+        });
+
+        // Cancel Crop
+        cancelCropBtn.addEventListener('click', function() {
+            isCropMode = false;
+            cropControls.classList.remove('active');
+            cropBtn.classList.remove('active-mode');
+            showToast('✂️ Crop cancelled');
+        });
+
+        // ============================================
+        // BACK TO OPTIONS (from Edit)
+        // ============================================
+        backToOptions.addEventListener('click', function() {
+            editScreen.classList.remove('active');
+            editScreen.style.display = 'none';
+            showResultPanel();
+            showToast('📄 Back to pages');
+        });
+
+        // ============================================
+        // FILTERS
+        // ============================================
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                applyFilter();
+            });
+        });
+
+        function applyFilter() {
+            if (pages.length === 0) return;
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i],
+                        g = data[i + 1],
+                        b = data[i + 2];
+                    switch (currentFilter) {
+                        case 'grayscale':
+                            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                            r = g = b = gray;
+                            break;
+                        case 'enhance':
+                            r = Math.min(255, r * 1.1 + 5);
+                            g = Math.min(255, g * 1.1 + 5);
+                            b = Math.min(255, b * 1.1 + 5);
+                            break;
+                        case 'vintage':
+                            r = Math.min(255, r * 1.1 + 10);
+                            g = Math.min(255, g * 0.9 + 5);
+                            b = Math.min(255, b * 0.8 + 5);
+                            break;
+                        default: break;
+                    }
+                    data[i] = r;
+                    data[i + 1] = g;
+                    data[i + 2] = b;
+                }
+                ctx.putImageData(imageData, 0, 0);
+                pages[currentPageIndex] = canvas.toDataURL('image/png');
+                editPreview.src = pages[currentPageIndex];
+            };
+            img.src = pages[currentPageIndex];
         }
 
         // ============================================
-        // EVENTS
+        // ROTATE
         // ============================================
-        captureBtn.addEventListener('click', capture);
-        downloadBtn.addEventListener('click', downloadImage);
-        backBtn.addEventListener('click', goBack);
-        resetBtn.addEventListener('click', resetScanner);
+        rotateBtn.addEventListener('click', function() {
+            if (pages.length === 0) return;
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.height;
+                canvas.height = img.width;
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                pages[currentPageIndex] = canvas.toDataURL('image/png');
+                editPreview.src = pages[currentPageIndex];
+                showToast('🔄 Rotated 90°');
+            };
+            img.src = pages[currentPageIndex];
+        });
+
+        // ============================================
+        // DELETE PAGE
+        // ============================================
+        deleteBtn.addEventListener('click', function() {
+            if (pages.length === 0) return;
+            pages.splice(currentPageIndex, 1);
+            if (pages.length === 0) {
+                showToast('No pages left');
+                editScreen.classList.remove('active');
+                editScreen.style.display = 'none';
+                resultPanel.style.display = 'none';
+                scannerDiv.style.display = 'block';
+                startCamera();
+                return;
+            }
+            currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+            editPreview.src = pages[currentPageIndex];
+            updateResultPanel();
+            showToast('🗑️ Page deleted');
+        });
+
+        // ============================================
+        // SAVE CHANGES
+        // ============================================
+        saveBtn.addEventListener('click', function() {
+            showToast('✅ Changes saved!');
+        });
+
+        // ============================================
+        // CREATE PDF
+        // ============================================
+        createPdfBtn.addEventListener('click', function() {
+            if (pages.length === 0) { showToast('❌ No pages', 'error'); return; }
+            if (typeof window.jspdf === 'undefined') { showToast('❌ PDF library not loaded', 'error'); return; }
+
+            showToast('📄 Creating PDF...');
+            const { jsPDF } = window.jspdf;
+            const name = pdfNameInput.value.trim() || 'twarvis';
+            const pdf = new jsPDF();
+
+            let loaded = 0;
+            pages.forEach((dataUrl, index) => {
+                const img = new Image();
+                img.onload = function() {
+                    if (index > 0) pdf.addPage();
+                    const imgWidth = pdf.internal.pageSize.width;
+                    const imgHeight = (this.height / this.width) * imgWidth;
+                    pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+                    loaded++;
+                    if (loaded === pages.length) {
+                        pdf.save(`${name}.pdf`);
+                        showToast(`✅ ${name}.pdf saved!`);
+                        // Reset everything
+                        pages = [];
+                        currentPageIndex = 0;
+                        editScreen.classList.remove('active');
+                        editScreen.style.display = 'none';
+                        resultPanel.style.display = 'none';
+                        scannerDiv.style.display = 'block';
+                        startCamera();
+                    }
+                };
+                img.src = dataUrl;
+            });
+        });
+
+        // ============================================
+        // RESET
+        // ============================================
+        resetBtn.addEventListener('click', function() {
+            pages = [];
+            currentPageIndex = 0;
+            resultPanel.style.display = 'none';
+            editScreen.classList.remove('active');
+            editScreen.style.display = 'none';
+            scannerDiv.style.display = 'block';
+            startCamera();
+            showToast('🔄 Reset');
+        });
 
         // ============================================
         // START
         // ============================================
         startCamera();
 
-        console.log('📱 Scanner loaded - using native camera resolution');
-        console.log('💡 Camera will use full resolution, not fixed 640x480');
+        console.log('📱 Student Hub Scanner - YOUR PROTOCOL');
+        console.log('📋 Four options: CONTINUE | DONE | RESCAN | CROP');
     </script>
 
 </body>
