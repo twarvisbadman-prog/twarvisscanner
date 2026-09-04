@@ -3,132 +3,1232 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>📸 CuteScan - Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Student Hub - Scanner</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* ============================================
+           SCANNER PAGE - Premium Dark Theme
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        #rain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+        }
+
+        .glass-overlay {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .logo i { color: #ff1a1a; }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .page-counter {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        /* ===== SCANNER AREA ===== */
+        .scanner-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-wrapper {
+            flex: 1;
+            position: relative;
+            background: #000;
+            min-height: 0;
+        }
+
+        .camera-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Scanner Frame Overlay */
+        .scan-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .frame-corners {
+            position: relative;
+            width: 75%;
+            max-width: 500px;
+            aspect-ratio: 3/4;
+        }
+
+        .corner {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: rgba(255,255,255,0.6);
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .corner.tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
+        .corner.tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
+        .corner.bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 4px; }
+        .corner.br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
+
+        .frame-label {
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* Loading Overlay */
+        .scan-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .scan-loading .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255,255,255,0.05);
+            border-top-color: #ff1a1a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .scan-loading p {
+            margin-top: 16px;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.9rem;
+        }
+
+        /* ===== BOTTOM CONTROLS ===== */
+        .scanner-controls {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 20px 24px;
+            flex-shrink: 0;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .ctrl-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .ctrl-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Capture Button */
+        .capture-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .capture-btn:active { transform: scale(0.9); }
+        .capture-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .capture-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .capture-dot {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            transition: 0.3s;
+            box-shadow: 0 4px 24px rgba(255, 26, 26, 0.3);
+        }
+
+        .capture-btn:hover .capture-ring {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        /* ============================================
+           RESULT PANEL
+           ============================================ */
+        .result-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 92vh;
+            background: rgba(15, 15, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px 24px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .result-panel.open { transform: translateY(0); }
+
+        .result-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 12px auto 0;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .result-header .page-info {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .result-header .page-info span { color: #fff; }
+
+        .result-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .result-actions button {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .result-actions button:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .result-body {
+            padding: 16px 24px 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .result-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .result-body::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .preview-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .preview-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            gap: 6px;
+            padding: 12px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 12px;
+        }
+
+        .toolbar button {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .toolbar button:hover {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+        }
+
+        .toolbar button.active {
+            background: rgba(255, 26, 26, 0.15);
+            border-color: rgba(255, 26, 26, 0.3);
+            color: #ff4d4d;
+        }
+
+        .toolbar button.danger:hover {
+            border-color: rgba(255,0,0,0.3);
+            color: #ff4d4d;
+        }
+
+        /* ===== EDIT SLIDERS ===== */
+        .edit-controls {
+            display: none;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 12px;
+        }
+
+        .edit-controls.show { display: block; }
+
+        .slider-group {
+            margin-bottom: 10px;
+        }
+
+        .slider-group label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255,255,255,0.06);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ff1a1a;
+            cursor: pointer;
+        }
+
+        /* ===== PDF ACTIONS ===== */
+        .pdf-actions {
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .name-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .name-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            white-space: nowrap;
+        }
+
+        .name-group input {
+            flex: 1;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: 0.3s;
+            outline: none;
+            min-width: 0;
+        }
+
+        .name-group input:focus {
+            border-color: rgba(255, 26, 26, 0.3);
+        }
+
+        .name-group .ext {
+            color: rgba(255,255,255,0.2);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-continue {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .btn-continue:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .btn-done {
+            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255, 26, 26, 0.2);
+        }
+
+        .btn-done:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(255, 26, 26, 0.3);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 300;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.06);
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.error { border-color: rgba(255,0,0,0.2); }
+        .toast.success { border-color: rgba(0,255,65,0.2); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .header-content {
+                padding: 0 12px;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .logo { font-size: 1rem; }
+            .nav-links a { font-size: 0.75rem; padding: 4px 8px; }
+            .page-counter { font-size: 0.7rem; padding: 2px 10px; }
+            
+            .capture-ring { width: 60px; height: 60px; }
+            .capture-dot { width: 46px; height: 46px; }
+            
+            .frame-corners { width: 85%; }
+            .corner { width: 20px; height: 20px; }
+            
+            .result-body { padding: 12px 16px 16px; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .name-group { flex-wrap: wrap; }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .header { padding: 4px 0; }
+            .scanner-controls { padding: 8px 16px 12px; }
+            .capture-ring { width: 48px; height: 48px; }
+            .capture-dot { width: 36px; height: 36px; }
+            .frame-corners { width: 60%; }
+        }
+    </style>
 </head>
 <body>
-    <!-- ============================================
-    SCANNER PAGE
-    ============================================ -->
-    <div class="scanner-page">
-        <!-- Top Bar -->
-        <div class="top-bar-cute">
-            <a href="index.html" class="back-btn">←</a>
-            <span class="page-title">📸 Scan Document</span>
-            <span id="pageCounter" class="page-counter">0 pages</span>
-        </div>
-
-        <!-- Status -->
-        <div id="statusToast" class="status-toast" style="display:none;"></div>
-
-        <!-- Camera View -->
-        <div class="camera-wrapper">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas" style="display:none;"></canvas>
-            
-            <!-- Scanner Frame Overlay -->
-            <div class="scan-frame" id="scanFrame">
-                <div class="frame-corners">
-                    <span class="corner tl"></span>
-                    <span class="corner tr"></span>
-                    <span class="corner bl"></span>
-                    <span class="corner br"></span>
+    <canvas id="rain-canvas"></canvas>
+    <div class="glass-overlay">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    STUDENT HUB
                 </div>
-                <div class="frame-label">📄 Place document here</div>
-            </div>
-
-            <!-- Loading -->
-            <div class="scan-loading" id="scanLoading" style="display:none;">
-                <div class="loading-heart">💖</div>
-                <p>Processing...</p>
+                <div class="nav-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <a href="scanner.html" class="active"><i class="fas fa-camera"></i> Scanner</a>
+                    <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+                </div>
+                <span class="page-counter" id="pageCounter"><i class="fas fa-file"></i> 0 pages</span>
             </div>
         </div>
 
-        <!-- Bottom Controls -->
-        <div class="scanner-controls">
-            <div class="controls-top">
-                <button id="flashBtn" class="ctrl-btn" disabled>💡</button>
-                <button id="captureBtn" class="capture-btn-cute" disabled>
-                    <div class="capture-ring">
-                        <div class="capture-dot"></div>
-                    </div>
-                </button>
-                <button id="galleryBtn" class="ctrl-btn">🖼️</button>
-            </div>
+        <!-- ===== TOAST ===== -->
+        <div class="toast" id="toast"></div>
 
-            <div class="controls-bottom" id="editTools" style="display:none;">
-                <div class="filter-row">
-                    <button class="filter-btn active" data-filter="original">Original</button>
-                    <button class="filter-btn" data-filter="grayscale">⚫</button>
-                    <button class="filter-btn" data-filter="enhance">✨</button>
-                    <button class="filter-btn" data-filter="bright">☀️</button>
-                    <button class="filter-btn" data-filter="contrast">🎯</button>
-                    <button class="filter-btn" data-filter="vintage">📻</button>
+        <!-- ===== SCANNER ===== -->
+        <div class="scanner-area">
+            <div class="camera-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+
+                <!-- Scanner Frame -->
+                <div class="scan-frame" id="scanFrame">
+                    <div class="frame-corners">
+                        <span class="corner tl"></span>
+                        <span class="corner tr"></span>
+                        <span class="corner bl"></span>
+                        <span class="corner br"></span>
+                    </div>
+                    <span class="frame-label">📄 POSITION DOCUMENT HERE</span>
                 </div>
 
-                <div class="slider-row">
-                    <div class="slider-group">
-                        <label>☀️ Brightness</label>
-                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
-                    </div>
-                    <div class="slider-group">
-                        <label>🎯 Contrast</label>
-                        <input type="range" id="contrastSlider" min="0" max="200" value="100" />
-                    </div>
+                <!-- Loading -->
+                <div class="scan-loading" id="scanLoading">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+            </div>
+
+            <!-- ===== CONTROLS ===== -->
+            <div class="scanner-controls">
+                <div class="controls-row">
+                    <button class="ctrl-btn" id="flashBtn" disabled>
+                        <i class="fas fa-bolt"></i>
+                    </button>
+                    <button class="capture-btn" id="captureBtn" disabled>
+                        <div class="capture-ring">
+                            <div class="capture-dot"></div>
+                        </div>
+                    </button>
+                    <button class="ctrl-btn" id="galleryBtn">
+                        <i class="fas fa-images"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- ============================================
-        RESULT PANEL (Slides up)
+        RESULT PANEL
         ============================================ -->
-        <div class="result-panel-cute" id="resultPanel">
+        <div class="result-panel" id="resultPanel">
             <div class="result-handle"></div>
-            
-            <div class="result-header-cute">
-                <span>📄 Page <span id="currentPageNum">1</span></span>
-                <div class="result-actions-cute">
-                    <button id="prevPageBtn" class="nav-btn">◀</button>
-                    <button id="nextPageBtn" class="nav-btn">▶</button>
-                    <button id="closeResultBtn" class="close-btn">✕</button>
+
+            <div class="result-header">
+                <span class="page-info">Page <span id="currentPageNum">1</span> of <span id="totalPages">1</span></span>
+                <div class="result-actions">
+                    <button id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+                    <button id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+                    <button id="closeResult"><i class="fas fa-times"></i></button>
                 </div>
             </div>
 
             <div class="result-body">
-                <img id="previewImage" class="preview-cute" alt="Scanned document" />
-                
-                <div class="result-tools-cute">
-                    <button id="editBtn" class="tool-btn-cute">✏️ Edit</button>
-                    <button id="cropBtn" class="tool-btn-cute">✂️ Crop</button>
-                    <button id="rotateBtn" class="tool-btn-cute">🔄 Rotate</button>
-                    <button id="deleteBtn" class="tool-btn-cute danger">🗑️</button>
+                <!-- Preview -->
+                <div class="preview-container">
+                    <img id="previewImage" alt="Scanned document" />
                 </div>
 
-                <div id="ocrBox" class="ocr-box" style="display:none;">
-                    <h4>📝 Extracted Text</h4>
-                    <pre id="ocrText"></pre>
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="active" data-filter="original">Original</button>
+                    <button data-filter="grayscale"><i class="fas fa-circle" style="color:#888;"></i> B&amp;W</button>
+                    <button data-filter="enhance"><i class="fas fa-magic"></i> Enhance</button>
+                    <button data-filter="bright"><i class="fas fa-sun"></i> Bright</button>
+                    <button data-filter="contrast"><i class="fas fa-adjust"></i> Contrast</button>
+                    <button data-filter="vintage"><i class="fas fa-history"></i> Vintage</button>
+                    <button id="editToggle" style="margin-left:auto;"><i class="fas fa-sliders-h"></i> Edit</button>
+                    <button id="rotateBtn" class=""><i class="fas fa-rotate-right"></i></button>
+                    <button id="deleteBtn" class="danger"><i class="fas fa-trash"></i></button>
                 </div>
 
+                <!-- Edit Controls -->
+                <div class="edit-controls" id="editControls">
+                    <div class="slider-group">
+                        <label>Brightness</label>
+                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
+                    </div>
+                    <div class="slider-group">
+                        <label>Contrast</label>
+                        <input type="range" id="contrastSlider" min="0" max="200" value="100" />
+                    </div>
+                </div>
+
+                <!-- PDF Actions -->
                 <div class="pdf-actions">
-                    <div class="name-input-group">
-                        <label>📄 PDF Name:</label>
-                        <input type="text" id="pdfNameInput" value="tarvis" />
-                        <span class="file-ext">.pdf</span>
+                    <div class="name-group">
+                        <label><i class="fas fa-file-pdf"></i> Name:</label>
+                        <input type="text" id="pdfName" value="twarvis" />
+                        <span class="ext">.pdf</span>
                     </div>
                     <div class="action-buttons">
-                        <button id="continueBtn" class="btn-cute-primary">➕ Continue Scanning</button>
-                        <button id="doneBtn" class="btn-cute-success">✅ Done - Make PDF</button>
+                        <button class="btn-action btn-continue" id="continueBtn">
+                            <i class="fas fa-plus-circle"></i> Scan Next Page
+                        </button>
+                        <button class="btn-action btn-done" id="doneBtn">
+                            <i class="fas fa-check-circle"></i> Done - Create PDF
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Libraries -->
+    <!-- ===== LIBRARIES ===== -->
     <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <script src="js/app.js"></script>
+    <!-- ===== APP ===== -->
+    <script>
+        // ============================================
+        // STUDENT HUB SCANNER - Complete App
+        // ============================================
+
+        class StudentHubScanner {
+            constructor() {
+                // DOM
+                this.video = document.getElementById('video');
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.preview = document.getElementById('previewImage');
+                this.resultPanel = document.getElementById('resultPanel');
+                this.toast = document.getElementById('toast');
+                this.scanLoading = document.getElementById('scanLoading');
+                this.pageCounter = document.getElementById('pageCounter');
+
+                // State
+                this.stream = null;
+                this.pages = [];
+                this.currentIndex = 0;
+                this.filter = 'original';
+                this.brightness = 100;
+                this.contrast = 100;
+                this.isProcessing = false;
+
+                // Bind
+                this.bindEvents();
+
+                // Auto-start
+                setTimeout(() => this.startCamera(), 500);
+
+                console.log('📸 Student Hub Scanner ready');
+            }
+
+            bindEvents() {
+                document.getElementById('captureBtn').addEventListener('click', () => this.capture());
+                document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
+                document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
+                document.getElementById('closeResult').addEventListener('click', () => this.closeResult());
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevPage());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextPage());
+                document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
+                document.getElementById('doneBtn').addEventListener('click', () => this.makePDF());
+                document.getElementById('editToggle').addEventListener('click', () => this.toggleEdit());
+                document.getElementById('rotateBtn').addEventListener('click', () => this.rotatePage());
+                document.getElementById('deleteBtn').addEventListener('click', () => this.deletePage());
+
+                // Filters
+                document.querySelectorAll('[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.filter = btn.dataset.filter;
+                        this.applyFilter();
+                    });
+                });
+
+                // Sliders
+                document.getElementById('brightnessSlider').addEventListener('input', (e) => {
+                    this.brightness = parseInt(e.target.value);
+                    this.applyFilter();
+                });
+                document.getElementById('contrastSlider').addEventListener('input', (e) => {
+                    this.contrast = parseInt(e.target.value);
+                    this.applyFilter();
+                });
+
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !this.isProcessing) this.capture();
+                    if (e.key === 'Escape') this.closeResult();
+                    if (e.key === 'ArrowLeft') this.prevPage();
+                    if (e.key === 'ArrowRight') this.nextPage();
+                });
+            }
+
+            // ===== CAMERA =====
+            async startCamera() {
+                try {
+                    this.showToast('Starting camera...');
+                    const constraints = {
+                        video: {
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    };
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    this.video.srcObject = this.stream;
+                    await this.video.play();
+                    document.getElementById('captureBtn').disabled = false;
+                    document.getElementById('flashBtn').disabled = false;
+                    this.showToast('✅ Camera ready');
+                    this.hideToastAfter(1500);
+                } catch (err) {
+                    console.error('Camera error:', err);
+                    this.showToast('❌ Camera access denied. Please allow camera permissions.', 'error');
+                    this.showUploadFallback();
+                }
+            }
+
+            showUploadFallback() {
+                const wrapper = document.querySelector('.camera-wrapper');
+                if (!wrapper) return;
+                wrapper.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;background:#0a0a0f;color:rgba(255,255,255,0.5);text-align:center;">
+                        <i class="fas fa-camera" style="font-size:48px;margin-bottom:16px;color:rgba(255,255,255,0.1);"></i>
+                        <h3 style="color:rgba(255,255,255,0.3);margin-bottom:8px;">Camera Unavailable</h3>
+                        <p style="font-size:0.9rem;margin-bottom:20px;">Upload an image from your device instead</p>
+                        <input type="file" id="uploadFallback" accept="image/*" style="display:none;" />
+                        <button onclick="document.getElementById('uploadFallback').click()" style="padding:12px 32px;border-radius:60px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;font-weight:600;">
+                            <i class="fas fa-upload"></i> Choose Image
+                        </button>
+                    </div>
+                `;
+                document.getElementById('uploadFallback').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            this.canvas.width = img.width;
+                            this.canvas.height = img.height;
+                            this.ctx.drawImage(img, 0, 0);
+                            this.addPage(this.canvas);
+                            this.showToast('✅ Image loaded');
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // ===== CAPTURE =====
+            capture() {
+                if (this.isProcessing) return;
+                this.isProcessing = true;
+                this.scanLoading.style.display = 'flex';
+
+                try {
+                    const w = this.video.videoWidth || 1280;
+                    const h = this.video.videoHeight || 720;
+
+                    this.canvas.width = w;
+                    this.canvas.height = h;
+                    this.ctx.drawImage(this.video, 0, 0, w, h);
+
+                    // Auto-crop
+                    let cropped = null;
+                    try {
+                        if (typeof Jscanify !== 'undefined') {
+                            const jscanify = new Jscanify();
+                            cropped = jscanify.extractPaper(this.canvas, 5);
+                        }
+                    } catch (err) {
+                        console.warn('Auto-crop failed:', err);
+                    }
+
+                    if (!cropped || cropped.width === 0) {
+                        const size = Math.min(w, h) * 0.78;
+                        const x = (w - size) / 2;
+                        const y = (h - size * 1.3) / 2;
+                        const temp = document.createElement('canvas');
+                        temp.width = size;
+                        temp.height = size * 1.3;
+                        const tCtx = temp.getContext('2d');
+                        tCtx.drawImage(this.canvas, x, y, size, size * 1.3, 0, 0, size, size * 1.3);
+                        cropped = temp;
+                    }
+
+                    // Apply filter
+                    cropped = this.applyFilterToCanvas(cropped);
+                    this.addPage(cropped);
+
+                    this.scanLoading.style.display = 'none';
+                    this.isProcessing = false;
+                    this.showToast('✅ Page scanned!');
+
+                } catch (err) {
+                    console.error('Capture error:', err);
+                    this.scanLoading.style.display = 'none';
+                    this.isProcessing = false;
+                    this.showToast('❌ Scan failed', 'error');
+                }
+            }
+
+            // ===== PAGE MANAGEMENT =====
+            addPage(canvas) {
+                this.pages.push(canvas.toDataURL('image/png'));
+                this.currentIndex = this.pages.length - 1;
+                this.updateUI();
+                this.showResult();
+                this.updateCounter();
+                document.getElementById('scanFrame').style.display = 'none';
+            }
+
+            updateUI() {
+                if (this.pages.length > 0) {
+                    this.preview.src = this.pages[this.currentIndex];
+                    document.getElementById('currentPageNum').textContent = this.currentIndex + 1;
+                    document.getElementById('totalPages').textContent = this.pages.length;
+                }
+            }
+
+            updateCounter() {
+                this.pageCounter.innerHTML = `<i class="fas fa-file"></i> ${this.pages.length} pages`;
+            }
+
+            showResult() {
+                this.resultPanel.classList.add('open');
+                this.updateUI();
+                document.getElementById('editControls').classList.remove('show');
+            }
+
+            closeResult() {
+                this.resultPanel.classList.remove('open');
+                document.getElementById('scanFrame').style.display = 'flex';
+            }
+
+            prevPage() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.updateUI();
+                }
+            }
+
+            nextPage() {
+                if (this.currentIndex < this.pages.length - 1) {
+                    this.currentIndex++;
+                    this.updateUI();
+                }
+            }
+
+            deletePage() {
+                if (this.pages.length === 0) return;
+                this.pages.splice(this.currentIndex, 1);
+                if (this.pages.length === 0) {
+                    this.closeResult();
+                    this.updateCounter();
+                    this.showToast('No pages left');
+                    document.getElementById('scanFrame').style.display = 'flex';
+                    return;
+                }
+                this.currentIndex = Math.min(this.currentIndex, this.pages.length - 1);
+                this.updateUI();
+                this.updateCounter();
+                this.showToast('🗑️ Page deleted');
+            }
+
+            // ===== CONTINUE / DONE =====
+            continueScanning() {
+                this.closeResult();
+                document.getElementById('scanFrame').style.display = 'flex';
+                this.showToast('📸 Scan next page');
+            }
+
+            makePDF() {
+                if (this.pages.length === 0) {
+                    this.showToast('❌ No pages to create PDF', 'error');
+                    return;
+                }
+
+                if (typeof window.jspdf === 'undefined') {
+                    this.showToast('❌ PDF library not loaded', 'error');
+                    return;
+                }
+
+                this.showToast('📄 Creating PDF...');
+                const { jsPDF } = window.jspdf;
+                const name = document.getElementById('pdfName').value.trim() || 'twarvis';
+                const pdf = new jsPDF();
+
+                this.pages.forEach((dataUrl, i) => {
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(dataUrl, 'PNG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
+                });
+
+                pdf.save(`${name}.pdf`);
+                this.showToast(`✅ ${name}.pdf saved!`);
+
+                // Reset
+                this.pages = [];
+                this.currentIndex = 0;
+                this.updateCounter();
+                this.closeResult();
+                document.getElementById('scanFrame').style.display = 'flex';
+            }
+
+            // ===== FILTERS =====
+            applyFilter() {
+                if (this.pages.length === 0) return;
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const filtered = this.applyFilterToCanvas(canvas);
+                    this.pages[this.currentIndex] = filtered.toDataURL('image/png');
+                    this.preview.src = this.pages[this.currentIndex];
+                };
+                img.src = this.pages[this.currentIndex];
+            }
+
+            applyFilterToCanvas(canvas) {
+                const result = document.createElement('canvas');
+                result.width = canvas.width;
+                result.height = canvas.height;
+                const ctx = result.getContext('2d');
+                ctx.drawImage(canvas, 0, 0);
+
+                try {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    const bright = this.brightness / 100;
+                    const contrast = this.contrast / 100;
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        let r = data[i], g = data[i + 1], b = data[i + 2];
+
+                        switch (this.filter) {
+                            case 'grayscale':
+                                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                                r = g = b = gray;
+                                break;
+                            case 'enhance':
+                                r = Math.min(255, r * 1.1 + 5);
+                                g = Math.min(255, g * 1.1 + 5);
+                                b = Math.min(255, b * 1.1 + 5);
+                                break;
+                            case 'bright':
+                                r = Math.min(255, r + 30);
+                                g = Math.min(255, g + 30);
+                                b = Math.min(255, b + 30);
+                                break;
+                            case 'contrast':
+                                r = Math.min(255, Math.max(0, (r - 128) * 1.5 + 128));
+                                g = Math.min(255, Math.max(0, (g - 128) * 1.5 + 128));
+                                b = Math.min(255, Math.max(0, (b - 128) * 1.5 + 128));
+                                break;
+                            case 'vintage':
+                                r = Math.min(255, r * 1.1 + 10);
+                                g = Math.min(255, g * 0.9 + 5);
+                                b = Math.min(255, b * 0.8 + 5);
+                                break;
+                        }
+
+                        r = Math.min(255, Math.max(0, (r - 128) * contrast + 128 + (bright - 1) * 50));
+                        g = Math.min(255, Math.max(0, (g - 128) * contrast + 128 + (bright - 1) * 50));
+                        b = Math.min(255, Math.max(0, (b - 128) * contrast + 128 + (bright - 1) * 50));
+
+                        data[i] = r;
+                        data[i + 1] = g;
+                        data[i + 2] = b;
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                } catch (err) { console.warn('Filter failed:', err); }
+                return result;
+            }
+
+            // ===== EDIT TOGGLE =====
+            toggleEdit() {
+                const controls = document.getElementById('editControls');
+                controls.classList.toggle('show');
+                if (controls.classList.contains('show')) {
+                    this.showToast('✏️ Adjust brightness & contrast');
+                }
+            }
+
+            // ===== ROTATE =====
+            rotatePage() {
+                if (this.pages.length === 0) return;
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.height;
+                    canvas.height = img.width;
+                    const ctx = canvas.getContext('2d');
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(Math.PI / 2);
+                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                    this.pages[this.currentIndex] = canvas.toDataURL('image/png');
+                    this.preview.src = this.pages[this.currentIndex];
+                    this.showToast('🔄 Rotated 90°');
+                };
+                img.src = this.pages[this.currentIndex];
+            }
+
+            // ===== FLASH =====
+            toggleFlash() {
+                if (!this.stream) return;
+                const track = this.stream.getVideoTracks()[0];
+                if (!track) return;
+                try {
+                    const settings = track.getSettings();
+                    track.applyConstraints({ advanced: [{ torch: !settings.torch }] })
+                        .then(() => this.showToast(settings.torch ? '💡 Flash off' : '💡 Flash on'));
+                } catch (err) {
+                    this.showToast('💡 Flash not supported', 'error');
+                }
+            }
+
+            // ===== GALLERY =====
+            openGallery() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.multiple = true;
+                input.onchange = (e) => {
+                    Array.from(e.target.files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0);
+                                this.addPage(canvas);
+                            };
+                            img.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    this.showToast(`📸 Added images`);
+                };
+                input.click();
+            }
+
+            // ===== TOAST =====
+            showToast(msg, type = 'info') {
+                this.toast.textContent = msg;
+                this.toast.style.display = 'block';
+                this.toast.className = 'toast';
+                if (type === 'error') this.toast.classList.add('error');
+                if (type === 'success') this.toast.classList.add('success');
+                clearTimeout(this.toast._timeout);
+            }
+
+            hideToastAfter(ms = 3000) {
+                clearTimeout(this.toast._timeout);
+                this.toast._timeout = setTimeout(() => {
+                    this.toast.style.display = 'none';
+                }, ms);
+            }
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new StudentHubScanner();
+        });
+
+        // ===== RAIN EFFECT =====
+        (function() {
+            const canvas = document.getElementById('rain-canvas');
+            const ctx = canvas.getContext('2d');
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            class Drop {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.len = Math.random() * 20 + 10;
+                    this.speed = Math.random() * 5 + 3;
+                    this.opacity = Math.random() * 0.3 + 0.1;
+                    this.width = Math.random() * 1.5 + 0.5;
+                }
+                fall() {
+                    this.y += this.speed;
+                    if (this.y > canvas.height) {
+                        this.y = -this.len;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x, this.y + this.len);
+                    ctx.strokeStyle = `rgba(150, 200, 255, ${this.opacity})`;
+                    ctx.lineWidth = this.width;
+                    ctx.stroke();
+                }
+            }
+
+            const drops = Array.from({ length: 200 }, () => new Drop());
+
+            function drawRain() {
+                ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drops.forEach(d => { d.draw(); d.fall(); });
+                requestAnimationFrame(drawRain);
+            }
+            drawRain();
+        })();
+    </script>
 </body>
 </html>
