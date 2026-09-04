@@ -2,93 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>📸 CuteScan - Scanner</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">📄 SmartScanner</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="scanner.html" class="active">Scanner</a></li>
-                <li><a href="about.html">About</a></li>
-            </ul>
+    <!-- ============================================
+    SCANNER PAGE
+    ============================================ -->
+    <div class="scanner-page">
+        <!-- Top Bar -->
+        <div class="top-bar-cute">
+            <a href="index.html" class="back-btn">←</a>
+            <span class="page-title">📸 Scan Document</span>
+            <span id="pageCounter" class="page-counter">0 pages</span>
         </div>
-    </nav>
 
-    <main>
-        <div class="scanner-container">
-            <h1>📸 Scan Your Document</h1>
-            <p class="scan-subtitle">
-                🔒 Everything stays on your device. No uploads, no servers, complete privacy.
-            </p>
+        <!-- Status -->
+        <div id="statusToast" class="status-toast" style="display:none;"></div>
 
-            <!-- Status Message -->
-            <div id="status" class="status-message" style="display: none;"></div>
+        <!-- Camera View -->
+        <div class="camera-wrapper">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            
+            <!-- Scanner Frame Overlay -->
+            <div class="scan-frame" id="scanFrame">
+                <div class="frame-corners">
+                    <span class="corner tl"></span>
+                    <span class="corner tr"></span>
+                    <span class="corner bl"></span>
+                    <span class="corner br"></span>
+                </div>
+                <div class="frame-label">📄 Place document here</div>
+            </div>
 
-            <!-- Video / Camera View -->
-            <div class="video-wrapper">
-                <video id="video" autoplay playsinline></video>
-                <canvas id="canvas" style="display: none;"></canvas>
-                <div id="cameraPlaceholder" class="camera-placeholder">
-                    <div class="placeholder-content">
-                        <span class="placeholder-icon">📷</span>
-                        <p>Click "Start Camera" to begin</p>
+            <!-- Loading -->
+            <div class="scan-loading" id="scanLoading" style="display:none;">
+                <div class="loading-heart">💖</div>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <!-- Bottom Controls -->
+        <div class="scanner-controls">
+            <div class="controls-top">
+                <button id="flashBtn" class="ctrl-btn" disabled>💡</button>
+                <button id="captureBtn" class="capture-btn-cute" disabled>
+                    <div class="capture-ring">
+                        <div class="capture-dot"></div>
+                    </div>
+                </button>
+                <button id="galleryBtn" class="ctrl-btn">🖼️</button>
+            </div>
+
+            <div class="controls-bottom" id="editTools" style="display:none;">
+                <div class="filter-row">
+                    <button class="filter-btn active" data-filter="original">Original</button>
+                    <button class="filter-btn" data-filter="grayscale">⚫</button>
+                    <button class="filter-btn" data-filter="enhance">✨</button>
+                    <button class="filter-btn" data-filter="bright">☀️</button>
+                    <button class="filter-btn" data-filter="contrast">🎯</button>
+                    <button class="filter-btn" data-filter="vintage">📻</button>
+                </div>
+
+                <div class="slider-row">
+                    <div class="slider-group">
+                        <label>☀️ Brightness</label>
+                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
+                    </div>
+                    <div class="slider-group">
+                        <label>🎯 Contrast</label>
+                        <input type="range" id="contrastSlider" min="0" max="200" value="100" />
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Controls -->
-            <div class="controls">
-                <button id="startCamera" class="btn btn-primary">📷 Start Camera</button>
-                <button id="capture" class="btn btn-success" disabled>📸 Scan Document</button>
-                <button id="reset" class="btn btn-secondary">🔄 Reset</button>
+        <!-- ============================================
+        RESULT PANEL (Slides up)
+        ============================================ -->
+        <div class="result-panel-cute" id="resultPanel">
+            <div class="result-handle"></div>
+            
+            <div class="result-header-cute">
+                <span>📄 Page <span id="currentPageNum">1</span></span>
+                <div class="result-actions-cute">
+                    <button id="prevPageBtn" class="nav-btn">◀</button>
+                    <button id="nextPageBtn" class="nav-btn">▶</button>
+                    <button id="closeResultBtn" class="close-btn">✕</button>
+                </div>
             </div>
 
-            <!-- Result Area -->
-            <div id="result" class="result-area" style="display: none;">
-                <h2>✅ Scanned Document</h2>
-                <div class="result-preview">
-                    <img id="preview" class="preview-image" alt="Scanned document preview" />
+            <div class="result-body">
+                <img id="previewImage" class="preview-cute" alt="Scanned document" />
+                
+                <div class="result-tools-cute">
+                    <button id="editBtn" class="tool-btn-cute">✏️ Edit</button>
+                    <button id="cropBtn" class="tool-btn-cute">✂️ Crop</button>
+                    <button id="rotateBtn" class="tool-btn-cute">🔄 Rotate</button>
+                    <button id="deleteBtn" class="tool-btn-cute danger">🗑️</button>
                 </div>
 
-                <div class="download-options">
-                    <h3>💾 Download As:</h3>
-                    <div class="download-buttons">
-                        <button id="downloadPNG" class="btn btn-download">PNG</button>
-                        <button id="downloadJPEG" class="btn btn-download">JPEG</button>
-                        <button id="downloadPDF" class="btn btn-download">PDF</button>
-                        <button id="downloadText" class="btn btn-download">📝 Text</button>
+                <div id="ocrBox" class="ocr-box" style="display:none;">
+                    <h4>📝 Extracted Text</h4>
+                    <pre id="ocrText"></pre>
+                </div>
+
+                <div class="pdf-actions">
+                    <div class="name-input-group">
+                        <label>📄 PDF Name:</label>
+                        <input type="text" id="pdfNameInput" value="tarvis" />
+                        <span class="file-ext">.pdf</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="continueBtn" class="btn-cute-primary">➕ Continue Scanning</button>
+                        <button id="doneBtn" class="btn-cute-success">✅ Done - Make PDF</button>
                     </div>
                 </div>
-
-                <div id="stats" class="stats-box">
-                    <p>📊 Document statistics will appear here after scanning.</p>
-                </div>
-
-                <!-- Extracted Text Display -->
-                <div id="textDisplay" class="text-display" style="display: none;">
-                    <h3>📝 Extracted Text</h3>
-                    <pre id="extractedText"></pre>
-                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <div class="footer-container">
-            <p>&copy; 2026 SmartScanner — 100% local processing. No data leaves your device.</p>
-        </div>
-    </footer>
-
-    <!-- External Libraries -->
+    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Main Scanner Script -->
-    <script src="js/scanner.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
