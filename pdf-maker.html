@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>📄 CuteScan - PDF Maker</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="pdf-maker-page">
+        <!-- Top Bar -->
+        <div class="top-bar-cute">
+            <a href="index.html" class="back-btn">←</a>
+            <span class="page-title">📄 Make PDF from Images</span>
+        </div>
+
+        <div class="pdf-maker-body">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📁</div>
+                <h3>Drop images here or tap to upload</h3>
+                <p>Select multiple images from your gallery</p>
+                <input type="file" id="fileInput" accept="image/*" multiple />
+                <button class="btn-cute-primary" onclick="document.getElementById('fileInput').click()">
+                    📸 Choose Images
+                </button>
+            </div>
+
+            <div class="pdf-preview-grid" id="previewGrid"></div>
+
+            <div class="pdf-controls" id="pdfControls" style="display:none;">
+                <div class="name-input-group">
+                    <label>📄 PDF Name:</label>
+                    <input type="text" id="pdfNameInput2" value="tarvis" />
+                    <span class="file-ext">.pdf</span>
+                </div>
+                <div class="pdf-action-buttons">
+                    <button id="makePdfBtn" class="btn-cute-success">📄 Make PDF</button>
+                    <button id="clearImagesBtn" class="btn-cute-danger">🗑️ Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
