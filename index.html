@@ -2,88 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Document Scanner - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Document Scanner Pro</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-brand">📄 SmartScanner</a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="scanner.html">Scanner</a></li>
-                <li><a href="about.html">About</a></li>
-            </ul>
+    <!-- ============================================
+    TOP BAR
+    ============================================ -->
+    <div class="top-bar">
+        <button id="backBtn" class="icon-btn">✕</button>
+        <span class="app-title">📄 Document Scanner</span>
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
+    </div>
+
+    <!-- ============================================
+    CAMERA VIEW
+    ============================================ -->
+    <div class="camera-container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        
+        <!-- Scanner Guide Overlay -->
+        <div class="scanner-overlay" id="scannerOverlay">
+            <div class="guide-frame">
+                <div class="guide-corner tl"></div>
+                <div class="guide-corner tr"></div>
+                <div class="guide-corner bl"></div>
+                <div class="guide-corner br"></div>
+            </div>
+            <div class="guide-text">Position document inside the frame</div>
         </div>
-    </nav>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>📄 Smart Document Scanner</h1>
-                <p class="subtitle">Scan, crop, enhance, and save documents — all locally on your device.</p>
-                <div class="hero-badges">
-                    <span class="badge">🔒 100% Private</span>
-                    <span class="badge">📱 Works Offline</span>
-                    <span class="badge">⚡ No Uploads</span>
-                    <span class="badge">🎯 Auto-Crop</span>
-                </div>
-                <a href="scanner.html" class="btn btn-primary btn-large">Start Scanning →</a>
+        <!-- Manual Crop Overlay (drag to adjust) -->
+        <div class="crop-overlay" id="cropOverlay" style="display:none;">
+            <div class="crop-box" id="cropBox">
+                <div class="crop-handle nw" data-handle="nw"></div>
+                <div class="crop-handle ne" data-handle="ne"></div>
+                <div class="crop-handle sw" data-handle="sw"></div>
+                <div class="crop-handle se" data-handle="se"></div>
+                <div class="crop-handle n" data-handle="n"></div>
+                <div class="crop-handle s" data-handle="s"></div>
+                <div class="crop-handle w" data-handle="w"></div>
+                <div class="crop-handle e" data-handle="e"></div>
             </div>
-            <div class="hero-image">
-                <div class="demo-box">
-                    <div class="demo-icon">📸</div>
-                    <p>Point. Scan. Save.</p>
-                    <small>All on your device</small>
-                </div>
-            </div>
-        </section>
-
-        <section class="features">
-            <h2>✨ Key Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Zero Cloud Upload</h3>
-                    <p>All processing happens on your device. Nothing is ever uploaded to any server.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">✂️</div>
-                    <h3>Auto-Crop &amp; Enhance</h3>
-                    <p>Automatically detects document edges and enhances image quality for clarity.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📝</div>
-                    <h3>OCR Text Extraction</h3>
-                    <p>Extract text from scanned documents using client-side OCR (Tesseract.js).</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💾</div>
-                    <h3>Multiple Download Formats</h3>
-                    <p>Save as PNG, JPEG, PDF, or plain text — directly to your device.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="quick-start">
-            <h2>🚀 Quick Start</h2>
-            <ol class="steps">
-                <li><span class="step-number">1</span> Click "Start Scanning"</li>
-                <li><span class="step-number">2</span> Allow camera access</li>
-                <li><span class="step-number">3</span> Position your document</li>
-                <li><span class="step-number">4</span> Click "Scan Document"</li>
-                <li><span class="step-number">5</span> Download your file</li>
-            </ol>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-container">
-            <p>&copy; 2026 SmartScanner — All processing is 100% local. No data is stored or transmitted.</p>
         </div>
-    </footer>
 
-    <script src="js/home.js"></script>
+        <!-- Loading -->
+        <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- ============================================
+    BOTTOM CONTROLS
+    ============================================ -->
+    <div class="bottom-controls">
+        <div class="controls-row">
+            <button id="flashBtn" class="control-btn" disabled>
+                <span class="icon">💡</span>
+                <span class="label">Flash</span>
+            </button>
+            
+            <button id="captureBtn" class="capture-btn" disabled>
+                <div class="capture-ring">
+                    <div class="capture-inner"></div>
+                </div>
+            </button>
+            
+            <button id="galleryBtn" class="control-btn">
+                <span class="icon">🖼️</span>
+                <span class="label">Gallery</span>
+            </button>
+        </div>
+        
+        <div class="tools-row" id="toolsRow" style="display:none;">
+            <button class="tool-btn" data-filter="none">Original</button>
+            <button class="tool-btn" data-filter="grayscale">⚫ Grayscale</button>
+            <button class="tool-btn" data-filter="enhance">✨ Enhance</button>
+            <button class="tool-btn" data-filter="bright">☀️ Bright</button>
+            <button class="tool-btn" data-filter="contrast">🎯 Contrast</button>
+        </div>
+    </div>
+
+    <!-- ============================================
+    RESULT PANEL (slides up after scan)
+    ============================================ -->
+    <div class="result-panel" id="resultPanel">
+        <div class="result-handle"></div>
+        
+        <div class="result-header">
+            <h3>✅ Scanned Document</h3>
+            <div class="result-actions">
+                <button id="retakeBtn" class="icon-btn">↺</button>
+                <button id="closeResultBtn" class="icon-btn">✕</button>
+            </div>
+        </div>
+
+        <div class="result-content">
+            <div class="result-scroll">
+                <img id="previewImage" class="result-preview" alt="Scanned document" />
+            </div>
+            
+            <div class="result-tools">
+                <button id="cropAdjustBtn" class="tool-action-btn">✂️ Adjust Crop</button>
+                <button id="rotateBtn" class="tool-action-btn">🔄 Rotate</button>
+                <button id="ocrBtn" class="tool-action-btn">📝 OCR Text</button>
+            </div>
+
+            <div class="ocr-result" id="ocrResult" style="display:none;">
+                <h4>Extracted Text</h4>
+                <pre id="ocrText"></pre>
+            </div>
+
+            <div class="download-section">
+                <h4>💾 Save As</h4>
+                <div class="download-grid">
+                    <button class="download-btn" data-format="png">📷 PNG</button>
+                    <button class="download-btn" data-format="jpeg">📷 JPEG</button>
+                    <button class="download-btn" data-format="pdf">📄 PDF</button>
+                    <button class="download-btn" data-format="txt">📝 Text</button>
+                    <button class="download-btn" data-format="pdf-multi">📚 Multi-Page PDF</button>
+                </div>
+            </div>
+
+            <div class="page-indicator" id="pageIndicator">
+                <span>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                <div class="page-nav">
+                    <button id="prevPageBtn" class="icon-btn-small">◀</button>
+                    <button id="nextPageBtn" class="icon-btn-small">▶</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    LIBRARIES
+    ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- ============================================
+    MAIN APP
+    ============================================ -->
+    <script src="js/app.js"></script>
 </body>
 </html>
