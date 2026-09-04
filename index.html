@@ -3,74 +3,489 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>📸 CuteScan - Document Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Student Hub - Document Scanner</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* ============================================
+           STUDENT HUB - Premium Dark Theme
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        /* Rain Canvas Background */
+        #rain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+        }
+
+        .glass-overlay {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 14px 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff1a1a, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: #ff1a1a;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* ===== LANDING HERO ===== */
+        .landing-hero {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            min-height: calc(100vh - 160px);
+        }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero-content h1 .highlight {
+            background: linear-gradient(135deg, #ff1a1a, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-content p {
+            color: rgba(255,255,255,0.5);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            max-width: 480px;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.6);
+        }
+
+        .badge i {
+            margin-right: 6px;
+            color: #ff1a1a;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 24px rgba(255, 26, 26, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(255, 26, 26, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hero-stats .stat {
+            text-align: left;
+        }
+
+        .hero-stats .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .hero-stats .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Hero Image / Scanner Preview */
+        .hero-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scanner-preview-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .scanner-preview-card .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .scanner-preview-card .preview-header span {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .scanner-preview-card .preview-frame {
+            background: #0a0a0f;
+            border-radius: 16px;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.15);
+            font-size: 4rem;
+        }
+
+        .scanner-preview-card .preview-features {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .scanner-preview-card .preview-features span {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: rgba(255,255,255,0.15);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            margin-top: 40px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .landing-hero {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-content p {
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-badges {
+                justify-content: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .scanner-preview-card {
+                max-width: 360px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 16px;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- ============================================
-    CUTE LANDING PAGE
-    ============================================ -->
-    <div class="landing">
-        <div class="landing-bg">
-            <div class="floating-shapes">
-                <span class="shape">📄</span>
-                <span class="shape">✨</span>
-                <span class="shape">📸</span>
-                <span class="shape">💖</span>
-                <span class="shape">📑</span>
-            </div>
-        </div>
-
-        <div class="landing-content">
-            <div class="logo-big">📸</div>
-            <h1 class="landing-title">Cute<span class="highlight">Scan</span></h1>
-            <p class="landing-subtitle">The cutest document scanner ever! ✨</p>
-            <p class="landing-desc">
-                Scan unlimited pages • Auto-crop • Make PDFs • All on your device
-            </p>
-
-            <div class="landing-badges">
-                <span class="badge-cute">🔒 100% Private</span>
-                <span class="badge-cute">📱 No Uploads</span>
-                <span class="badge-cute">⚡ Instant</span>
-                <span class="badge-cute">💖 Free</span>
-            </div>
-
-            <div class="landing-buttons">
-                <a href="scanner.html" class="btn-cute btn-primary">
-                    📸 Start Scanning
-                    <span class="btn-sparkle">✨</span>
-                </a>
-                <a href="pdf-maker.html" class="btn-cute btn-secondary">
-                    📄 Make PDF from Images
-                </a>
-            </div>
-
-            <div class="landing-features">
-                <div class="feature-mini">
-                    <span>✂️</span>
-                    <span>Auto-Crop</span>
+    <canvas id="rain-canvas"></canvas>
+    <div class="glass-overlay">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    STUDENT <span style="color:#fff;">HUB</span>
                 </div>
-                <div class="feature-mini">
-                    <span>📚</span>
-                    <span>Multi-Page</span>
-                </div>
-                <div class="feature-mini">
-                    <span>🎨</span>
-                    <span>Filters</span>
-                </div>
-                <div class="feature-mini">
-                    <span>💾</span>
-                    <span>Save Offline</span>
+                <div class="nav-links">
+                    <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
+                    <a href="scanner.html"><i class="fas fa-camera"></i> Scanner</a>
+                    <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
                 </div>
             </div>
         </div>
 
-        <div class="landing-footer">
-            <p>💖 Made with love • All processing is local • No data leaves your device</p>
+        <!-- ===== LANDING HERO ===== -->
+        <div class="landing-hero">
+            <div class="hero-content">
+                <h1>
+                    Smart Document<br />
+                    <span class="highlight">Scanner</span> for Students
+                </h1>
+                <p>
+                    Scan unlimited pages, auto-crop, add filters, and create PDFs.
+                    All processing happens on your device — nothing is uploaded.
+                </p>
+                <div class="hero-badges">
+                    <span class="badge"><i class="fas fa-lock"></i> 100% Private</span>
+                    <span class="badge"><i class="fas fa-bolt"></i> Instant</span>
+                    <span class="badge"><i class="fas fa-infinity"></i> Unlimited Pages</span>
+                    <span class="badge"><i class="fas fa-file-pdf"></i> PDF Export</span>
+                </div>
+                <div class="hero-buttons">
+                    <a href="scanner.html" class="btn-primary">
+                        <i class="fas fa-camera"></i> Start Scanning
+                    </a>
+                    <a href="about.html" class="btn-secondary">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Local Processing</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Unlimited Pages</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">📄</div>
+                        <div class="stat-label">PDF &amp; Images</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-preview">
+                <div class="scanner-preview-card">
+                    <div class="preview-header">
+                        <span><i class="fas fa-camera"></i> Scanner Ready</span>
+                        <span><i class="fas fa-circle" style="color:#00ff41;font-size:8px;"></i> Active</span>
+                    </div>
+                    <div class="preview-frame">
+                        <span>📄</span>
+                    </div>
+                    <div class="preview-features">
+                        <span>✂️ Auto-Crop</span>
+                        <span>🎨 Filters</span>
+                        <span>📚 Multi-Page</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Student Hub — All processing is local. No data leaves your device.</p>
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script>
+        // ===== RAIN EFFECT =====
+        const canvas = document.getElementById('rain-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Drop {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.len = Math.random() * 20 + 10;
+                this.speed = Math.random() * 5 + 3;
+                this.opacity = Math.random() * 0.3 + 0.1;
+                this.width = Math.random() * 1.5 + 0.5;
+            }
+            fall() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.y = -this.len;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + this.len);
+                ctx.strokeStyle = `rgba(150, 200, 255, ${this.opacity})`;
+                ctx.lineWidth = this.width;
+                ctx.stroke();
+            }
+        }
+
+        const drops = [];
+        for (let i = 0; i < 200; i++) drops.push(new Drop());
+
+        function drawRain() {
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let d of drops) { d.draw(); d.fall(); }
+            requestAnimationFrame(drawRain);
+        }
+        drawRain();
+    </script>
 </body>
 </html>
