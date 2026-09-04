@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         /* ============================================
-           SCANNER PAGE - Premium Dark Theme
+           MATRIX GOLDEN RAIN THEME
            ============================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -21,6 +21,7 @@
             color: #fff;
         }
 
+        /* Matrix Golden Rain Canvas */
         #rain-canvas {
             position: fixed;
             top: 0;
@@ -28,7 +29,19 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+            background: #0a0a0a;
+        }
+
+        /* Golden overlay glow */
+        .glow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
         }
 
         .glass-overlay {
@@ -41,9 +54,9 @@
 
         /* ===== HEADER ===== */
         .header {
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.08);
             padding: 10px 0;
             flex-shrink: 0;
         }
@@ -63,10 +76,11 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #fff;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
 
-        .logo i { color: #ff1a1a; }
+        .logo i { color: #ffd700; }
 
         .nav-links {
             display: flex;
@@ -75,7 +89,7 @@
         }
 
         .nav-links a {
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 215, 0, 0.3);
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 500;
@@ -86,18 +100,18 @@
 
         .nav-links a:hover,
         .nav-links a.active {
-            color: #fff;
-            background: rgba(255,255,255,0.05);
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
         }
 
         .page-counter {
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 215, 0, 0.4);
             font-size: 0.8rem;
             font-weight: 600;
             padding: 4px 14px;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255, 215, 0, 0.08);
             border-radius: 20px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 215, 0, 0.03);
         }
 
         /* ===== SCANNER AREA ===== */
@@ -122,7 +136,7 @@
             object-fit: cover;
         }
 
-        /* Scanner Frame Overlay */
+        /* Scanner Frame Overlay - Golden */
         .scan-frame {
             position: absolute;
             top: 0;
@@ -146,9 +160,10 @@
             position: absolute;
             width: 28px;
             height: 28px;
-            border-color: rgba(255,255,255,0.6);
+            border-color: rgba(255, 215, 0, 0.5);
             border-style: solid;
             border-width: 0;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
         }
 
         .corner.tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
@@ -161,11 +176,12 @@
             bottom: -36px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 215, 0, 0.3);
             font-size: 12px;
             font-weight: 500;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         /* Loading Overlay */
@@ -175,7 +191,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(10px);
             display: none;
             flex-direction: column;
@@ -187,25 +203,27 @@
         .scan-loading .spinner {
             width: 48px;
             height: 48px;
-            border: 3px solid rgba(255,255,255,0.05);
-            border-top-color: #ff1a1a;
+            border: 3px solid rgba(255, 215, 0, 0.05);
+            border-top-color: #ffd700;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .scan-loading p {
             margin-top: 16px;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 215, 0, 0.3);
             font-size: 0.9rem;
+            letter-spacing: 1px;
         }
 
         /* ===== BOTTOM CONTROLS ===== */
         .scanner-controls {
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255, 215, 0, 0.05);
             padding: 16px 20px 24px;
             flex-shrink: 0;
         }
@@ -221,7 +239,7 @@
         .ctrl-btn {
             background: none;
             border: none;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 215, 0, 0.3);
             font-size: 22px;
             cursor: pointer;
             padding: 8px 16px;
@@ -230,16 +248,16 @@
         }
 
         .ctrl-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
         }
 
         .ctrl-btn:disabled {
-            opacity: 0.3;
+            opacity: 0.2;
             cursor: not-allowed;
         }
 
-        /* Capture Button */
+        /* Capture Button - Golden */
         .capture-btn {
             background: none;
             border: none;
@@ -249,13 +267,13 @@
         }
 
         .capture-btn:active { transform: scale(0.9); }
-        .capture-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .capture-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .capture-ring {
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.15);
+            border: 3px solid rgba(255, 215, 0, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -266,17 +284,18 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            background: linear-gradient(135deg, #ffd700, #b8860b);
             transition: 0.3s;
-            box-shadow: 0 4px 24px rgba(255, 26, 26, 0.3);
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.3);
         }
 
         .capture-btn:hover .capture-ring {
-            border-color: rgba(255,255,255,0.3);
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
         }
 
         /* ============================================
-           RESULT PANEL
+           RESULT PANEL - Step 1: Scan Decision
            ============================================ */
         .result-panel {
             position: fixed;
@@ -284,14 +303,14 @@
             left: 0;
             right: 0;
             max-height: 92vh;
-            background: rgba(15, 15, 26, 0.98);
+            background: rgba(10, 10, 10, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px 24px 0 0;
             transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 200;
-            box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
-            border-top: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
+            border-top: 1px solid rgba(255, 215, 0, 0.05);
             overflow: hidden;
         }
 
@@ -300,133 +319,258 @@
         .result-handle {
             width: 40px;
             height: 4px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 2px;
             margin: 12px auto 0;
         }
 
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+        /* ===== STEP 1: DECISION SCREEN ===== */
+        .step-decision {
+            padding: 20px 24px 24px;
         }
 
-        .result-header .page-info {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.6);
-        }
-
-        .result-header .page-info span { color: #fff; }
-
-        .result-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .result-actions button {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.3);
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .result-actions button:hover {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-        }
-
-        .result-body {
-            padding: 16px 24px 24px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .result-body::-webkit-scrollbar {
-            width: 4px;
-        }
-        .result-body::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-        }
-
-        .preview-container {
+        .step-decision .preview-mini {
             background: rgba(0,0,0,0.3);
             border-radius: 16px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            margin-bottom: 16px;
         }
 
-        .preview-container img {
+        .step-decision .preview-mini img {
             width: 100%;
             height: auto;
             display: block;
+            max-height: 40vh;
+            object-fit: contain;
         }
 
-        /* ===== TOOLBAR ===== */
-        .toolbar {
+        .step-decision .page-info {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 215, 0, 0.3);
+            margin-bottom: 16px;
+        }
+
+        .step-decision .page-info span {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        /* BIG DECISION BUTTONS */
+        .decision-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .btn-decision {
+            padding: 20px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-decision .icon-big {
+            font-size: 2rem;
+        }
+        .btn-decision .sub-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.6;
+        }
+
+        /* CONTINUE Button - Bright Golden */
+        .btn-continue-scan {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #0a0a0a;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.25);
+        }
+
+        .btn-continue-scan:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-continue-scan:active {
+            transform: scale(0.97);
+        }
+
+        /* DONE Button - Bold Red/White */
+        .btn-done-scan {
+            background: linear-gradient(135deg, #ff1a1a, #cc0000);
+            color: #fff;
+            box-shadow: 0 4px 30px rgba(255, 26, 26, 0.25);
+        }
+
+        .btn-done-scan:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 50px rgba(255, 26, 26, 0.4);
+        }
+
+        .btn-done-scan:active {
+            transform: scale(0.97);
+        }
+
+        /* Page Navigation in Decision */
+        .decision-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 12px 0 16px;
+        }
+
+        .decision-nav button {
+            background: rgba(255, 215, 0, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.05);
+            color: rgba(255, 215, 0, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+        .decision-nav button:hover {
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
+        }
+
+        .decision-nav .page-count {
+            color: rgba(255, 215, 0, 0.2);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== STEP 2: EDIT SCREEN (Hidden initially) ===== */
+        .step-edit {
+            display: none;
+            padding: 16px 24px 24px;
+        }
+
+        .step-edit.active {
+            display: block;
+            animation: fadeSlideUp 0.4s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-edit .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .step-edit .edit-header h3 {
+            color: #ffd700;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .step-edit .edit-header .close-edit {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.2);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .step-edit .edit-header .close-edit:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .step-edit .preview-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.04);
+            margin-bottom: 16px;
+        }
+
+        .step-edit .preview-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 35vh;
+            object-fit: contain;
+        }
+
+        /* ===== TOOLBAR - Bold & Bright ===== */
+        .edit-toolbar {
             display: flex;
             gap: 6px;
-            padding: 12px 0;
+            padding: 8px 0 12px;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.04);
             margin-bottom: 12px;
         }
 
-        .toolbar button {
-            padding: 6px 14px;
+        .edit-toolbar button {
+            padding: 8px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.03);
-            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            background: rgba(255, 215, 0, 0.02);
+            color: rgba(255, 215, 0, 0.4);
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
             font-family: inherit;
+            letter-spacing: 0.3px;
         }
 
-        .toolbar button:hover {
-            background: rgba(255,255,255,0.06);
-            color: #fff;
+        .edit-toolbar button:hover {
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
         }
 
-        .toolbar button.active {
-            background: rgba(255, 26, 26, 0.15);
-            border-color: rgba(255, 26, 26, 0.3);
-            color: #ff4d4d;
+        .edit-toolbar button.active {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.05);
         }
 
-        .toolbar button.danger:hover {
-            border-color: rgba(255,0,0,0.3);
-            color: #ff4d4d;
+        .edit-toolbar button.danger:hover {
+            border-color: rgba(255,0,0,0.2);
+            color: #ff4444;
         }
 
         /* ===== EDIT SLIDERS ===== */
-        .edit-controls {
-            display: none;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+        .edit-sliders {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.04);
             margin-bottom: 12px;
-        }
-
-        .edit-controls.show { display: block; }
-
-        .slider-group {
-            margin-bottom: 10px;
         }
 
         .slider-group label {
             font-size: 12px;
-            color: rgba(255,255,255,0.3);
+            font-weight: 600;
+            color: rgba(255, 215, 0, 0.3);
             display: block;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .slider-group input[type="range"] {
@@ -434,7 +578,7 @@
             height: 4px;
             -webkit-appearance: none;
             appearance: none;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 215, 0, 0.06);
             border-radius: 2px;
             outline: none;
         }
@@ -445,95 +589,83 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #ff1a1a;
+            background: #ffd700;
             cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
 
-        /* ===== PDF ACTIONS ===== */
-        .pdf-actions {
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-        }
-
-        .name-group {
+        /* ===== PDF NAMING ===== */
+        .pdf-naming {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 215, 0, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.04);
         }
 
-        .name-group label {
+        .pdf-naming label {
             font-size: 13px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.5);
+            font-weight: 700;
+            color: rgba(255, 215, 0, 0.3);
             white-space: nowrap;
         }
 
-        .name-group input {
+        .pdf-naming input {
             flex: 1;
-            padding: 10px 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            color: #fff;
+            padding: 8px 14px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            border-radius: 10px;
+            color: #ffd700;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             font-family: inherit;
             transition: 0.3s;
             outline: none;
             min-width: 0;
         }
 
-        .name-group input:focus {
-            border-color: rgba(255, 26, 26, 0.3);
+        .pdf-naming input:focus {
+            border-color: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.03);
         }
 
-        .name-group .ext {
-            color: rgba(255,255,255,0.2);
+        .pdf-naming .ext {
+            color: rgba(255, 215, 0, 0.15);
             font-weight: 600;
             font-size: 14px;
         }
 
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .btn-action {
-            padding: 14px;
+        /* ===== CREATE PDF BUTTON ===== */
+        .btn-create-pdf {
+            width: 100%;
+            padding: 16px;
             border: none;
             border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #0a0a0a;
+            font-weight: 800;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
             font-family: inherit;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 12px;
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
         }
 
-        .btn-continue {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .btn-continue:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .btn-done {
-            background: linear-gradient(135deg, #ff1a1a, #cc0000);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(255, 26, 26, 0.2);
-        }
-
-        .btn-done:hover {
+        .btn-create-pdf:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(255, 26, 26, 0.3);
+            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-create-pdf:active {
+            transform: scale(0.98);
         }
 
         /* ===== TOAST ===== */
@@ -542,30 +674,27 @@
             top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.9);
+            padding: 14px 28px;
+            border-radius: 14px;
+            background: rgba(0,0,0,0.92);
             backdrop-filter: blur(20px);
             color: #fff;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             z-index: 300;
             display: none;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255, 215, 0, 0.06);
             max-width: 90%;
             text-align: center;
+            letter-spacing: 0.3px;
         }
 
         .toast.error { border-color: rgba(255,0,0,0.2); }
-        .toast.success { border-color: rgba(0,255,65,0.2); }
+        .toast.success { border-color: rgba(255, 215, 0, 0.2); }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .header-content {
-                padding: 0 12px;
-                flex-wrap: wrap;
-                gap: 4px;
-            }
+            .header-content { padding: 0 12px; flex-wrap: wrap; gap: 4px; }
             .logo { font-size: 1rem; }
             .nav-links a { font-size: 0.75rem; padding: 4px 8px; }
             .page-counter { font-size: 0.7rem; padding: 2px 10px; }
@@ -576,9 +705,14 @@
             .frame-corners { width: 85%; }
             .corner { width: 20px; height: 20px; }
             
-            .result-body { padding: 12px 16px 16px; }
-            .action-buttons { grid-template-columns: 1fr; }
-            .name-group { flex-wrap: wrap; }
+            .decision-buttons { grid-template-columns: 1fr; }
+            .btn-decision { padding: 16px; font-size: 1rem; }
+            
+            .step-decision { padding: 16px; }
+            .step-edit { padding: 12px 16px 16px; }
+            
+            .edit-sliders { grid-template-columns: 1fr; }
+            .pdf-naming { flex-wrap: wrap; }
         }
 
         @media (orientation: landscape) and (max-height: 500px) {
@@ -591,7 +725,10 @@
     </style>
 </head>
 <body>
+    <!-- Matrix Golden Rain Canvas -->
     <canvas id="rain-canvas"></canvas>
+    <div class="glow-overlay"></div>
+    
     <div class="glass-overlay">
         <!-- ===== HEADER ===== -->
         <div class="header">
@@ -618,7 +755,7 @@
                 <video id="video" autoplay playsinline></video>
                 <canvas id="canvas" style="display:none;"></canvas>
 
-                <!-- Scanner Frame -->
+                <!-- Scanner Frame - Golden -->
                 <div class="scan-frame" id="scanFrame">
                     <div class="frame-corners">
                         <span class="corner tl"></span>
@@ -626,13 +763,13 @@
                         <span class="corner bl"></span>
                         <span class="corner br"></span>
                     </div>
-                    <span class="frame-label">📄 POSITION DOCUMENT HERE</span>
+                    <span class="frame-label">✦ POSITION DOCUMENT ✦</span>
                 </div>
 
                 <!-- Loading -->
                 <div class="scan-loading" id="scanLoading">
                     <div class="spinner"></div>
-                    <p>Processing...</p>
+                    <p>✦ PROCESSING ✦</p>
                 </div>
             </div>
 
@@ -660,62 +797,82 @@
         <div class="result-panel" id="resultPanel">
             <div class="result-handle"></div>
 
-            <div class="result-header">
-                <span class="page-info">Page <span id="currentPageNum">1</span> of <span id="totalPages">1</span></span>
-                <div class="result-actions">
-                    <button id="prevBtn"><i class="fas fa-chevron-left"></i></button>
-                    <button id="nextBtn"><i class="fas fa-chevron-right"></i></button>
-                    <button id="closeResult"><i class="fas fa-times"></i></button>
+            <!-- ===== STEP 1: DECISION SCREEN ===== -->
+            <div class="step-decision" id="stepDecision">
+                <div class="preview-mini">
+                    <img id="decisionPreview" alt="Scanned page" />
+                </div>
+
+                <div class="page-info">
+                    Page <span id="decisionPageNum">1</span> of <span id="decisionTotalPages">1</span>
+                </div>
+
+                <div class="decision-nav">
+                    <button id="decisionPrev"><i class="fas fa-chevron-left"></i> Prev</button>
+                    <span class="page-count" id="decisionCount">1 / 1</span>
+                    <button id="decisionNext">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+
+                <div class="decision-buttons">
+                    <button class="btn-decision btn-continue-scan" id="continueBtn">
+                        <span class="icon-big">📸</span>
+                        SCAN NEXT PAGE
+                        <span class="sub-text">Continue scanning more pages</span>
+                    </button>
+                    <button class="btn-decision btn-done-scan" id="doneBtn">
+                        <span class="icon-big">✅</span>
+                        I'M DONE SCANNING
+                        <span class="sub-text">Edit, filter &amp; create PDF</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="result-body">
-                <!-- Preview -->
+            <!-- ===== STEP 2: EDIT SCREEN ===== -->
+            <div class="step-edit" id="stepEdit">
+                <div class="edit-header">
+                    <h3><i class="fas fa-edit"></i> Edit &amp; Create PDF</h3>
+                    <button class="close-edit" id="backToDecision"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+
                 <div class="preview-container">
-                    <img id="previewImage" alt="Scanned document" />
+                    <img id="editPreview" alt="Scanned document" />
                 </div>
 
                 <!-- Toolbar -->
-                <div class="toolbar">
+                <div class="edit-toolbar">
                     <button class="active" data-filter="original">Original</button>
-                    <button data-filter="grayscale"><i class="fas fa-circle" style="color:#888;"></i> B&amp;W</button>
-                    <button data-filter="enhance"><i class="fas fa-magic"></i> Enhance</button>
-                    <button data-filter="bright"><i class="fas fa-sun"></i> Bright</button>
-                    <button data-filter="contrast"><i class="fas fa-adjust"></i> Contrast</button>
-                    <button data-filter="vintage"><i class="fas fa-history"></i> Vintage</button>
-                    <button id="editToggle" style="margin-left:auto;"><i class="fas fa-sliders-h"></i> Edit</button>
-                    <button id="rotateBtn" class=""><i class="fas fa-rotate-right"></i></button>
-                    <button id="deleteBtn" class="danger"><i class="fas fa-trash"></i></button>
+                    <button data-filter="grayscale">⚫ B&amp;W</button>
+                    <button data-filter="enhance">✨ Enhance</button>
+                    <button data-filter="bright">☀️ Bright</button>
+                    <button data-filter="contrast">🎯 Contrast</button>
+                    <button data-filter="vintage">📻 Vintage</button>
+                    <button id="rotateEditBtn" class="">🔄 Rotate</button>
+                    <button id="deleteEditBtn" class="danger">🗑️ Delete</button>
                 </div>
 
-                <!-- Edit Controls -->
-                <div class="edit-controls" id="editControls">
+                <!-- Sliders -->
+                <div class="edit-sliders">
                     <div class="slider-group">
-                        <label>Brightness</label>
+                        <label>☀️ Brightness</label>
                         <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
                     </div>
                     <div class="slider-group">
-                        <label>Contrast</label>
+                        <label>🎯 Contrast</label>
                         <input type="range" id="contrastSlider" min="0" max="200" value="100" />
                     </div>
                 </div>
 
-                <!-- PDF Actions -->
-                <div class="pdf-actions">
-                    <div class="name-group">
-                        <label><i class="fas fa-file-pdf"></i> Name:</label>
-                        <input type="text" id="pdfName" value="twarvis" />
-                        <span class="ext">.pdf</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn-action btn-continue" id="continueBtn">
-                            <i class="fas fa-plus-circle"></i> Scan Next Page
-                        </button>
-                        <button class="btn-action btn-done" id="doneBtn">
-                            <i class="fas fa-check-circle"></i> Done - Create PDF
-                        </button>
-                    </div>
+                <!-- PDF Naming -->
+                <div class="pdf-naming">
+                    <label><i class="fas fa-file-pdf"></i> Name:</label>
+                    <input type="text" id="pdfName" value="twarvis" />
+                    <span class="ext">.pdf</span>
                 </div>
+
+                <!-- Create PDF Button -->
+                <button class="btn-create-pdf" id="createPdfBtn">
+                    <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
+                </button>
             </div>
         </div>
     </div>
@@ -725,10 +882,66 @@
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- ===== APP ===== -->
     <script>
         // ============================================
-        // STUDENT HUB SCANNER - Complete App
+        // MATRIX GOLDEN RAIN
+        // ============================================
+        (function() {
+            const canvas = document.getElementById('rain-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Golden characters - Matrix style
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            class GoldenDrop {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.speed = Math.random() * 4 + 2;
+                    this.size = Math.random() * 14 + 10;
+                    this.opacity = Math.random() * 0.3 + 0.1;
+                    this.char = chars[Math.floor(Math.random() * chars.length)];
+                }
+                fall() {
+                    this.y += this.speed;
+                    if (this.y > canvas.height + 20) {
+                        this.reset();
+                        this.y = -20;
+                    }
+                }
+                draw() {
+                    ctx.font = `${this.size}px monospace`;
+                    ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
+                    ctx.shadowColor = `rgba(255, 215, 0, ${this.opacity * 0.3})`;
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(this.char, this.x, this.y);
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            const drops = Array.from({ length: 150 }, () => new GoldenDrop());
+
+            function drawRain() {
+                ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drops.forEach(d => { d.draw(); d.fall(); });
+                requestAnimationFrame(drawRain);
+            }
+            drawRain();
+        })();
+
+        // ============================================
+        // STUDENT HUB SCANNER - Proper Flow
         // ============================================
 
         class StudentHubScanner {
@@ -737,11 +950,15 @@
                 this.video = document.getElementById('video');
                 this.canvas = document.getElementById('canvas');
                 this.ctx = this.canvas.getContext('2d');
-                this.preview = document.getElementById('previewImage');
+                this.decisionPreview = document.getElementById('decisionPreview');
+                this.editPreview = document.getElementById('editPreview');
                 this.resultPanel = document.getElementById('resultPanel');
+                this.stepDecision = document.getElementById('stepDecision');
+                this.stepEdit = document.getElementById('stepEdit');
                 this.toast = document.getElementById('toast');
                 this.scanLoading = document.getElementById('scanLoading');
                 this.pageCounter = document.getElementById('pageCounter');
+                this.scanFrame = document.getElementById('scanFrame');
 
                 // State
                 this.stream = null;
@@ -751,6 +968,7 @@
                 this.brightness = 100;
                 this.contrast = 100;
                 this.isProcessing = false;
+                this.isEditMode = false;
 
                 // Bind
                 this.bindEvents();
@@ -762,19 +980,23 @@
             }
 
             bindEvents() {
+                // Camera controls
                 document.getElementById('captureBtn').addEventListener('click', () => this.capture());
                 document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
                 document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
-                document.getElementById('closeResult').addEventListener('click', () => this.closeResult());
-                document.getElementById('prevBtn').addEventListener('click', () => this.prevPage());
-                document.getElementById('nextBtn').addEventListener('click', () => this.nextPage());
-                document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
-                document.getElementById('doneBtn').addEventListener('click', () => this.makePDF());
-                document.getElementById('editToggle').addEventListener('click', () => this.toggleEdit());
-                document.getElementById('rotateBtn').addEventListener('click', () => this.rotatePage());
-                document.getElementById('deleteBtn').addEventListener('click', () => this.deletePage());
 
-                // Filters
+                // Decision buttons
+                document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
+                document.getElementById('doneBtn').addEventListener('click', () => this.goToEditMode());
+
+                // Decision navigation
+                document.getElementById('decisionPrev').addEventListener('click', () => this.decisionPrev());
+                document.getElementById('decisionNext').addEventListener('click', () => this.decisionNext());
+
+                // Edit mode navigation
+                document.getElementById('backToDecision').addEventListener('click', () => this.backToDecision());
+
+                // Edit tools
                 document.querySelectorAll('[data-filter]').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
@@ -783,6 +1005,9 @@
                         this.applyFilter();
                     });
                 });
+
+                document.getElementById('rotateEditBtn').addEventListener('click', () => this.rotatePage());
+                document.getElementById('deleteEditBtn').addEventListener('click', () => this.deletePage());
 
                 // Sliders
                 document.getElementById('brightnessSlider').addEventListener('input', (e) => {
@@ -794,19 +1019,20 @@
                     this.applyFilter();
                 });
 
+                // Create PDF
+                document.getElementById('createPdfBtn').addEventListener('click', () => this.makePDF());
+
                 // Keyboard
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !this.isProcessing) this.capture();
                     if (e.key === 'Escape') this.closeResult();
-                    if (e.key === 'ArrowLeft') this.prevPage();
-                    if (e.key === 'ArrowRight') this.nextPage();
                 });
             }
 
             // ===== CAMERA =====
             async startCamera() {
                 try {
-                    this.showToast('Starting camera...');
+                    this.showToast('✦ Starting camera...');
                     const constraints = {
                         video: {
                             facingMode: 'environment',
@@ -819,46 +1045,12 @@
                     await this.video.play();
                     document.getElementById('captureBtn').disabled = false;
                     document.getElementById('flashBtn').disabled = false;
-                    this.showToast('✅ Camera ready');
+                    this.showToast('✦ Camera ready');
                     this.hideToastAfter(1500);
                 } catch (err) {
                     console.error('Camera error:', err);
-                    this.showToast('❌ Camera access denied. Please allow camera permissions.', 'error');
-                    this.showUploadFallback();
+                    this.showToast('❌ Camera access denied', 'error');
                 }
-            }
-
-            showUploadFallback() {
-                const wrapper = document.querySelector('.camera-wrapper');
-                if (!wrapper) return;
-                wrapper.innerHTML = `
-                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;background:#0a0a0f;color:rgba(255,255,255,0.5);text-align:center;">
-                        <i class="fas fa-camera" style="font-size:48px;margin-bottom:16px;color:rgba(255,255,255,0.1);"></i>
-                        <h3 style="color:rgba(255,255,255,0.3);margin-bottom:8px;">Camera Unavailable</h3>
-                        <p style="font-size:0.9rem;margin-bottom:20px;">Upload an image from your device instead</p>
-                        <input type="file" id="uploadFallback" accept="image/*" style="display:none;" />
-                        <button onclick="document.getElementById('uploadFallback').click()" style="padding:12px 32px;border-radius:60px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;font-weight:600;">
-                            <i class="fas fa-upload"></i> Choose Image
-                        </button>
-                    </div>
-                `;
-                document.getElementById('uploadFallback').addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            this.canvas.width = img.width;
-                            this.canvas.height = img.height;
-                            this.ctx.drawImage(img, 0, 0);
-                            this.addPage(this.canvas);
-                            this.showToast('✅ Image loaded');
-                        };
-                        img.src = event.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
             }
 
             // ===== CAPTURE =====
@@ -898,8 +1090,6 @@
                         cropped = temp;
                     }
 
-                    // Apply filter
-                    cropped = this.applyFilterToCanvas(cropped);
                     this.addPage(cropped);
 
                     this.scanLoading.style.display = 'none';
@@ -916,19 +1106,27 @@
 
             // ===== PAGE MANAGEMENT =====
             addPage(canvas) {
-                this.pages.push(canvas.toDataURL('image/png'));
+                const dataUrl = canvas.toDataURL('image/png');
+                this.pages.push(dataUrl);
                 this.currentIndex = this.pages.length - 1;
-                this.updateUI();
-                this.showResult();
+                this.updateDecisionView();
                 this.updateCounter();
-                document.getElementById('scanFrame').style.display = 'none';
+                this.showResult();
+                this.scanFrame.style.display = 'none';
             }
 
-            updateUI() {
+            updateDecisionView() {
                 if (this.pages.length > 0) {
-                    this.preview.src = this.pages[this.currentIndex];
-                    document.getElementById('currentPageNum').textContent = this.currentIndex + 1;
-                    document.getElementById('totalPages').textContent = this.pages.length;
+                    this.decisionPreview.src = this.pages[this.currentIndex];
+                    document.getElementById('decisionPageNum').textContent = this.currentIndex + 1;
+                    document.getElementById('decisionTotalPages').textContent = this.pages.length;
+                    document.getElementById('decisionCount').textContent = `${this.currentIndex + 1} / ${this.pages.length}`;
+                }
+            }
+
+            updateEditView() {
+                if (this.pages.length > 0) {
+                    this.editPreview.src = this.pages[this.currentIndex];
                 }
             }
 
@@ -938,82 +1136,62 @@
 
             showResult() {
                 this.resultPanel.classList.add('open');
-                this.updateUI();
-                document.getElementById('editControls').classList.remove('show');
+                this.stepDecision.style.display = 'block';
+                this.stepEdit.classList.remove('active');
+                this.stepEdit.style.display = 'none';
+                this.isEditMode = false;
+                this.updateDecisionView();
             }
 
             closeResult() {
                 this.resultPanel.classList.remove('open');
-                document.getElementById('scanFrame').style.display = 'flex';
+                this.scanFrame.style.display = 'flex';
             }
 
-            prevPage() {
+            // ===== DECISION NAVIGATION =====
+            decisionPrev() {
                 if (this.currentIndex > 0) {
                     this.currentIndex--;
-                    this.updateUI();
+                    this.updateDecisionView();
                 }
             }
 
-            nextPage() {
+            decisionNext() {
                 if (this.currentIndex < this.pages.length - 1) {
                     this.currentIndex++;
-                    this.updateUI();
+                    this.updateDecisionView();
                 }
             }
 
-            deletePage() {
-                if (this.pages.length === 0) return;
-                this.pages.splice(this.currentIndex, 1);
-                if (this.pages.length === 0) {
-                    this.closeResult();
-                    this.updateCounter();
-                    this.showToast('No pages left');
-                    document.getElementById('scanFrame').style.display = 'flex';
-                    return;
-                }
-                this.currentIndex = Math.min(this.currentIndex, this.pages.length - 1);
-                this.updateUI();
-                this.updateCounter();
-                this.showToast('🗑️ Page deleted');
-            }
-
-            // ===== CONTINUE / DONE =====
+            // ===== CONTINUE SCANNING =====
             continueScanning() {
                 this.closeResult();
-                document.getElementById('scanFrame').style.display = 'flex';
+                this.scanFrame.style.display = 'flex';
                 this.showToast('📸 Scan next page');
             }
 
-            makePDF() {
+            // ===== GO TO EDIT MODE =====
+            goToEditMode() {
                 if (this.pages.length === 0) {
-                    this.showToast('❌ No pages to create PDF', 'error');
+                    this.showToast('❌ No pages to edit', 'error');
                     return;
                 }
+                this.isEditMode = true;
+                this.stepDecision.style.display = 'none';
+                this.stepEdit.style.display = 'block';
+                setTimeout(() => {
+                    this.stepEdit.classList.add('active');
+                }, 50);
+                this.updateEditView();
+                this.showToast('✏️ Edit your document');
+            }
 
-                if (typeof window.jspdf === 'undefined') {
-                    this.showToast('❌ PDF library not loaded', 'error');
-                    return;
-                }
-
-                this.showToast('📄 Creating PDF...');
-                const { jsPDF } = window.jspdf;
-                const name = document.getElementById('pdfName').value.trim() || 'twarvis';
-                const pdf = new jsPDF();
-
-                this.pages.forEach((dataUrl, i) => {
-                    if (i > 0) pdf.addPage();
-                    pdf.addImage(dataUrl, 'PNG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
-                });
-
-                pdf.save(`${name}.pdf`);
-                this.showToast(`✅ ${name}.pdf saved!`);
-
-                // Reset
-                this.pages = [];
-                this.currentIndex = 0;
-                this.updateCounter();
-                this.closeResult();
-                document.getElementById('scanFrame').style.display = 'flex';
+            backToDecision() {
+                this.isEditMode = false;
+                this.stepEdit.classList.remove('active');
+                this.stepEdit.style.display = 'none';
+                this.stepDecision.style.display = 'block';
+                this.updateDecisionView();
             }
 
             // ===== FILTERS =====
@@ -1028,7 +1206,7 @@
                     ctx.drawImage(img, 0, 0);
                     const filtered = this.applyFilterToCanvas(canvas);
                     this.pages[this.currentIndex] = filtered.toDataURL('image/png');
-                    this.preview.src = this.pages[this.currentIndex];
+                    this.editPreview.src = this.pages[this.currentIndex];
                 };
                 img.src = this.pages[this.currentIndex];
             }
@@ -1089,15 +1267,6 @@
                 return result;
             }
 
-            // ===== EDIT TOGGLE =====
-            toggleEdit() {
-                const controls = document.getElementById('editControls');
-                controls.classList.toggle('show');
-                if (controls.classList.contains('show')) {
-                    this.showToast('✏️ Adjust brightness & contrast');
-                }
-            }
-
             // ===== ROTATE =====
             rotatePage() {
                 if (this.pages.length === 0) return;
@@ -1111,10 +1280,66 @@
                     ctx.rotate(Math.PI / 2);
                     ctx.drawImage(img, -img.width / 2, -img.height / 2);
                     this.pages[this.currentIndex] = canvas.toDataURL('image/png');
-                    this.preview.src = this.pages[this.currentIndex];
+                    this.editPreview.src = this.pages[this.currentIndex];
                     this.showToast('🔄 Rotated 90°');
                 };
                 img.src = this.pages[this.currentIndex];
+            }
+
+            // ===== DELETE PAGE =====
+            deletePage() {
+                if (this.pages.length === 0) return;
+                this.pages.splice(this.currentIndex, 1);
+                if (this.pages.length === 0) {
+                    this.showToast('No pages left');
+                    this.backToDecision();
+                    this.closeResult();
+                    this.updateCounter();
+                    this.scanFrame.style.display = 'flex';
+                    return;
+                }
+                this.currentIndex = Math.min(this.currentIndex, this.pages.length - 1);
+                this.updateEditView();
+                this.updateDecisionView();
+                this.updateCounter();
+                this.showToast('🗑️ Page deleted');
+            }
+
+            // ===== MAKE PDF =====
+            makePDF() {
+                if (this.pages.length === 0) {
+                    this.showToast('❌ No pages', 'error');
+                    return;
+                }
+
+                if (typeof window.jspdf === 'undefined') {
+                    this.showToast('❌ PDF library not loaded', 'error');
+                    return;
+                }
+
+                this.showToast('📄 Creating PDF...');
+                const { jsPDF } = window.jspdf;
+                const name = document.getElementById('pdfName').value.trim() || 'twarvis';
+                const pdf = new jsPDF();
+
+                this.pages.forEach((dataUrl, i) => {
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(dataUrl, 'PNG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
+                });
+
+                pdf.save(`${name}.pdf`);
+                this.showToast(`✅ ${name}.pdf saved!`);
+
+                // Reset after save
+                this.pages = [];
+                this.currentIndex = 0;
+                this.updateCounter();
+                this.closeResult();
+                this.scanFrame.style.display = 'flex';
+                this.stepDecision.style.display = 'block';
+                this.stepEdit.classList.remove('active');
+                this.stepEdit.style.display = 'none';
+                this.isEditMode = false;
             }
 
             // ===== FLASH =====
@@ -1181,54 +1406,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             window.app = new StudentHubScanner();
         });
-
-        // ===== RAIN EFFECT =====
-        (function() {
-            const canvas = document.getElementById('rain-canvas');
-            const ctx = canvas.getContext('2d');
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            class Drop {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height - canvas.height;
-                    this.len = Math.random() * 20 + 10;
-                    this.speed = Math.random() * 5 + 3;
-                    this.opacity = Math.random() * 0.3 + 0.1;
-                    this.width = Math.random() * 1.5 + 0.5;
-                }
-                fall() {
-                    this.y += this.speed;
-                    if (this.y > canvas.height) {
-                        this.y = -this.len;
-                        this.x = Math.random() * canvas.width;
-                    }
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(this.x, this.y + this.len);
-                    ctx.strokeStyle = `rgba(150, 200, 255, ${this.opacity})`;
-                    ctx.lineWidth = this.width;
-                    ctx.stroke();
-                }
-            }
-
-            const drops = Array.from({ length: 200 }, () => new Drop());
-
-            function drawRain() {
-                ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                drops.forEach(d => { d.draw(); d.fall(); });
-                requestAnimationFrame(drawRain);
-            }
-            drawRain();
-        })();
     </script>
 </body>
 </html>
