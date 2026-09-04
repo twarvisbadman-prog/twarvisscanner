@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Student Hub Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -18,7 +18,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #0a0a0a;
+            background: #000;
             color: #fff;
             font-family: 'Inter', sans-serif;
             position: fixed;
@@ -26,160 +26,177 @@
             left: 0;
         }
 
-        /* ===== LAYOUT ===== */
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 12px;
+        /* ===== FULL SCREEN CAMERA ===== */
+        #cameraView {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-        }
-
-        /* ===== CAMERA ===== */
-        .scanner {
-            position: relative;
-            width: 100%;
-            max-width: 700px;
-            height: 68vh;
-            min-height: 300px;
-            background: #111;
-            border: 2px solid #ffd700;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.12);
+            height: 100%;
+            z-index: 1;
+            background: #000;
         }
 
         #video {
-            position: absolute;
-            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            background: #222;
             display: block;
         }
 
-        .scanner-overlay {
-            position: absolute;
-            inset: 0;
+        /* ===== SCAN FRAME OVERLAY ===== */
+        .scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .scan-box {
-            width: 82%;
-            height: 72%;
-            border: 2px solid rgba(255, 215, 0, 0.85);
+        .frame-box {
+            width: 80%;
+            max-width: 450px;
+            aspect-ratio: 3/4;
+            border: 2px solid rgba(255, 215, 0, 0.6);
             border-radius: 12px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.28);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
             position: relative;
         }
 
-        .scan-box::before,
-        .scan-box::after {
-            content: "";
+        .frame-box .corner {
             position: absolute;
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
             border-color: #ffd700;
             border-style: solid;
         }
-
-        .scan-box::before {
+        .frame-box .corner.tl {
             top: -2px;
             left: -2px;
             border-width: 4px 0 0 4px;
-            border-radius: 8px 0 0 0;
+            border-radius: 6px 0 0 0;
         }
-
-        .scan-box::after {
+        .frame-box .corner.tr {
+            top: -2px;
             right: -2px;
+            border-width: 4px 4px 0 0;
+            border-radius: 0 6px 0 0;
+        }
+        .frame-box .corner.bl {
             bottom: -2px;
+            left: -2px;
+            border-width: 0 0 4px 4px;
+            border-radius: 0 0 0 6px;
+        }
+        .frame-box .corner.br {
+            bottom: -2px;
+            right: -2px;
             border-width: 0 4px 4px 0;
-            border-radius: 0 0 8px 0;
+            border-radius: 0 0 6px 0;
         }
 
-        .scan-hint {
+        .frame-label {
             position: absolute;
-            bottom: 18px;
+            bottom: -40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.65);
-            color: #ffd700;
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 13px;
+            color: rgba(255, 215, 0, 0.4);
+            font-size: 12px;
+            letter-spacing: 2px;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         /* ===== STATUS ===== */
         #status {
-            margin-top: 10px;
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
             color: #ffd700;
             font-size: 14px;
             text-align: center;
-            min-height: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        /* ===== BOTTOM CONTROLS ===== */
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
             padding: 0 20px;
         }
 
-        /* ===== CONTROLS ===== */
-        .controls {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 15px 30px;
+        .ctrl-btn {
+            background: none;
             border: none;
-            border-radius: 60px;
-            font-size: 18px;
-            font-weight: bold;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 24px;
             cursor: pointer;
-            transition: transform 0.15s ease, opacity 0.15s ease;
+            padding: 10px;
+            transition: 0.3s;
             touch-action: manipulation;
         }
-
-        button:active {
-            transform: scale(0.92);
+        .ctrl-btn:active {
+            transform: scale(0.9);
         }
-        button:disabled {
+        .ctrl-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .capture-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .capture-btn:active {
+            transform: scale(0.9);
+        }
+        .capture-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
-            transform: scale(1);
         }
 
-        .btn-gold {
-            background: #ffd700;
-            color: black;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        .capture-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
         }
-        .btn-green {
-            background: #00ff41;
-            color: black;
-        }
-        .btn-red {
-            background: #ff4444;
-            color: white;
-        }
-        .btn-blue {
-            background: #00b4d8;
-            color: white;
-        }
-        .btn-dark {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+        .capture-dot {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            transition: 0.3s;
         }
 
         /* ============================================
-           RESULT PANEL - YOUR FOUR OPTIONS
+           RESULT PANEL - SLIDES UP
            ============================================ */
         #resultPanel {
             display: none;
@@ -191,7 +208,7 @@
             background: rgba(10, 10, 10, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px 24px 0 0;
-            z-index: 200;
+            z-index: 100;
             border-top: 1px solid rgba(255, 215, 0, 0.05);
             overflow: hidden;
             padding: 16px 20px 24px;
@@ -235,7 +252,7 @@
             font-weight: 700;
         }
 
-        /* ===== YOUR FOUR OPTIONS GRID ===== */
+        /* ===== FOUR OPTIONS ===== */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -261,7 +278,6 @@
             justify-content: center;
             touch-action: manipulation;
         }
-
         .btn-option:active {
             transform: scale(0.95);
         }
@@ -274,28 +290,21 @@
             opacity: 0.6;
         }
 
-        /* OPTION 1: CONTINUE - GOLDEN */
         .btn-continue {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             color: #0a0a0a;
             box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
         }
-
-        /* OPTION 2: DONE - RED */
         .btn-done {
             background: linear-gradient(135deg, #ff1a1a, #cc0000);
             color: #fff;
             box-shadow: 0 4px 30px rgba(255, 26, 26, 0.2);
         }
-
-        /* OPTION 3: RESCAN - BLUE */
         .btn-rescan {
             background: linear-gradient(135deg, #00b4d8, #0077b6);
             color: #fff;
             box-shadow: 0 4px 30px rgba(0, 180, 216, 0.15);
         }
-
-        /* OPTION 4: CROP - GREEN/WHITE */
         .btn-crop {
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
@@ -317,7 +326,6 @@
         .crop-controls.active {
             display: flex;
         }
-
         .crop-controls .btn-crop-action {
             flex: 1;
             padding: 12px;
@@ -339,7 +347,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* ===== EDIT SCREEN (After DONE) ===== */
+        /* ===== EDIT SCREEN ===== */
         #editScreen {
             display: none;
             padding: 16px 20px 24px;
@@ -396,7 +404,6 @@
             object-fit: contain;
         }
 
-        /* Edit Toolbar */
         .edit-toolbar {
             display: flex;
             gap: 6px;
@@ -432,7 +439,6 @@
             color: #00ff41;
         }
 
-        /* PDF Naming */
         .pdf-naming {
             display: flex;
             align-items: center;
@@ -498,7 +504,7 @@
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            top: 70px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
@@ -508,7 +514,7 @@
             color: #fff;
             font-size: 13px;
             font-weight: 600;
-            z-index: 300;
+            z-index: 200;
             display: none;
             border: 1px solid rgba(255, 215, 0, 0.06);
             max-width: 90%;
@@ -517,25 +523,28 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
-            .scanner {
-                height: 65dvh;
-                min-height: 280px;
-                border-radius: 16px;
+            .frame-box {
+                width: 85%;
             }
-            .scan-box {
-                width: 88%;
-                height: 70%;
+            .capture-ring {
+                width: 60px;
+                height: 60px;
+            }
+            .capture-dot {
+                width: 46px;
+                height: 46px;
             }
             .controls {
-                gap: 10px;
-                margin-top: 10px;
+                bottom: 30px;
+                gap: 20px;
             }
-            button {
-                padding: 13px 22px;
-                font-size: 16px;
+            .ctrl-btn {
+                font-size: 20px;
             }
             #status {
-                font-size: 13px;
+                font-size: 12px;
+                top: 50px;
+                padding: 6px 16px;
             }
             .options-grid {
                 gap: 8px;
@@ -566,118 +575,117 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <div class="container">
+    <!-- ===== FULL SCREEN CAMERA ===== -->
+    <div id="cameraView">
+        <video id="video" autoplay muted playsinline></video>
 
-        <!-- CAMERA -->
-        <div class="scanner" id="scanner">
-            <video id="video" autoplay muted playsinline></video>
-            <div class="scanner-overlay">
-                <div class="scan-box"></div>
-                <div class="scan-hint">📄 Place document inside the frame</div>
+        <div class="scan-overlay" id="scanOverlay">
+            <div class="frame-box">
+                <span class="corner tl"></span>
+                <span class="corner tr"></span>
+                <span class="corner bl"></span>
+                <span class="corner br"></span>
+                <span class="frame-label">✦ POSITION DOCUMENT ✦</span>
             </div>
         </div>
-
-        <!-- STATUS -->
-        <div id="status">📷 Starting camera...</div>
-
-        <!-- CONTROLS -->
-        <div class="controls">
-            <button class="btn-gold" id="captureBtn" disabled>📸 Scan</button>
-            <button class="btn-red" id="resetBtn">🔄 Reset</button>
-        </div>
-
-        <!-- ============================================
-        RESULT PANEL - YOUR FOUR OPTIONS
-        ============================================ -->
-        <div id="resultPanel">
-            <div class="preview-mini">
-                <img id="previewImage" alt="Scanned page" />
-            </div>
-
-            <div class="page-info">
-                Page <span id="pageNum">1</span> of <span id="totalPages">1</span>
-            </div>
-
-            <!-- YOUR FOUR OPTIONS -->
-            <div class="options-grid">
-                <button class="btn-option btn-continue" id="continueBtn">
-                    <span class="icon-big">📸</span>
-                    CONTINUE
-                    <span class="sub-text">Scan next page</span>
-                </button>
-                <button class="btn-option btn-done" id="doneBtn">
-                    <span class="icon-big">✅</span>
-                    DONE
-                    <span class="sub-text">Finish &amp; edit</span>
-                </button>
-                <button class="btn-option btn-rescan" id="rescanBtn">
-                    <span class="icon-big">🔄</span>
-                    RESCAN
-                    <span class="sub-text">Retake this page</span>
-                </button>
-                <button class="btn-option btn-crop" id="cropBtn">
-                    <span class="icon-big">✂️</span>
-                    CROP
-                    <span class="sub-text">Manual crop</span>
-                </button>
-            </div>
-
-            <!-- Crop Controls -->
-            <div class="crop-controls" id="cropControls">
-                <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">✅ Apply Crop</button>
-                <button class="btn-crop-action btn-cancel-crop" id="cancelCropBtn">✕ Cancel</button>
-            </div>
-
-            <!-- ============================================
-            EDIT SCREEN (After DONE)
-            ============================================ -->
-            <div id="editScreen">
-                <div class="edit-header">
-                    <h3><i class="fas fa-edit"></i> Edit Document</h3>
-                    <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
-                </div>
-
-                <div class="preview-container">
-                    <img id="editPreview" alt="Document" />
-                </div>
-
-                <div class="edit-toolbar">
-                    <button class="active" data-filter="original">Original</button>
-                    <button data-filter="grayscale">⚫ B&amp;W</button>
-                    <button data-filter="enhance">✨ Enhance</button>
-                    <button data-filter="vintage">📻 Vintage</button>
-                    <button id="rotateBtn">🔄 Rotate</button>
-                    <button id="deleteBtn" class="danger">🗑️ Delete</button>
-                    <button id="saveBtn" class="btn-save">💾 Save</button>
-                </div>
-
-                <div class="pdf-naming">
-                    <label><i class="fas fa-file-pdf"></i> Name:</label>
-                    <input type="text" id="pdfName" value="twarvis" />
-                    <span class="ext">.pdf</span>
-                </div>
-
-                <button class="btn-create-pdf" id="createPdfBtn">
-                    <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
-                </button>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
+    <!-- STATUS -->
+    <div id="status">📷 Starting camera...</div>
 
+    <!-- CONTROLS -->
+    <div class="controls">
+        <button class="ctrl-btn" id="flashBtn" disabled><i class="fas fa-bolt"></i></button>
+        <button class="capture-btn" id="captureBtn" disabled>
+            <div class="capture-ring">
+                <div class="capture-dot"></div>
+            </div>
+        </button>
+        <button class="ctrl-btn" id="galleryBtn"><i class="fas fa-images"></i></button>
+    </div>
+
+    <!-- ===== RESULT PANEL ===== -->
+    <div id="resultPanel">
+        <div class="preview-mini">
+            <img id="previewImage" alt="Scanned page" />
+        </div>
+
+        <div class="page-info">
+            Page <span id="pageNum">1</span> of <span id="totalPages">1</span>
+        </div>
+
+        <div class="options-grid">
+            <button class="btn-option btn-continue" id="continueBtn">
+                <span class="icon-big">📸</span>
+                CONTINUE
+                <span class="sub-text">Scan next page</span>
+            </button>
+            <button class="btn-option btn-done" id="doneBtn">
+                <span class="icon-big">✅</span>
+                DONE
+                <span class="sub-text">Finish &amp; edit</span>
+            </button>
+            <button class="btn-option btn-rescan" id="rescanBtn">
+                <span class="icon-big">🔄</span>
+                RESCAN
+                <span class="sub-text">Retake this page</span>
+            </button>
+            <button class="btn-option btn-crop" id="cropBtn">
+                <span class="icon-big">✂️</span>
+                CROP
+                <span class="sub-text">Manual crop</span>
+            </button>
+        </div>
+
+        <div class="crop-controls" id="cropControls">
+            <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">✅ Apply Crop</button>
+            <button class="btn-crop-action btn-cancel-crop" id="cancelCropBtn">✕ Cancel</button>
+        </div>
+
+        <div id="editScreen">
+            <div class="edit-header">
+                <h3><i class="fas fa-edit"></i> Edit Document</h3>
+                <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
+            </div>
+
+            <div class="preview-container">
+                <img id="editPreview" alt="Document" />
+            </div>
+
+            <div class="edit-toolbar">
+                <button class="active" data-filter="original">Original</button>
+                <button data-filter="grayscale">⚫ B&amp;W</button>
+                <button data-filter="enhance">✨ Enhance</button>
+                <button data-filter="vintage">📻 Vintage</button>
+                <button id="rotateBtn">🔄 Rotate</button>
+                <button id="deleteBtn" class="danger">🗑️ Delete</button>
+                <button id="saveBtn" class="btn-save">💾 Save</button>
+            </div>
+
+            <div class="pdf-naming">
+                <label><i class="fas fa-file-pdf"></i> Name:</label>
+                <input type="text" id="pdfName" value="twarvis" />
+                <span class="ext">.pdf</span>
+            </div>
+
+            <button class="btn-create-pdf" id="createPdfBtn">
+                <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
     <script>
         // ============================================
-        // STUDENT HUB SCANNER - YOUR PROTOCOL
+        // FULL SCREEN SCANNER - YOUR PROTOCOL
         // ============================================
 
         const video = document.getElementById('video');
         const statusDiv = document.getElementById('status');
         const captureBtn = document.getElementById('captureBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const scannerDiv = document.getElementById('scanner');
+        const flashBtn = document.getElementById('flashBtn');
+        const galleryBtn = document.getElementById('galleryBtn');
+        const scanOverlay = document.getElementById('scanOverlay');
 
         const resultPanel = document.getElementById('resultPanel');
         const previewImage = document.getElementById('previewImage');
@@ -710,7 +718,6 @@
         let currentFilter = 'original';
         let isCropMode = false;
         let isProcessing = false;
-        let capturedImageData = null;
 
         // ============================================
         // TOAST
@@ -748,10 +755,11 @@
             try {
                 stopCamera();
                 captureBtn.disabled = true;
-                scannerDiv.style.display = 'block';
+                flashBtn.disabled = true;
                 resultPanel.style.display = 'none';
                 editScreen.classList.remove('active');
                 editScreen.style.display = 'none';
+                scanOverlay.style.display = 'flex';
 
                 if (location.protocol !== 'https:' &&
                     location.hostname !== 'localhost' &&
@@ -760,7 +768,7 @@
                     return;
                 }
 
-                setStatus('⏳ Starting camera...');
+                setStatus('📷 Starting camera...');
 
                 let constraints = {
                     audio: false,
@@ -788,8 +796,9 @@
 
                 await video.play();
 
-                setStatus('✅ Camera ready! Place document in frame and tap Scan.');
                 captureBtn.disabled = false;
+                flashBtn.disabled = false;
+                setStatus('✅ Tap the circle to scan', '#00ff41');
 
             } catch (error) {
                 console.error('Camera error:', error);
@@ -803,15 +812,15 @@
                 const retryBtn = document.createElement('button');
                 retryBtn.textContent = '🔄 Retry Camera';
                 retryBtn.style.cssText =
-                    'margin-top:10px;padding:10px 20px;background:#444;color:white;border:none;border-radius:30px;font-size:14px;cursor:pointer;';
+                    'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:20;padding:12px 30px;background:#444;color:white;border:none;border-radius:30px;font-size:16px;cursor:pointer;';
                 retryBtn.onclick = () => { retryBtn.remove();
                     startCamera(); };
-                statusDiv.parentNode.insertBefore(retryBtn, statusDiv.nextSibling);
+                document.body.appendChild(retryBtn);
             }
         }
 
         // ============================================
-        // CAPTURE
+        // CAPTURE - WORKING
         // ============================================
         function capture() {
             if (isProcessing) return;
@@ -832,7 +841,6 @@
                 const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
                 ctx.drawImage(video, 0, 0, width, height);
 
-                // Auto-crop
                 let finalCanvas = canvas;
                 try {
                     if (typeof Jscanify !== 'undefined') {
@@ -840,18 +848,30 @@
                         const cropped = scanner.extractPaper(canvas, 5);
                         if (cropped && cropped.width > 100 && cropped.height > 100) {
                             finalCanvas = cropped;
+                            console.log('✅ Auto-crop applied');
                         }
                     }
                 } catch (e) { console.warn('Auto-crop failed', e); }
 
-                capturedImageData = finalCanvas.toDataURL('image/png');
+                const imageData = finalCanvas.toDataURL('image/png');
 
-                // Add to pages
-                pages.push(capturedImageData);
+                pages.push(imageData);
                 currentPageIndex = pages.length - 1;
 
                 // Show result panel
-                showResultPanel();
+                resultPanel.style.display = 'block';
+                editScreen.classList.remove('active');
+                editScreen.style.display = 'none';
+                previewImage.src = pages[currentPageIndex];
+                pageNum.textContent = currentPageIndex + 1;
+                totalPages.textContent = pages.length;
+                cropControls.classList.remove('active');
+                isCropMode = false;
+                cropBtn.classList.remove('active-mode');
+                scanOverlay.style.display = 'none';
+
+                // Stop camera
+                stopCamera();
 
                 setStatus('✅ Page scanned!', '#00ff41');
                 showToast('✅ Page scanned!');
@@ -866,22 +886,8 @@
         }
 
         // ============================================
-        // RESULT PANEL - YOUR FOUR OPTIONS
+        // RESULT PANEL - UPDATE
         // ============================================
-        function showResultPanel() {
-            resultPanel.style.display = 'block';
-            editScreen.classList.remove('active');
-            editScreen.style.display = 'none';
-            previewImage.src = pages[currentPageIndex];
-            pageNum.textContent = currentPageIndex + 1;
-            totalPages.textContent = pages.length;
-            cropControls.classList.remove('active');
-            isCropMode = false;
-            cropBtn.classList.remove('active-mode');
-            scannerDiv.style.display = 'none';
-            stopCamera();
-        }
-
         function updateResultPanel() {
             if (pages.length > 0) {
                 previewImage.src = pages[currentPageIndex];
@@ -891,18 +897,18 @@
         }
 
         // ============================================
-        // FOUR OPTIONS - YOUR PROTOCOL
+        // FOUR OPTIONS
         // ============================================
 
-        // 1. CONTINUE - Scan next page
+        // 1. CONTINUE
         continueBtn.addEventListener('click', function() {
             resultPanel.style.display = 'none';
-            scannerDiv.style.display = 'block';
+            scanOverlay.style.display = 'flex';
             startCamera();
             showToast('📸 Scan next page');
         });
 
-        // 2. DONE - Go to edit mode
+        // 2. DONE
         doneBtn.addEventListener('click', function() {
             if (pages.length === 0) { showToast('❌ No pages to edit', 'error'); return; }
             editScreen.style.display = 'block';
@@ -911,13 +917,13 @@
             showToast('✏️ Edit your document');
         });
 
-        // 3. RESCAN - Remove current page and retake
+        // 3. RESCAN
         rescanBtn.addEventListener('click', function() {
             if (pages.length === 0) return;
             pages.splice(currentPageIndex, 1);
             if (pages.length === 0) {
                 resultPanel.style.display = 'none';
-                scannerDiv.style.display = 'block';
+                scanOverlay.style.display = 'flex';
                 startCamera();
                 showToast('🔄 No pages left. Scan again.');
                 return;
@@ -927,7 +933,7 @@
             showToast('🔄 Page removed. Scan again.');
         });
 
-        // 4. CROP - Manual crop mode
+        // 4. CROP
         cropBtn.addEventListener('click', function() {
             if (isCropMode) {
                 isCropMode = false;
@@ -939,14 +945,13 @@
                 isCropMode = true;
                 cropControls.classList.add('active');
                 cropBtn.classList.add('active-mode');
-                showToast('✂️ Drag the golden handles to crop');
+                showToast('✂️ Tap "Apply Crop" to auto-crop');
             }
         });
 
         // Apply Crop
         applyCropBtn.addEventListener('click', function() {
             if (!isCropMode || pages.length === 0) return;
-            // Simple crop: use jscanify again
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
@@ -964,6 +969,8 @@
                             updateResultPanel();
                             editPreview.src = pages[currentPageIndex];
                             showToast('✅ Crop applied!');
+                        } else {
+                            showToast('❌ No document detected', 'error');
                         }
                     }
                 } catch (e) { showToast('❌ Crop failed', 'error'); }
@@ -984,12 +991,12 @@
         });
 
         // ============================================
-        // BACK TO OPTIONS (from Edit)
+        // BACK TO OPTIONS
         // ============================================
         backToOptions.addEventListener('click', function() {
             editScreen.classList.remove('active');
             editScreen.style.display = 'none';
-            showResultPanel();
+            resultPanel.style.display = 'block';
             showToast('📄 Back to pages');
         });
 
@@ -1072,7 +1079,7 @@
         });
 
         // ============================================
-        // DELETE PAGE
+        // DELETE
         // ============================================
         deleteBtn.addEventListener('click', function() {
             if (pages.length === 0) return;
@@ -1082,7 +1089,7 @@
                 editScreen.classList.remove('active');
                 editScreen.style.display = 'none';
                 resultPanel.style.display = 'none';
-                scannerDiv.style.display = 'block';
+                scanOverlay.style.display = 'flex';
                 startCamera();
                 return;
             }
@@ -1093,7 +1100,7 @@
         });
 
         // ============================================
-        // SAVE CHANGES
+        // SAVE
         // ============================================
         saveBtn.addEventListener('click', function() {
             showToast('✅ Changes saved!');
@@ -1123,13 +1130,12 @@
                     if (loaded === pages.length) {
                         pdf.save(`${name}.pdf`);
                         showToast(`✅ ${name}.pdf saved!`);
-                        // Reset everything
                         pages = [];
                         currentPageIndex = 0;
                         editScreen.classList.remove('active');
                         editScreen.style.display = 'none';
                         resultPanel.style.display = 'none';
-                        scannerDiv.style.display = 'block';
+                        scanOverlay.style.display = 'flex';
                         startCamera();
                     }
                 };
@@ -1138,25 +1144,92 @@
         });
 
         // ============================================
+        // GALLERY
+        // ============================================
+        galleryBtn.addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.onchange = function(e) {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                let loaded = 0;
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/png');
+                            pages.push(dataUrl);
+                            currentPageIndex = pages.length - 1;
+                            loaded++;
+                            if (loaded === files.length) {
+                                resultPanel.style.display = 'block';
+                                editScreen.classList.remove('active');
+                                editScreen.style.display = 'none';
+                                previewImage.src = pages[currentPageIndex];
+                                pageNum.textContent = currentPageIndex + 1;
+                                totalPages.textContent = pages.length;
+                                scanOverlay.style.display = 'none';
+                                stopCamera();
+                                showToast(`📸 Added ${files.length} images`);
+                            }
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+            input.click();
+        });
+
+        // ============================================
+        // FLASH
+        // ============================================
+        flashBtn.addEventListener('click', function() {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            if (!track) return;
+            try {
+                const settings = track.getSettings();
+                track.applyConstraints({ advanced: [{ torch: !settings.torch }] })
+                    .then(() => showToast(settings.torch ? '💡 Flash off' : '💡 Flash on'));
+            } catch (err) {
+                showToast('💡 Flash not supported', 'error');
+            }
+        });
+
+        // ============================================
         // RESET
         // ============================================
-        resetBtn.addEventListener('click', function() {
+        document.getElementById('resetBtn')?.addEventListener('click', function() {
             pages = [];
             currentPageIndex = 0;
             resultPanel.style.display = 'none';
             editScreen.classList.remove('active');
             editScreen.style.display = 'none';
-            scannerDiv.style.display = 'block';
+            scanOverlay.style.display = 'flex';
             startCamera();
             showToast('🔄 Reset');
         });
+
+        // ============================================
+        // CAPTURE BUTTON EVENT
+        // ============================================
+        captureBtn.addEventListener('click', capture);
 
         // ============================================
         // START
         // ============================================
         startCamera();
 
-        console.log('📱 Student Hub Scanner - YOUR PROTOCOL');
+        console.log('📱 Full Screen Scanner - Working');
         console.log('📋 Four options: CONTINUE | DONE | RESCAN | CROP');
     </script>
 
