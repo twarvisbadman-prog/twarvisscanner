@@ -21,7 +21,6 @@
             color: #fff;
         }
 
-        /* Matrix Golden Rain Canvas */
         #rain-canvas {
             position: fixed;
             top: 0;
@@ -32,7 +31,6 @@
             background: #0a0a0a;
         }
 
-        /* Golden overlay glow */
         .glow-overlay {
             position: fixed;
             top: 0;
@@ -131,7 +129,6 @@
             text-align: center;
         }
 
-        /* Badge */
         .hero-badge {
             display: inline-block;
             padding: 6px 20px;
@@ -353,7 +350,6 @@
             letter-spacing: 1px;
         }
 
-        /* Social Icons */
         .social-links {
             display: flex;
             justify-content: center;
@@ -423,7 +419,6 @@
             box-shadow: 0 8px 30px rgba(10, 102, 194, 0.15);
         }
 
-        /* Footer Credits */
         .footer-credits {
             color: rgba(255, 255, 255, 0.05);
             font-size: 0.7rem;
@@ -639,13 +634,13 @@
                         <span class="card-tag"><i class="fas fa-camera"></i> Live Scan</span>
                     </a>
 
-                    <!-- GALLERY CARD -->
-                    <a href="scanner.html?mode=gallery" class="choice-card gallery-card" id="galleryChoice">
+                    <!-- GALLERY CARD - DIRECT GALLERY ACCESS -->
+                    <div class="choice-card gallery-card" id="galleryChoice" style="cursor:pointer;">
                         <span class="card-icon">🖼️</span>
                         <h3>Use Images</h3>
-                        <p>Select existing images from your device gallery. Make PDFs from your photos.</p>
-                        <span class="card-tag"><i class="fas fa-images"></i> From Gallery</span>
-                    </a>
+                        <p>Select existing images from your device gallery. Edit and make PDFs instantly.</p>
+                        <span class="card-tag"><i class="fas fa-images"></i> Choose Photos</span>
+                    </div>
                 </div>
 
                 <!-- ===== STATS ===== -->
@@ -680,9 +675,7 @@
                     Smart Document Scanner for Students
                 </div>
 
-                <!-- Social Links -->
                 <div class="social-links">
-                    <!-- Instagram -->
                     <a href="https://www.instagram.com/twarvis_?igsi=aXF5YzA0enRwM2kx&utm_source=qr" 
                        target="_blank" 
                        class="social-link instagram"
@@ -691,7 +684,6 @@
                         @twarvis_
                     </a>
 
-                    <!-- WhatsApp -->
                     <a href="https://wa.me/255740706007" 
                        target="_blank" 
                        class="social-link whatsapp"
@@ -700,7 +692,6 @@
                         +255 740 706 007
                     </a>
 
-                    <!-- LinkedIn -->
                     <a href="https://www.linkedin.com/in/twarvis-davinc-7a7066431?utm_source=share_via&utm_content=profile&utm_medium=member_ios" 
                        target="_blank" 
                        class="social-link linkedin"
@@ -710,7 +701,6 @@
                     </a>
                 </div>
 
-                <!-- Credits -->
                 <div class="footer-credits">
                     <span>Developed with <span class="heart">❤</span> by <span class="name">Twarvis Davinc</span></span>
                     <br />
@@ -780,15 +770,47 @@
         })();
 
         // ============================================
-        // GALLERY MODE HANDLER
+        // DIRECT GALLERY ACCESS - FIXED
         // ============================================
         document.getElementById('galleryChoice').addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = 'scanner.html?mode=gallery';
+            
+            // Create hidden file input
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            
+            input.onchange = function(e) {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                // Store images in localStorage to pass to scanner
+                const imageDataArray = [];
+                let loaded = 0;
+                
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imageDataArray.push(event.target.result);
+                        loaded++;
+                        
+                        if (loaded === files.length) {
+                            // Save to sessionStorage
+                            sessionStorage.setItem('galleryImages', JSON.stringify(imageDataArray));
+                            // Open scanner in gallery mode
+                            window.location.href = 'scanner.html?mode=gallery';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+            
+            input.click();
         });
 
         console.log('✦ Student Hub Home loaded');
-        console.log('📸 Choose: Scan or Use Images');
+        console.log('📸 Click "Use Images" to select photos from your gallery');
         console.log('✦ Follow me on social media!');
     </script>
 </body>
