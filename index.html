@@ -8,11 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ============================================
-           MATRIX GOLDEN RAIN THEME - HOME PAGE
-           ============================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
@@ -20,7 +16,6 @@
             overflow-x: hidden;
             color: #fff;
         }
-
         #rain-canvas {
             position: fixed;
             top: 0;
@@ -30,7 +25,6 @@
             z-index: 0;
             background: #0a0a0a;
         }
-
         .glow-overlay {
             position: fixed;
             top: 0;
@@ -41,7 +35,6 @@
             z-index: 1;
             pointer-events: none;
         }
-
         .glass-overlay {
             position: relative;
             z-index: 2;
@@ -49,8 +42,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* ===== HEADER ===== */
         .header {
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(20px);
@@ -61,7 +52,6 @@
             top: 0;
             z-index: 100;
         }
-
         .header-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -70,7 +60,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.3rem;
             font-weight: 800;
@@ -80,18 +69,12 @@
             color: #ffd700;
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
         }
-
-        .logo i { 
-            color: #ffd700;
-            font-size: 1.4rem;
-        }
-
+        .logo i { color: #ffd700; font-size: 1.4rem; }
         .nav-links {
             display: flex;
             gap: 20px;
             align-items: center;
         }
-
         .nav-links a {
             color: rgba(255, 215, 0, 0.3);
             text-decoration: none;
@@ -102,18 +85,12 @@
             border-radius: 8px;
             letter-spacing: 0.3px;
         }
-
         .nav-links a:hover,
         .nav-links a.active {
             color: #ffd700;
             background: rgba(255, 215, 0, 0.05);
         }
-
-        .nav-links a i {
-            margin-right: 6px;
-        }
-
-        /* ===== HERO SECTION ===== */
+        .nav-links a i { margin-right: 6px; }
         .hero {
             flex: 1;
             display: flex;
@@ -122,13 +99,11 @@
             padding: 40px 24px 40px;
             min-height: calc(100vh - 200px);
         }
-
         .hero-content {
             max-width: 1100px;
             width: 100%;
             text-align: center;
         }
-
         .hero-badge {
             display: inline-block;
             padding: 6px 20px;
@@ -142,19 +117,13 @@
             text-transform: uppercase;
             margin-bottom: 20px;
         }
-
-        .hero-badge i {
-            color: #ffd700;
-            margin-right: 6px;
-        }
-
+        .hero-badge i { color: #ffd700; margin-right: 6px; }
         .hero-title {
             font-size: 3.5rem;
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 16px;
         }
-
         .hero-title .highlight {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             -webkit-background-clip: text;
@@ -162,7 +131,6 @@
             color: transparent;
             text-shadow: 0 0 60px rgba(255, 215, 0, 0.1);
         }
-
         .hero-subtitle {
             color: rgba(255, 215, 0, 0.2);
             font-size: 1.2rem;
@@ -171,8 +139,6 @@
             font-weight: 300;
             letter-spacing: 0.5px;
         }
-
-        /* ===== CHOICE CARDS ===== */
         .choice-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -180,7 +146,6 @@
             max-width: 800px;
             margin: 0 auto 40px;
         }
-
         .choice-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -194,7 +159,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .choice-card::before {
             content: '';
             position: absolute;
@@ -206,37 +170,25 @@
             opacity: 0;
             transition: 0.4s;
         }
-
-        .choice-card:hover::before {
-            opacity: 1;
-        }
-
+        .choice-card:hover::before { opacity: 1; }
         .choice-card:hover {
             transform: translateY(-8px);
             border-color: rgba(255, 215, 0, 0.15);
             box-shadow: 0 20px 60px rgba(255, 215, 0, 0.05);
         }
-
-        .choice-card .card-icon {
-            font-size: 3.5rem;
-            display: block;
-            margin-bottom: 16px;
-        }
-
+        .choice-card .card-icon { font-size: 3.5rem; display: block; margin-bottom: 16px; }
         .choice-card h3 {
             font-size: 1.4rem;
             font-weight: 800;
             margin-bottom: 8px;
             color: #ffd700;
         }
-
         .choice-card p {
             color: rgba(255, 215, 0, 0.2);
             font-size: 0.95rem;
             font-weight: 400;
             line-height: 1.5;
         }
-
         .choice-card .card-tag {
             display: inline-block;
             margin-top: 16px;
@@ -250,44 +202,28 @@
             border: 1px solid rgba(255, 215, 0, 0.05);
             color: rgba(255, 215, 0, 0.2);
         }
-
-        .choice-card .card-tag i {
-            margin-right: 4px;
-        }
-
-        /* SCAN CARD - Golden Glow */
+        .choice-card .card-tag i { margin-right: 4px; }
         .choice-card.scan-card {
             border-color: rgba(255, 215, 0, 0.08);
         }
-
         .choice-card.scan-card:hover {
             border-color: rgba(255, 215, 0, 0.2);
             box-shadow: 0 20px 60px rgba(255, 215, 0, 0.08);
         }
-
         .choice-card.scan-card .card-icon {
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.1));
         }
-
-        /* GALLERY CARD - Blue/Cyan accent */
         .choice-card.gallery-card {
             border-color: rgba(0, 180, 216, 0.08);
         }
-
         .choice-card.gallery-card:hover {
             border-color: rgba(0, 180, 216, 0.15);
             box-shadow: 0 20px 60px rgba(0, 180, 216, 0.05);
         }
-
         .choice-card.gallery-card .card-icon {
             filter: drop-shadow(0 0 30px rgba(0, 180, 216, 0.05));
         }
-
-        .choice-card.gallery-card h3 {
-            color: #00b4d8;
-        }
-
-        /* ===== STATS BAR ===== */
+        .choice-card.gallery-card h3 { color: #00b4d8; }
         .stats-bar {
             display: flex;
             justify-content: center;
@@ -297,26 +233,19 @@
             max-width: 600px;
             margin: 0 auto;
         }
-
-        .stat-item {
-            text-align: center;
-        }
-
+        .stat-item { text-align: center; }
         .stat-item .number {
             font-size: 1.8rem;
             font-weight: 800;
             color: #ffd700;
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
         }
-
         .stat-item .label {
             font-size: 0.8rem;
             color: rgba(255, 215, 0, 0.15);
             font-weight: 500;
             margin-top: 2px;
         }
-
-        /* ===== FOOTER WITH SOCIAL LINKS ===== */
         .footer {
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(20px);
@@ -325,31 +254,24 @@
             margin-top: 20px;
             flex-shrink: 0;
         }
-
         .footer-content {
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
         }
-
         .footer-brand {
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffd700;
             margin-bottom: 6px;
         }
-
-        .footer-brand span {
-            color: rgba(255, 215, 0, 0.2);
-        }
-
+        .footer-brand span { color: rgba(255, 215, 0, 0.2); }
         .footer-tagline {
             color: rgba(255, 215, 0, 0.08);
             font-size: 0.8rem;
             margin-bottom: 16px;
             letter-spacing: 1px;
         }
-
         .social-links {
             display: flex;
             justify-content: center;
@@ -357,7 +279,6 @@
             flex-wrap: wrap;
             margin-bottom: 16px;
         }
-
         .social-link {
             display: inline-flex;
             align-items: center;
@@ -371,54 +292,38 @@
             border: 1px solid transparent;
             background: rgba(255,255,255,0.02);
         }
-
-        .social-link i {
-            font-size: 1.3rem;
-        }
-
-        .social-link:hover {
-            transform: translateY(-4px) scale(1.02);
-        }
-
-        /* Instagram - Pink/Purple */
+        .social-link i { font-size: 1.3rem; }
+        .social-link:hover { transform: translateY(-4px) scale(1.02); }
         .social-link.instagram {
             color: #e4405f;
             border-color: rgba(228, 64, 95, 0.15);
             background: rgba(228, 64, 95, 0.04);
         }
-
         .social-link.instagram:hover {
             background: rgba(228, 64, 95, 0.12);
             border-color: rgba(228, 64, 95, 0.3);
             box-shadow: 0 8px 30px rgba(228, 64, 95, 0.15);
         }
-
-        /* WhatsApp - Green */
         .social-link.whatsapp {
             color: #25d366;
             border-color: rgba(37, 211, 102, 0.15);
             background: rgba(37, 211, 102, 0.04);
         }
-
         .social-link.whatsapp:hover {
             background: rgba(37, 211, 102, 0.12);
             border-color: rgba(37, 211, 102, 0.3);
             box-shadow: 0 8px 30px rgba(37, 211, 102, 0.15);
         }
-
-        /* LinkedIn - Blue */
         .social-link.linkedin {
             color: #0a66c2;
             border-color: rgba(10, 102, 194, 0.15);
             background: rgba(10, 102, 194, 0.04);
         }
-
         .social-link.linkedin:hover {
             background: rgba(10, 102, 194, 0.12);
             border-color: rgba(10, 102, 194, 0.3);
             box-shadow: 0 8px 30px rgba(10, 102, 194, 0.15);
         }
-
         .footer-credits {
             color: rgba(255, 255, 255, 0.05);
             font-size: 0.7rem;
@@ -426,173 +331,56 @@
             padding-top: 12px;
             border-top: 1px solid rgba(255, 215, 0, 0.02);
         }
-
-        .footer-credits .heart {
-            color: #ff4444;
-        }
-
+        .footer-credits .heart { color: #ff4444; }
         .footer-credits .name {
             color: rgba(255, 215, 0, 0.1);
             font-weight: 600;
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.4rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1rem;
-                padding: 0 16px;
-            }
-
-            .choice-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-                max-width: 480px;
-            }
-
-            .choice-card {
-                padding: 32px 24px;
-            }
-
-            .choice-card .card-icon {
-                font-size: 2.8rem;
-            }
-
-            .stats-bar {
-                gap: 30px;
-                flex-wrap: wrap;
-            }
-
-            .stat-item .number {
-                font-size: 1.4rem;
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 8px;
-                padding: 0 16px;
-            }
-
-            .logo {
-                font-size: 1.1rem;
-            }
-
-            .nav-links {
-                gap: 12px;
-            }
-
-            .nav-links a {
-                font-size: 0.8rem;
-                padding: 4px 12px;
-            }
-
-            .social-links {
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .social-link {
-                width: 100%;
-                max-width: 280px;
-                justify-content: center;
-            }
+            .hero-title { font-size: 2.4rem; }
+            .hero-subtitle { font-size: 1rem; padding: 0 16px; }
+            .choice-grid { grid-template-columns: 1fr; gap: 16px; max-width: 480px; }
+            .choice-card { padding: 32px 24px; }
+            .choice-card .card-icon { font-size: 2.8rem; }
+            .stats-bar { gap: 30px; flex-wrap: wrap; }
+            .stat-item .number { font-size: 1.4rem; }
+            .header-content { flex-direction: column; gap: 8px; padding: 0 16px; }
+            .logo { font-size: 1.1rem; }
+            .nav-links { gap: 12px; }
+            .nav-links a { font-size: 0.8rem; padding: 4px 12px; }
+            .social-links { flex-direction: column; align-items: center; gap: 12px; }
+            .social-link { width: 100%; max-width: 280px; justify-content: center; }
         }
-
         @media (max-width: 480px) {
-            .hero {
-                padding: 20px 16px 30px;
-            }
-
-            .hero-title {
-                font-size: 1.8rem;
-            }
-
-            .choice-card {
-                padding: 24px 20px;
-            }
-
-            .choice-card h3 {
-                font-size: 1.2rem;
-            }
-
-            .stats-bar {
-                gap: 20px;
-            }
-
-            .stat-item .number {
-                font-size: 1.2rem;
-            }
-
-            .footer {
-                padding: 20px 16px 16px;
-            }
-
-            .social-link {
-                padding: 8px 18px;
-                font-size: 0.8rem;
-            }
+            .hero { padding: 20px 16px 30px; }
+            .hero-title { font-size: 1.8rem; }
+            .choice-card { padding: 24px 20px; }
+            .choice-card h3 { font-size: 1.2rem; }
+            .stats-bar { gap: 20px; }
+            .stat-item .number { font-size: 1.2rem; }
+            .footer { padding: 20px 16px 16px; }
+            .social-link { padding: 8px 18px; font-size: 0.8rem; }
         }
-
-        /* ===== ANIMATIONS ===== */
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .hero-badge {
-            animation: fadeUp 0.6s ease forwards;
-        }
-
-        .hero-title {
-            animation: fadeUp 0.6s ease 0.1s forwards;
-            opacity: 0;
-        }
-
-        .hero-subtitle {
-            animation: fadeUp 0.6s ease 0.2s forwards;
-            opacity: 0;
-        }
-
-        .choice-card {
-            animation: fadeUp 0.6s ease 0.3s forwards;
-            opacity: 0;
-        }
-
-        .choice-card:last-child {
-            animation-delay: 0.4s;
-        }
-
-        .stats-bar {
-            animation: fadeUp 0.6s ease 0.5s forwards;
-            opacity: 0;
-        }
-
-        .social-link {
-            animation: fadeUp 0.6s ease 0.6s forwards;
-            opacity: 0;
-        }
-
+        .hero-badge { animation: fadeUp 0.6s ease forwards; }
+        .hero-title { animation: fadeUp 0.6s ease 0.1s forwards; opacity: 0; }
+        .hero-subtitle { animation: fadeUp 0.6s ease 0.2s forwards; opacity: 0; }
+        .choice-card { animation: fadeUp 0.6s ease 0.3s forwards; opacity: 0; }
+        .choice-card:last-child { animation-delay: 0.4s; }
+        .stats-bar { animation: fadeUp 0.6s ease 0.5s forwards; opacity: 0; }
+        .social-link { animation: fadeUp 0.6s ease 0.6s forwards; opacity: 0; }
         .social-link:nth-child(2) { animation-delay: 0.7s; }
         .social-link:nth-child(3) { animation-delay: 0.8s; }
     </style>
 </head>
 <body>
-    <!-- Matrix Golden Rain Canvas -->
     <canvas id="rain-canvas"></canvas>
     <div class="glow-overlay"></div>
     
     <div class="glass-overlay">
-        <!-- ===== HEADER ===== -->
         <div class="header">
             <div class="header-content">
                 <div class="logo">
@@ -607,26 +395,21 @@
             </div>
         </div>
 
-        <!-- ===== HERO ===== -->
         <div class="hero">
             <div class="hero-content">
                 <div class="hero-badge">
                     <i class="fas fa-shield-alt"></i> 100% Local Processing
                 </div>
-
                 <h1 class="hero-title">
                     Smart Document<br />
                     <span class="highlight">Scanner</span>
                 </h1>
-
                 <p class="hero-subtitle">
                     Scan unlimited pages or use images from your device.<br />
                     All processing is local — nothing is ever uploaded.
                 </p>
 
-                <!-- ===== CHOICE CARDS ===== -->
                 <div class="choice-grid">
-                    <!-- SCAN CARD -->
                     <a href="scanner.html" class="choice-card scan-card">
                         <span class="card-icon">📸</span>
                         <h3>Scan Document</h3>
@@ -634,7 +417,6 @@
                         <span class="card-tag"><i class="fas fa-camera"></i> Live Scan</span>
                     </a>
 
-                    <!-- GALLERY CARD - DIRECT GALLERY ACCESS -->
                     <div class="choice-card gallery-card" id="galleryChoice" style="cursor:pointer;">
                         <span class="card-icon">🖼️</span>
                         <h3>Use Images</h3>
@@ -643,7 +425,6 @@
                     </div>
                 </div>
 
-                <!-- ===== STATS ===== -->
                 <div class="stats-bar">
                     <div class="stat-item">
                         <div class="number">100%</div>
@@ -665,7 +446,6 @@
             </div>
         </div>
 
-        <!-- ===== FOOTER WITH SOCIAL LINKS ===== -->
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-brand">
@@ -674,33 +454,20 @@
                 <div class="footer-tagline">
                     Smart Document Scanner for Students
                 </div>
-
                 <div class="social-links">
                     <a href="https://www.instagram.com/twarvis_?igsi=aXF5YzA0enRwM2kx&utm_source=qr" 
-                       target="_blank" 
-                       class="social-link instagram"
-                       title="Follow me on Instagram">
-                        <i class="fab fa-instagram"></i>
-                        @twarvis_
+                       target="_blank" class="social-link instagram" title="Follow me on Instagram">
+                        <i class="fab fa-instagram"></i> @twarvis_
                     </a>
-
                     <a href="https://wa.me/255740706007" 
-                       target="_blank" 
-                       class="social-link whatsapp"
-                       title="Chat with me on WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                        +255 740 706 007
+                       target="_blank" class="social-link whatsapp" title="Chat with me on WhatsApp">
+                        <i class="fab fa-whatsapp"></i> +255 740 706 007
                     </a>
-
                     <a href="https://www.linkedin.com/in/twarvis-davinc-7a7066431?utm_source=share_via&utm_content=profile&utm_medium=member_ios" 
-                       target="_blank" 
-                       class="social-link linkedin"
-                       title="Connect with me on LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
-                        Twarvis Davinc
+                       target="_blank" class="social-link linkedin" title="Connect with me on LinkedIn">
+                        <i class="fab fa-linkedin-in"></i> Twarvis Davinc
                     </a>
                 </div>
-
                 <div class="footer-credits">
                     <span>Developed with <span class="heart">❤</span> by <span class="name">Twarvis Davinc</span></span>
                     <br />
@@ -713,22 +480,17 @@
     </div>
 
     <script>
-        // ============================================
-        // MATRIX GOLDEN RAIN
-        // ============================================
+        // Matrix Golden Rain
         (function() {
             const canvas = document.getElementById('rain-canvas');
             const ctx = canvas.getContext('2d');
-            
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
             resize();
             window.addEventListener('resize', resize);
-
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            
             class GoldenDrop {
                 constructor() {
                     this.reset();
@@ -757,9 +519,7 @@
                     ctx.shadowBlur = 0;
                 }
             }
-
             const drops = Array.from({ length: 150 }, () => new GoldenDrop());
-
             function drawRain() {
                 ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -769,13 +529,11 @@
             drawRain();
         })();
 
-        // ============================================
-        // DIRECT GALLERY ACCESS - FIXED
-        // ============================================
+        // GALLERY - DIRECT OPEN WITH REDIRECT
         document.getElementById('galleryChoice').addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Create hidden file input
+            // Create file input
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -785,7 +543,6 @@
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
                 
-                // Store images in localStorage to pass to scanner
                 const imageDataArray = [];
                 let loaded = 0;
                 
@@ -796,9 +553,9 @@
                         loaded++;
                         
                         if (loaded === files.length) {
-                            // Save to sessionStorage
+                            // Store in sessionStorage
                             sessionStorage.setItem('galleryImages', JSON.stringify(imageDataArray));
-                            // Open scanner in gallery mode
+                            // Redirect to scanner with gallery mode
                             window.location.href = 'scanner.html?mode=gallery';
                         }
                     };
@@ -811,7 +568,6 @@
 
         console.log('✦ Student Hub Home loaded');
         console.log('📸 Click "Use Images" to select photos from your gallery');
-        console.log('✦ Follow me on social media!');
     </script>
 </body>
 </html>
