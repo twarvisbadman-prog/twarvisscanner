@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         /* ============================================
-           MATRIX GOLDEN RAIN THEME
+           MATRIX GOLDEN RAIN THEME - SCANNER
            ============================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -32,7 +32,6 @@
             background: #0a0a0a;
         }
 
-        /* Golden overlay glow */
         .glow-overlay {
             position: fixed;
             top: 0;
@@ -136,7 +135,7 @@
             object-fit: cover;
         }
 
-        /* Scanner Frame Overlay - Golden */
+        /* Scanner Frame - Golden */
         .scan-frame {
             position: absolute;
             top: 0;
@@ -184,7 +183,7 @@
             text-transform: uppercase;
         }
 
-        /* Loading Overlay */
+        /* Loading */
         .scan-loading {
             position: absolute;
             top: 0;
@@ -295,7 +294,7 @@
         }
 
         /* ============================================
-           RESULT PANEL - Step 1: Scan Decision
+           RESULT PANEL - THREE OPTIONS
            ============================================ */
         .result-panel {
             position: fixed;
@@ -324,20 +323,21 @@
             margin: 12px auto 0;
         }
 
-        /* ===== STEP 1: DECISION SCREEN ===== */
-        .step-decision {
+        /* ===== THREE OPTIONS SCREEN ===== */
+        .step-options {
             padding: 20px 24px 24px;
         }
 
-        .step-decision .preview-mini {
+        .step-options .preview-mini {
             background: rgba(0,0,0,0.3);
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid rgba(255, 215, 0, 0.04);
             margin-bottom: 16px;
+            position: relative;
         }
 
-        .step-decision .preview-mini img {
+        .step-options .preview-mini img {
             width: 100%;
             height: auto;
             display: block;
@@ -345,91 +345,148 @@
             object-fit: contain;
         }
 
-        .step-decision .page-info {
+        /* Crop overlay on preview */
+        .crop-preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            cursor: crosshair;
+        }
+
+        .crop-preview-overlay.active {
+            display: block;
+        }
+
+        .crop-box-preview {
+            position: absolute;
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            display: none;
+            cursor: move;
+        }
+
+        .crop-box-preview .crop-handle {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #ffd700;
+            border: 2px solid #0a0a0a;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .crop-handle.nw { top: -8px; left: -8px; cursor: nw-resize; }
+        .crop-handle.ne { top: -8px; right: -8px; cursor: ne-resize; }
+        .crop-handle.sw { bottom: -8px; left: -8px; cursor: sw-resize; }
+        .crop-handle.se { bottom: -8px; right: -8px; cursor: se-resize; }
+
+        .step-options .page-info {
             text-align: center;
             font-size: 0.9rem;
             color: rgba(255, 215, 0, 0.3);
             margin-bottom: 16px;
         }
 
-        .step-decision .page-info span {
+        .step-options .page-info span {
             color: #ffd700;
             font-weight: 700;
         }
 
-        /* BIG DECISION BUTTONS */
-        .decision-buttons {
+        /* THREE BIG BUTTONS */
+        .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
             margin-top: 8px;
         }
 
-        .btn-decision {
-            padding: 20px;
+        .btn-option {
+            padding: 16px 12px;
             border: none;
             border-radius: 16px;
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            text-align: center;
         }
 
-        .btn-decision .icon-big {
-            font-size: 2rem;
+        .btn-option .icon-big {
+            font-size: 1.8rem;
         }
-        .btn-decision .sub-text {
-            font-size: 0.75rem;
+        .btn-option .sub-text {
+            font-size: 0.65rem;
             font-weight: 500;
             opacity: 0.6;
         }
 
-        /* CONTINUE Button - Bright Golden */
-        .btn-continue-scan {
+        /* CONTINUE - Golden */
+        .btn-continue {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             color: #0a0a0a;
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.25);
+            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
         }
 
-        .btn-continue-scan:hover {
+        .btn-continue:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.35);
         }
 
-        .btn-continue-scan:active {
-            transform: scale(0.97);
-        }
+        .btn-continue:active { transform: scale(0.97); }
 
-        /* DONE Button - Bold Red/White */
-        .btn-done-scan {
+        /* DONE - Bold Red */
+        .btn-done {
             background: linear-gradient(135deg, #ff1a1a, #cc0000);
             color: #fff;
-            box-shadow: 0 4px 30px rgba(255, 26, 26, 0.25);
+            box-shadow: 0 4px 30px rgba(255, 26, 26, 0.2);
         }
 
-        .btn-done-scan:hover {
+        .btn-done:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 50px rgba(255, 26, 26, 0.4);
+            box-shadow: 0 8px 50px rgba(255, 26, 26, 0.35);
         }
 
-        .btn-done-scan:active {
-            transform: scale(0.97);
+        .btn-done:active { transform: scale(0.97); }
+
+        /* CROP - White outline */
+        .btn-crop {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Page Navigation in Decision */
-        .decision-nav {
+        .btn-crop:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .btn-crop.active-mode {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
+        }
+
+        .btn-crop:active { transform: scale(0.97); }
+
+        /* Page Navigation */
+        .options-nav {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin: 12px 0 16px;
         }
 
-        .decision-nav button {
+        .options-nav button {
             background: rgba(255, 215, 0, 0.03);
             border: 1px solid rgba(255, 215, 0, 0.05);
             color: rgba(255, 215, 0, 0.3);
@@ -440,19 +497,64 @@
             font-size: 13px;
         }
 
-        .decision-nav button:hover {
+        .options-nav button:hover {
             background: rgba(255, 215, 0, 0.05);
             color: #ffd700;
         }
 
-        .decision-nav .page-count {
+        .options-nav .page-count {
             color: rgba(255, 215, 0, 0.2);
             font-size: 13px;
             display: flex;
             align-items: center;
         }
 
-        /* ===== STEP 2: EDIT SCREEN (Hidden initially) ===== */
+        /* ===== CROP MODE CONTROLS ===== */
+        .crop-controls {
+            display: none;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 215, 0, 0.04);
+        }
+
+        .crop-controls.active {
+            display: flex;
+        }
+
+        .crop-controls .btn-crop-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-apply-crop {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #0a0a0a;
+        }
+
+        .btn-apply-crop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-cancel-crop {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-cancel-crop:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        /* ===== STEP 2: EDIT SCREEN ===== */
         .step-edit {
             display: none;
             padding: 16px 24px 24px;
@@ -513,7 +615,7 @@
             object-fit: contain;
         }
 
-        /* ===== TOOLBAR - Bold & Bright ===== */
+        /* Edit Toolbar */
         .edit-toolbar {
             display: flex;
             gap: 6px;
@@ -554,7 +656,7 @@
             color: #ff4444;
         }
 
-        /* ===== EDIT SLIDERS ===== */
+        /* Edit Sliders */
         .edit-sliders {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -594,7 +696,7 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
 
-        /* ===== PDF NAMING ===== */
+        /* PDF Naming */
         .pdf-naming {
             display: flex;
             align-items: center;
@@ -639,7 +741,7 @@
             font-size: 14px;
         }
 
-        /* ===== CREATE PDF BUTTON ===== */
+        /* Create PDF Button */
         .btn-create-pdf {
             width: 100%;
             padding: 16px;
@@ -693,6 +795,23 @@
         .toast.success { border-color: rgba(255, 215, 0, 0.2); }
 
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .btn-option {
+                padding: 14px;
+                flex-direction: row;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .btn-option .icon-big { font-size: 1.4rem; }
+            .btn-option .sub-text { display: none; }
+        }
+
         @media (max-width: 640px) {
             .header-content { padding: 0 12px; flex-wrap: wrap; gap: 4px; }
             .logo { font-size: 1rem; }
@@ -705,14 +824,15 @@
             .frame-corners { width: 85%; }
             .corner { width: 20px; height: 20px; }
             
-            .decision-buttons { grid-template-columns: 1fr; }
-            .btn-decision { padding: 16px; font-size: 1rem; }
-            
-            .step-decision { padding: 16px; }
+            .step-options { padding: 16px; }
             .step-edit { padding: 12px 16px 16px; }
             
             .edit-sliders { grid-template-columns: 1fr; }
             .pdf-naming { flex-wrap: wrap; }
+
+            .crop-controls {
+                flex-direction: column;
+            }
         }
 
         @media (orientation: landscape) and (max-height: 500px) {
@@ -797,41 +917,68 @@
         <div class="result-panel" id="resultPanel">
             <div class="result-handle"></div>
 
-            <!-- ===== STEP 1: DECISION SCREEN ===== -->
-            <div class="step-decision" id="stepDecision">
-                <div class="preview-mini">
-                    <img id="decisionPreview" alt="Scanned page" />
+            <!-- ===== THREE OPTIONS SCREEN ===== -->
+            <div class="step-options" id="stepOptions">
+                <div class="preview-mini" id="previewWrapper">
+                    <img id="optionsPreview" alt="Scanned page" />
+                    <!-- Crop overlay -->
+                    <div class="crop-preview-overlay" id="cropOverlay">
+                        <div class="crop-box-preview" id="cropBox">
+                            <div class="crop-handle nw" data-handle="nw"></div>
+                            <div class="crop-handle ne" data-handle="ne"></div>
+                            <div class="crop-handle sw" data-handle="sw"></div>
+                            <div class="crop-handle se" data-handle="se"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="page-info">
-                    Page <span id="decisionPageNum">1</span> of <span id="decisionTotalPages">1</span>
+                    Page <span id="optionsPageNum">1</span> of <span id="optionsTotalPages">1</span>
                 </div>
 
-                <div class="decision-nav">
-                    <button id="decisionPrev"><i class="fas fa-chevron-left"></i> Prev</button>
-                    <span class="page-count" id="decisionCount">1 / 1</span>
-                    <button id="decisionNext">Next <i class="fas fa-chevron-right"></i></button>
+                <div class="options-nav">
+                    <button id="optionsPrev"><i class="fas fa-chevron-left"></i> Prev</button>
+                    <span class="page-count" id="optionsCount">1 / 1</span>
+                    <button id="optionsNext">Next <i class="fas fa-chevron-right"></i></button>
                 </div>
 
-                <div class="decision-buttons">
-                    <button class="btn-decision btn-continue-scan" id="continueBtn">
+                <!-- ===== THREE BIG BUTTONS ===== -->
+                <div class="options-grid">
+                    <button class="btn-option btn-continue" id="continueBtn">
                         <span class="icon-big">📸</span>
-                        SCAN NEXT PAGE
-                        <span class="sub-text">Continue scanning more pages</span>
+                        CONTINUE SCANNING
+                        <span class="sub-text">Scan next page</span>
                     </button>
-                    <button class="btn-decision btn-done-scan" id="doneBtn">
+                    
+                    <button class="btn-option btn-done" id="doneBtn">
                         <span class="icon-big">✅</span>
-                        I'M DONE SCANNING
-                        <span class="sub-text">Edit, filter &amp; create PDF</span>
+                        DONE
+                        <span class="sub-text">Finish &amp; edit</span>
+                    </button>
+                    
+                    <button class="btn-option btn-crop" id="cropBtn">
+                        <span class="icon-big">✂️</span>
+                        CROP PAGE
+                        <span class="sub-text">Manual crop</span>
+                    </button>
+                </div>
+
+                <!-- Crop Controls (shown when crop mode is active) -->
+                <div class="crop-controls" id="cropControls">
+                    <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">
+                        ✅ Apply Crop
+                    </button>
+                    <button class="btn-crop-action btn-cancel-crop" id="cancelCropBtn">
+                        ✕ Cancel
                     </button>
                 </div>
             </div>
 
-            <!-- ===== STEP 2: EDIT SCREEN ===== -->
+            <!-- ===== EDIT SCREEN (After DONE) ===== -->
             <div class="step-edit" id="stepEdit">
                 <div class="edit-header">
                     <h3><i class="fas fa-edit"></i> Edit &amp; Create PDF</h3>
-                    <button class="close-edit" id="backToDecision"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="close-edit" id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
                 </div>
 
                 <div class="preview-container">
@@ -897,7 +1044,6 @@
             resize();
             window.addEventListener('resize', resize);
 
-            // Golden characters - Matrix style
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             
             class GoldenDrop {
@@ -941,7 +1087,7 @@
         })();
 
         // ============================================
-        // STUDENT HUB SCANNER - Proper Flow
+        // STUDENT HUB SCANNER - Three Options + Crop
         // ============================================
 
         class StudentHubScanner {
@@ -950,15 +1096,21 @@
                 this.video = document.getElementById('video');
                 this.canvas = document.getElementById('canvas');
                 this.ctx = this.canvas.getContext('2d');
-                this.decisionPreview = document.getElementById('decisionPreview');
+                this.optionsPreview = document.getElementById('optionsPreview');
                 this.editPreview = document.getElementById('editPreview');
                 this.resultPanel = document.getElementById('resultPanel');
-                this.stepDecision = document.getElementById('stepDecision');
+                this.stepOptions = document.getElementById('stepOptions');
                 this.stepEdit = document.getElementById('stepEdit');
                 this.toast = document.getElementById('toast');
                 this.scanLoading = document.getElementById('scanLoading');
                 this.pageCounter = document.getElementById('pageCounter');
                 this.scanFrame = document.getElementById('scanFrame');
+
+                // Crop elements
+                this.cropOverlay = document.getElementById('cropOverlay');
+                this.cropBox = document.getElementById('cropBox');
+                this.cropControls = document.getElementById('cropControls');
+                this.previewWrapper = document.getElementById('previewWrapper');
 
                 // State
                 this.stream = null;
@@ -969,9 +1121,15 @@
                 this.contrast = 100;
                 this.isProcessing = false;
                 this.isEditMode = false;
+                this.isCropMode = false;
+                this.cropData = { x: 0, y: 0, w: 0, h: 0 };
+                this.isCropping = false;
 
                 // Bind
                 this.bindEvents();
+
+                // Check for gallery mode
+                this.checkGalleryMode();
 
                 // Auto-start
                 setTimeout(() => this.startCamera(), 500);
@@ -985,16 +1143,21 @@
                 document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
                 document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
 
-                // Decision buttons
+                // Three options buttons
                 document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
                 document.getElementById('doneBtn').addEventListener('click', () => this.goToEditMode());
+                document.getElementById('cropBtn').addEventListener('click', () => this.toggleCropMode());
 
-                // Decision navigation
-                document.getElementById('decisionPrev').addEventListener('click', () => this.decisionPrev());
-                document.getElementById('decisionNext').addEventListener('click', () => this.decisionNext());
+                // Crop controls
+                document.getElementById('applyCropBtn').addEventListener('click', () => this.applyCrop());
+                document.getElementById('cancelCropBtn').addEventListener('click', () => this.cancelCrop());
+
+                // Options navigation
+                document.getElementById('optionsPrev').addEventListener('click', () => this.optionsPrev());
+                document.getElementById('optionsNext').addEventListener('click', () => this.optionsNext());
 
                 // Edit mode navigation
-                document.getElementById('backToDecision').addEventListener('click', () => this.backToDecision());
+                document.getElementById('backToOptions').addEventListener('click', () => this.backToOptions());
 
                 // Edit tools
                 document.querySelectorAll('[data-filter]').forEach(btn => {
@@ -1025,11 +1188,37 @@
                 // Keyboard
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !this.isProcessing) this.capture();
-                    if (e.key === 'Escape') this.closeResult();
+                    if (e.key === 'Escape') {
+                        if (this.isCropMode) {
+                            this.cancelCrop();
+                        } else {
+                            this.closeResult();
+                        }
+                    }
                 });
+
+                // Crop drag events
+                this.initCropDrag();
             }
 
-            // ===== CAMERA =====
+            // ============================================
+            // GALLERY MODE
+            // ============================================
+            checkGalleryMode() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const mode = urlParams.get('mode');
+                
+                if (mode === 'gallery') {
+                    setTimeout(() => {
+                        this.openGallery();
+                        this.showToast('🖼️ Select images from your gallery');
+                    }, 800);
+                }
+            }
+
+            // ============================================
+            // CAMERA
+            // ============================================
             async startCamera() {
                 try {
                     this.showToast('✦ Starting camera...');
@@ -1053,7 +1242,9 @@
                 }
             }
 
-            // ===== CAPTURE =====
+            // ============================================
+            // CAPTURE
+            // ============================================
             capture() {
                 if (this.isProcessing) return;
                 this.isProcessing = true;
@@ -1104,23 +1295,26 @@
                 }
             }
 
-            // ===== PAGE MANAGEMENT =====
+            // ============================================
+            // PAGE MANAGEMENT
+            // ============================================
             addPage(canvas) {
                 const dataUrl = canvas.toDataURL('image/png');
                 this.pages.push(dataUrl);
                 this.currentIndex = this.pages.length - 1;
-                this.updateDecisionView();
+                this.updateOptionsView();
                 this.updateCounter();
                 this.showResult();
                 this.scanFrame.style.display = 'none';
+                this.exitCropMode();
             }
 
-            updateDecisionView() {
+            updateOptionsView() {
                 if (this.pages.length > 0) {
-                    this.decisionPreview.src = this.pages[this.currentIndex];
-                    document.getElementById('decisionPageNum').textContent = this.currentIndex + 1;
-                    document.getElementById('decisionTotalPages').textContent = this.pages.length;
-                    document.getElementById('decisionCount').textContent = `${this.currentIndex + 1} / ${this.pages.length}`;
+                    this.optionsPreview.src = this.pages[this.currentIndex];
+                    document.getElementById('optionsPageNum').textContent = this.currentIndex + 1;
+                    document.getElementById('optionsTotalPages').textContent = this.pages.length;
+                    document.getElementById('optionsCount').textContent = `${this.currentIndex + 1} / ${this.pages.length}`;
                 }
             }
 
@@ -1136,65 +1330,271 @@
 
             showResult() {
                 this.resultPanel.classList.add('open');
-                this.stepDecision.style.display = 'block';
+                this.stepOptions.style.display = 'block';
                 this.stepEdit.classList.remove('active');
                 this.stepEdit.style.display = 'none';
                 this.isEditMode = false;
-                this.updateDecisionView();
+                this.exitCropMode();
+                this.updateOptionsView();
             }
 
             closeResult() {
                 this.resultPanel.classList.remove('open');
                 this.scanFrame.style.display = 'flex';
+                this.exitCropMode();
             }
 
-            // ===== DECISION NAVIGATION =====
-            decisionPrev() {
+            // ============================================
+            // OPTIONS NAVIGATION
+            // ============================================
+            optionsPrev() {
                 if (this.currentIndex > 0) {
                     this.currentIndex--;
-                    this.updateDecisionView();
+                    this.updateOptionsView();
+                    this.exitCropMode();
                 }
             }
 
-            decisionNext() {
+            optionsNext() {
                 if (this.currentIndex < this.pages.length - 1) {
                     this.currentIndex++;
-                    this.updateDecisionView();
+                    this.updateOptionsView();
+                    this.exitCropMode();
                 }
             }
 
-            // ===== CONTINUE SCANNING =====
+            // ============================================
+            // THREE OPTIONS ACTIONS
+            // ============================================
             continueScanning() {
                 this.closeResult();
                 this.scanFrame.style.display = 'flex';
                 this.showToast('📸 Scan next page');
             }
 
-            // ===== GO TO EDIT MODE =====
             goToEditMode() {
                 if (this.pages.length === 0) {
                     this.showToast('❌ No pages to edit', 'error');
                     return;
                 }
                 this.isEditMode = true;
-                this.stepDecision.style.display = 'none';
+                this.stepOptions.style.display = 'none';
                 this.stepEdit.style.display = 'block';
                 setTimeout(() => {
                     this.stepEdit.classList.add('active');
                 }, 50);
                 this.updateEditView();
                 this.showToast('✏️ Edit your document');
+                this.exitCropMode();
             }
 
-            backToDecision() {
+            backToOptions() {
                 this.isEditMode = false;
                 this.stepEdit.classList.remove('active');
                 this.stepEdit.style.display = 'none';
-                this.stepDecision.style.display = 'block';
-                this.updateDecisionView();
+                this.stepOptions.style.display = 'block';
+                this.updateOptionsView();
+                this.exitCropMode();
             }
 
-            // ===== FILTERS =====
+            // ============================================
+            // CROP MODE
+            // ============================================
+            toggleCropMode() {
+                if (this.isCropMode) {
+                    this.exitCropMode();
+                } else {
+                    this.enterCropMode();
+                }
+            }
+
+            enterCropMode() {
+                if (this.pages.length === 0) {
+                    this.showToast('❌ No page to crop', 'error');
+                    return;
+                }
+                this.isCropMode = true;
+                this.cropOverlay.classList.add('active');
+                this.cropControls.classList.add('active');
+                document.getElementById('cropBtn').classList.add('active-mode');
+                
+                // Initialize crop box to full image
+                const previewImg = this.optionsPreview;
+                const wrapper = this.previewWrapper;
+                const rect = wrapper.getBoundingClientRect();
+                const imgRect = previewImg.getBoundingClientRect();
+                
+                // Set crop box to 80% of image
+                const padding = 0.1;
+                this.cropData = {
+                    x: padding,
+                    y: padding,
+                    w: 1 - padding * 2,
+                    h: 1 - padding * 2
+                };
+                this.updateCropBox();
+                this.showToast('✂️ Drag corners to crop the page');
+            }
+
+            exitCropMode() {
+                this.isCropMode = false;
+                this.cropOverlay.classList.remove('active');
+                this.cropControls.classList.remove('active');
+                document.getElementById('cropBtn').classList.remove('active-mode');
+            }
+
+            updateCropBox() {
+                const wrapper = this.previewWrapper;
+                const rect = wrapper.getBoundingClientRect();
+                const w = rect.width;
+                const h = rect.height;
+                
+                const box = this.cropBox;
+                box.style.display = 'block';
+                box.style.left = (this.cropData.x * w) + 'px';
+                box.style.top = (this.cropData.y * h) + 'px';
+                box.style.width = (this.cropData.w * w) + 'px';
+                box.style.height = (this.cropData.h * h) + 'px';
+            }
+
+            initCropDrag() {
+                let isDragging = false;
+                let handle = null;
+                let startX, startY, startData;
+
+                const box = this.cropBox;
+                const handles = box.querySelectorAll('.crop-handle');
+
+                handles.forEach(h => {
+                    h.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        isDragging = true;
+                        handle = h.dataset.handle;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        startData = { ...this.cropData };
+                    });
+
+                    h.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        isDragging = true;
+                        handle = h.dataset.handle;
+                        startX = touch.clientX;
+                        startY = touch.clientY;
+                        startData = { ...this.cropData };
+                    });
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging || !this.isCropMode) return;
+                    this.resizeCrop(e.clientX, e.clientY);
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (!isDragging || !this.isCropMode) return;
+                    const touch = e.touches[0];
+                    this.resizeCrop(touch.clientX, touch.clientY);
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                    }
+                });
+
+                document.addEventListener('touchend', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                    }
+                });
+            }
+
+            resizeCrop(clientX, clientY) {
+                const wrapper = this.previewWrapper;
+                const rect = wrapper.getBoundingClientRect();
+                const dx = (clientX - startX) / rect.width;
+                const dy = (clientY - startY) / rect.height;
+
+                let x = startData.x;
+                let y = startData.y;
+                let w = startData.w;
+                let h = startData.h;
+
+                const minSize = 0.05;
+
+                switch (handle) {
+                    case 'se':
+                        w = Math.max(minSize, startData.w + dx);
+                        h = Math.max(minSize, startData.h + dy);
+                        break;
+                    case 'nw':
+                        x = Math.max(0, startData.x + dx);
+                        y = Math.max(0, startData.y + dy);
+                        w = Math.max(minSize, startData.w - dx);
+                        h = Math.max(minSize, startData.h - dy);
+                        break;
+                    case 'ne':
+                        y = Math.max(0, startData.y + dy);
+                        w = Math.max(minSize, startData.w + dx);
+                        h = Math.max(minSize, startData.h - dy);
+                        break;
+                    case 'sw':
+                        x = Math.max(0, startData.x + dx);
+                        w = Math.max(minSize, startData.w - dx);
+                        h = Math.max(minSize, startData.h + dy);
+                        break;
+                }
+
+                // Ensure within bounds
+                x = Math.max(0, Math.min(x, 1 - minSize));
+                y = Math.max(0, Math.min(y, 1 - minSize));
+                w = Math.min(1 - x, Math.max(minSize, w));
+                h = Math.min(1 - y, Math.max(minSize, h));
+
+                this.cropData = { x, y, w, h };
+                this.updateCropBox();
+            }
+
+            applyCrop() {
+                if (!this.isCropMode || this.pages.length === 0) return;
+
+                const dataUrl = this.pages[this.currentIndex];
+                const img = new Image();
+                img.onload = () => {
+                    const wrapper = this.previewWrapper;
+                    const rect = wrapper.getBoundingClientRect();
+                    
+                    // Calculate crop in image coordinates
+                    const cropX = this.cropData.x * img.width;
+                    const cropY = this.cropData.y * img.height;
+                    const cropW = this.cropData.w * img.width;
+                    const cropH = this.cropData.h * img.height;
+
+                    // Create cropped canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cropW;
+                    canvas.height = cropH;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+                    // Update page
+                    this.pages[this.currentIndex] = canvas.toDataURL('image/png');
+                    this.updateOptionsView();
+                    this.showToast('✅ Crop applied!');
+                    this.exitCropMode();
+                };
+                img.src = dataUrl;
+            }
+
+            cancelCrop() {
+                this.exitCropMode();
+                this.showToast('✂️ Crop cancelled');
+            }
+
+            // ============================================
+            // FILTERS
+            // ============================================
             applyFilter() {
                 if (this.pages.length === 0) return;
                 const img = new Image();
@@ -1267,7 +1667,9 @@
                 return result;
             }
 
-            // ===== ROTATE =====
+            // ============================================
+            // ROTATE
+            // ============================================
             rotatePage() {
                 if (this.pages.length === 0) return;
                 const img = new Image();
@@ -1286,13 +1688,15 @@
                 img.src = this.pages[this.currentIndex];
             }
 
-            // ===== DELETE PAGE =====
+            // ============================================
+            // DELETE PAGE
+            // ============================================
             deletePage() {
                 if (this.pages.length === 0) return;
                 this.pages.splice(this.currentIndex, 1);
                 if (this.pages.length === 0) {
                     this.showToast('No pages left');
-                    this.backToDecision();
+                    this.backToOptions();
                     this.closeResult();
                     this.updateCounter();
                     this.scanFrame.style.display = 'flex';
@@ -1300,12 +1704,14 @@
                 }
                 this.currentIndex = Math.min(this.currentIndex, this.pages.length - 1);
                 this.updateEditView();
-                this.updateDecisionView();
+                this.updateOptionsView();
                 this.updateCounter();
                 this.showToast('🗑️ Page deleted');
             }
 
-            // ===== MAKE PDF =====
+            // ============================================
+            // MAKE PDF
+            // ============================================
             makePDF() {
                 if (this.pages.length === 0) {
                     this.showToast('❌ No pages', 'error');
@@ -1336,13 +1742,16 @@
                 this.updateCounter();
                 this.closeResult();
                 this.scanFrame.style.display = 'flex';
-                this.stepDecision.style.display = 'block';
+                this.stepOptions.style.display = 'block';
                 this.stepEdit.classList.remove('active');
                 this.stepEdit.style.display = 'none';
                 this.isEditMode = false;
+                this.exitCropMode();
             }
 
-            // ===== FLASH =====
+            // ============================================
+            // FLASH
+            // ============================================
             toggleFlash() {
                 if (!this.stream) return;
                 const track = this.stream.getVideoTracks()[0];
@@ -1356,14 +1765,19 @@
                 }
             }
 
-            // ===== GALLERY =====
+            // ============================================
+            // GALLERY
+            // ============================================
             openGallery() {
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
                 input.multiple = true;
                 input.onchange = (e) => {
-                    Array.from(e.target.files).forEach(file => {
+                    const files = Array.from(e.target.files);
+                    if (files.length === 0) return;
+                    
+                    files.forEach(file => {
                         const reader = new FileReader();
                         reader.onload = (event) => {
                             const img = new Image();
@@ -1379,12 +1793,14 @@
                         };
                         reader.readAsDataURL(file);
                     });
-                    this.showToast(`📸 Added images`);
+                    this.showToast(`📸 Added ${files.length} images`);
                 };
                 input.click();
             }
 
-            // ===== TOAST =====
+            // ============================================
+            // TOAST
+            // ============================================
             showToast(msg, type = 'info') {
                 this.toast.textContent = msg;
                 this.toast.style.display = 'block';
