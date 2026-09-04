@@ -35,6 +35,10 @@
             height: 100%;
             z-index: 1;
             background: #000;
+            display: none;
+        }
+        #cameraView.active {
+            display: block;
         }
 
         #video {
@@ -44,7 +48,6 @@
             display: block;
         }
 
-        /* ===== SCAN FRAME OVERLAY ===== */
         .scan-overlay {
             position: fixed;
             top: 0;
@@ -127,20 +130,24 @@
             border-radius: 30px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 215, 0, 0.1);
+            display: none;
         }
 
-        /* ===== BOTTOM CONTROLS ===== */
+        /* ===== CONTROLS ===== */
         .controls {
             position: fixed;
             bottom: 40px;
             left: 0;
             right: 0;
             z-index: 10;
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             gap: 30px;
             padding: 0 20px;
+        }
+        .controls.active {
+            display: flex;
         }
 
         .ctrl-btn {
@@ -196,7 +203,7 @@
         }
 
         /* ============================================
-           RESULT PANEL - SLIDES UP
+           RESULT PANEL - FOUR OPTIONS
            ============================================ */
         #resultPanel {
             display: none;
@@ -213,6 +220,9 @@
             overflow: hidden;
             padding: 16px 20px 24px;
             animation: slideUp 0.4s ease;
+        }
+        #resultPanel.active {
+            display: block;
         }
 
         @keyframes slideUp {
@@ -231,12 +241,11 @@
             border: 1px solid rgba(255, 215, 0, 0.04);
             margin-bottom: 14px;
         }
-
         #resultPanel .preview-mini img {
             width: 100%;
             height: auto;
             display: block;
-            max-height: 35vh;
+            max-height: 30vh;
             object-fit: contain;
         }
 
@@ -246,7 +255,6 @@
             color: rgba(255, 215, 0, 0.3);
             margin-bottom: 12px;
         }
-
         #resultPanel .page-info span {
             color: #ffd700;
             font-weight: 700;
@@ -257,7 +265,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 6px;
         }
 
         .btn-option {
@@ -305,81 +312,51 @@
             color: #fff;
             box-shadow: 0 4px 30px rgba(0, 180, 216, 0.15);
         }
-        .btn-crop {
+        .btn-delete-page {
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
-            border: 2px solid rgba(0, 255, 65, 0.15);
+            border: 2px solid rgba(255, 0, 0, 0.2);
         }
-        .btn-crop.active-mode {
-            border-color: #ffd700;
-            background: rgba(255, 215, 0, 0.05);
-        }
-
-        /* ===== CROP CONTROLS ===== */
-        .crop-controls {
-            display: none;
-            gap: 10px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 215, 0, 0.04);
-        }
-        .crop-controls.active {
-            display: flex;
-        }
-        .crop-controls .btn-crop-action {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: inherit;
-            touch-action: manipulation;
-        }
-        .btn-apply-crop {
-            background: linear-gradient(135deg, #00ff41, #00cc33);
-            color: #0a0a0a;
-        }
-        .btn-cancel-crop {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .btn-delete-page:hover {
+            border-color: rgba(255, 0, 0, 0.5);
+            background: rgba(255, 0, 0, 0.05);
         }
 
-        /* ===== EDIT SCREEN ===== */
-        #editScreen {
+        /* ============================================
+           EDIT MODE (After DONE)
+           ============================================ */
+        #editMode {
             display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 92vh;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px 24px 0 0;
+            z-index: 150;
+            border-top: 1px solid rgba(255, 215, 0, 0.05);
+            overflow: hidden;
             padding: 16px 20px 24px;
+            animation: slideUp 0.4s ease;
         }
-        #editScreen.active {
+        #editMode.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        #editScreen .edit-header {
+        #editMode .edit-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
         }
-        #editScreen .edit-header h3 {
+        #editMode .edit-header h3 {
             color: #ffd700;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
         }
-        #editScreen .edit-header button {
+        #editMode .edit-header button {
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.2);
@@ -388,15 +365,74 @@
             padding: 4px 8px;
             border-radius: 6px;
         }
+        #editMode .edit-header button:hover {
+            color: #fff;
+        }
 
-        #editScreen .preview-container {
+        /* Page thumbnails */
+        .edit-pages {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 8px 0 14px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.04);
+        }
+        .edit-pages::-webkit-scrollbar {
+            height: 4px;
+        }
+        .edit-pages::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        .page-thumb {
+            flex-shrink: 0;
+            width: 80px;
+            height: 100px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            background: #111;
+        }
+        .page-thumb.active {
+            border-color: #ffd700;
+        }
+        .page-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .page-thumb .page-num {
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .page-thumb .drag-handle {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            cursor: grab;
+        }
+
+        .edit-preview-container {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid rgba(255, 215, 0, 0.04);
             margin-bottom: 14px;
         }
-        #editScreen .preview-container img {
+        .edit-preview-container img {
             width: 100%;
             height: auto;
             display: block;
@@ -501,6 +537,78 @@
             transform: scale(0.97);
         }
 
+        /* ============================================
+           THANK YOU MODAL
+           ============================================ */
+        #thankYouModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+        #thankYouModal.active {
+            display: flex;
+        }
+
+        .thank-you-box {
+            background: rgba(20, 20, 35, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 30px;
+            padding: 50px 40px 40px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: popIn 0.5s ease;
+        }
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .thank-you-box .emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+        .thank-you-box h2 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .thank-you-box p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .thank-you-box .btn-close-thanks {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 60px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #0a0a0a;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        .thank-you-box .btn-close-thanks:hover {
+            transform: scale(1.05);
+        }
+
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
@@ -560,12 +668,16 @@
             #resultPanel {
                 padding: 14px 16px 20px;
             }
-            #editScreen {
+            #editMode {
                 padding: 12px 16px 20px;
             }
             .edit-toolbar button {
                 font-size: 10px;
                 padding: 6px 12px;
+            }
+            .page-thumb {
+                width: 60px;
+                height: 80px;
             }
         }
     </style>
@@ -576,9 +688,8 @@
     <div class="toast" id="toast"></div>
 
     <!-- ===== FULL SCREEN CAMERA ===== -->
-    <div id="cameraView">
+    <div id="cameraView" class="active">
         <video id="video" autoplay muted playsinline></video>
-
         <div class="scan-overlay" id="scanOverlay">
             <div class="frame-box">
                 <span class="corner tl"></span>
@@ -594,7 +705,7 @@
     <div id="status">📷 Starting camera...</div>
 
     <!-- CONTROLS -->
-    <div class="controls">
+    <div class="controls active" id="controls">
         <button class="ctrl-btn" id="flashBtn" disabled><i class="fas fa-bolt"></i></button>
         <button class="capture-btn" id="captureBtn" disabled>
             <div class="capture-ring">
@@ -604,16 +715,14 @@
         <button class="ctrl-btn" id="galleryBtn"><i class="fas fa-images"></i></button>
     </div>
 
-    <!-- ===== RESULT PANEL ===== -->
+    <!-- ===== RESULT PANEL (FOUR OPTIONS) ===== -->
     <div id="resultPanel">
         <div class="preview-mini">
             <img id="previewImage" alt="Scanned page" />
         </div>
-
         <div class="page-info">
             Page <span id="pageNum">1</span> of <span id="totalPages">1</span>
         </div>
-
         <div class="options-grid">
             <button class="btn-option btn-continue" id="continueBtn">
                 <span class="icon-big">📸</span>
@@ -630,84 +739,105 @@
                 RESCAN
                 <span class="sub-text">Retake this page</span>
             </button>
-            <button class="btn-option btn-crop" id="cropBtn">
-                <span class="icon-big">✂️</span>
-                CROP
-                <span class="sub-text">Manual crop</span>
+            <button class="btn-option btn-delete-page" id="deletePageBtn">
+                <span class="icon-big">🗑️</span>
+                DELETE
+                <span class="sub-text">Remove this page</span>
             </button>
         </div>
+    </div>
 
-        <div class="crop-controls" id="cropControls">
-            <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">✅ Apply Crop</button>
-            <button class="btn-crop-action btn-cancel-crop" id="cancelCropBtn">✕ Cancel</button>
+    <!-- ===== EDIT MODE (After DONE) ===== -->
+    <div id="editMode">
+        <div class="edit-header">
+            <h3><i class="fas fa-edit"></i> Edit Document</h3>
+            <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
         </div>
 
-        <div id="editScreen">
-            <div class="edit-header">
-                <h3><i class="fas fa-edit"></i> Edit Document</h3>
-                <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
-            </div>
+        <!-- Page Thumbnails -->
+        <div class="edit-pages" id="editPages"></div>
 
-            <div class="preview-container">
-                <img id="editPreview" alt="Document" />
-            </div>
+        <!-- Preview -->
+        <div class="edit-preview-container">
+            <img id="editPreview" alt="Document" />
+        </div>
 
-            <div class="edit-toolbar">
-                <button class="active" data-filter="original">Original</button>
-                <button data-filter="grayscale">⚫ B&amp;W</button>
-                <button data-filter="enhance">✨ Enhance</button>
-                <button data-filter="vintage">📻 Vintage</button>
-                <button id="rotateBtn">🔄 Rotate</button>
-                <button id="deleteBtn" class="danger">🗑️ Delete</button>
-                <button id="saveBtn" class="btn-save">💾 Save</button>
-            </div>
+        <!-- Toolbar -->
+        <div class="edit-toolbar">
+            <button class="active" data-filter="original">Original</button>
+            <button data-filter="grayscale">⚫ B&amp;W</button>
+            <button data-filter="enhance">✨ Enhance</button>
+            <button data-filter="vintage">📻 Vintage</button>
+            <button id="rotateBtn">🔄 Rotate</button>
+            <button id="deleteEditBtn" class="danger">🗑️ Delete</button>
+            <button id="saveBtn" class="btn-save">💾 Save</button>
+        </div>
 
-            <div class="pdf-naming">
-                <label><i class="fas fa-file-pdf"></i> Name:</label>
-                <input type="text" id="pdfName" value="twarvis" />
-                <span class="ext">.pdf</span>
-            </div>
+        <!-- PDF Naming -->
+        <div class="pdf-naming">
+            <label><i class="fas fa-file-pdf"></i> Name:</label>
+            <input type="text" id="pdfName" value="twarvis" />
+            <span class="ext">.pdf</span>
+        </div>
 
-            <button class="btn-create-pdf" id="createPdfBtn">
-                <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
-            </button>
+        <!-- Create PDF -->
+        <button class="btn-create-pdf" id="createPdfBtn">
+            <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
+        </button>
+    </div>
+
+    <!-- ===== THANK YOU MODAL ===== -->
+    <div id="thankYouModal">
+        <div class="thank-you-box">
+            <div class="emoji">🎉</div>
+            <h2>Thank You!</h2>
+            <p>
+                Thanks for using our web!<br />
+                Please come again.<br />
+                <span style="color:rgba(255,215,0,0.3);">You're welcome!</span>
+            </p>
+            <button class="btn-close-thanks" id="closeThankYou">Continue</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jscanify@1.2.0/dist/jscanify.min.js"></script>
     <script>
         // ============================================
-        // FULL SCREEN SCANNER - YOUR PROTOCOL
+        // COMPLETE SCANNER - ALL FIXES
         // ============================================
 
+        // ===== DOM REFS =====
         const video = document.getElementById('video');
         const statusDiv = document.getElementById('status');
         const captureBtn = document.getElementById('captureBtn');
         const flashBtn = document.getElementById('flashBtn');
         const galleryBtn = document.getElementById('galleryBtn');
+        const cameraView = document.getElementById('cameraView');
+        const controls = document.getElementById('controls');
         const scanOverlay = document.getElementById('scanOverlay');
 
         const resultPanel = document.getElementById('resultPanel');
         const previewImage = document.getElementById('previewImage');
-        const editPreview = document.getElementById('editPreview');
         const pageNum = document.getElementById('pageNum');
         const totalPages = document.getElementById('totalPages');
 
         const continueBtn = document.getElementById('continueBtn');
         const doneBtn = document.getElementById('doneBtn');
         const rescanBtn = document.getElementById('rescanBtn');
-        const cropBtn = document.getElementById('cropBtn');
-        const applyCropBtn = document.getElementById('applyCropBtn');
-        const cancelCropBtn = document.getElementById('cancelCropBtn');
-        const cropControls = document.getElementById('cropControls');
+        const deletePageBtn = document.getElementById('deletePageBtn');
 
-        const editScreen = document.getElementById('editScreen');
+        const editMode = document.getElementById('editMode');
+        const editPreview = document.getElementById('editPreview');
+        const editPages = document.getElementById('editPages');
         const backToOptions = document.getElementById('backToOptions');
         const rotateBtn = document.getElementById('rotateBtn');
-        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteEditBtn = document.getElementById('deleteEditBtn');
         const saveBtn = document.getElementById('saveBtn');
         const createPdfBtn = document.getElementById('createPdfBtn');
         const pdfNameInput = document.getElementById('pdfName');
+
+        const thankYouModal = document.getElementById('thankYouModal');
+        const closeThankYou = document.getElementById('closeThankYou');
 
         const toast = document.getElementById('toast');
 
@@ -716,7 +846,6 @@
         let pages = [];
         let currentPageIndex = 0;
         let currentFilter = 'original';
-        let isCropMode = false;
         let isProcessing = false;
 
         // ============================================
@@ -738,6 +867,11 @@
         function setStatus(msg, color = '#ffd700') {
             statusDiv.textContent = msg;
             statusDiv.style.color = color;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusDiv.style.display = 'none';
         }
 
         // ============================================
@@ -756,10 +890,12 @@
                 stopCamera();
                 captureBtn.disabled = true;
                 flashBtn.disabled = true;
-                resultPanel.style.display = 'none';
-                editScreen.classList.remove('active');
-                editScreen.style.display = 'none';
+                resultPanel.classList.remove('active');
+                editMode.classList.remove('active');
+                cameraView.classList.add('active');
+                controls.classList.add('active');
                 scanOverlay.style.display = 'flex';
+                hideStatus();
 
                 if (location.protocol !== 'https:' &&
                     location.hostname !== 'localhost' &&
@@ -799,6 +935,7 @@
                 captureBtn.disabled = false;
                 flashBtn.disabled = false;
                 setStatus('✅ Tap the circle to scan', '#00ff41');
+                setTimeout(hideStatus, 2000);
 
             } catch (error) {
                 console.error('Camera error:', error);
@@ -820,7 +957,7 @@
         }
 
         // ============================================
-        // CAPTURE - WORKING
+        // CAPTURE
         // ============================================
         function capture() {
             if (isProcessing) return;
@@ -848,7 +985,6 @@
                         const cropped = scanner.extractPaper(canvas, 5);
                         if (cropped && cropped.width > 100 && cropped.height > 100) {
                             finalCanvas = cropped;
-                            console.log('✅ Auto-crop applied');
                         }
                     }
                 } catch (e) { console.warn('Auto-crop failed', e); }
@@ -859,21 +995,15 @@
                 currentPageIndex = pages.length - 1;
 
                 // Show result panel
-                resultPanel.style.display = 'block';
-                editScreen.classList.remove('active');
-                editScreen.style.display = 'none';
+                cameraView.classList.remove('active');
+                controls.classList.remove('active');
+                resultPanel.classList.add('active');
                 previewImage.src = pages[currentPageIndex];
                 pageNum.textContent = currentPageIndex + 1;
                 totalPages.textContent = pages.length;
-                cropControls.classList.remove('active');
-                isCropMode = false;
-                cropBtn.classList.remove('active-mode');
-                scanOverlay.style.display = 'none';
 
-                // Stop camera
                 stopCamera();
-
-                setStatus('✅ Page scanned!', '#00ff41');
+                hideStatus();
                 showToast('✅ Page scanned!');
 
             } catch (error) {
@@ -886,7 +1016,7 @@
         }
 
         // ============================================
-        // RESULT PANEL - UPDATE
+        // UPDATE RESULT PANEL
         // ============================================
         function updateResultPanel() {
             if (pages.length > 0) {
@@ -897,108 +1027,102 @@
         }
 
         // ============================================
-        // FOUR OPTIONS
+        // FOUR OPTIONS - FIXED
         // ============================================
 
-        // 1. CONTINUE
+        // 1. CONTINUE - Scan next page
         continueBtn.addEventListener('click', function() {
-            resultPanel.style.display = 'none';
-            scanOverlay.style.display = 'flex';
+            resultPanel.classList.remove('active');
             startCamera();
             showToast('📸 Scan next page');
         });
 
-        // 2. DONE
+        // 2. DONE - Go to edit mode
         doneBtn.addEventListener('click', function() {
             if (pages.length === 0) { showToast('❌ No pages to edit', 'error'); return; }
-            editScreen.style.display = 'block';
-            setTimeout(() => { editScreen.classList.add('active'); }, 50);
+            resultPanel.classList.remove('active');
+            editMode.classList.add('active');
+            renderEditPages();
             editPreview.src = pages[currentPageIndex];
             showToast('✏️ Edit your document');
         });
 
-        // 3. RESCAN
+        // 3. RESCAN - Delete page AND open camera
         rescanBtn.addEventListener('click', function() {
             if (pages.length === 0) return;
+
+            // Remove current page
             pages.splice(currentPageIndex, 1);
+
             if (pages.length === 0) {
-                resultPanel.style.display = 'none';
-                scanOverlay.style.display = 'flex';
-                startCamera();
+                resultPanel.classList.remove('active');
                 showToast('🔄 No pages left. Scan again.');
+                startCamera();
                 return;
             }
+
             currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
             updateResultPanel();
-            showToast('🔄 Page removed. Scan again.');
+            showToast('🔄 Page removed. Camera opening...');
+
+            // Open camera for rescan
+            setTimeout(() => {
+                resultPanel.classList.remove('active');
+                startCamera();
+                showToast('📸 Scan replacement page');
+            }, 500);
         });
 
-        // 4. CROP
-        cropBtn.addEventListener('click', function() {
-            if (isCropMode) {
-                isCropMode = false;
-                cropControls.classList.remove('active');
-                cropBtn.classList.remove('active-mode');
-                showToast('✂️ Crop cancelled');
-            } else {
-                if (pages.length === 0) { showToast('❌ No page to crop', 'error'); return; }
-                isCropMode = true;
-                cropControls.classList.add('active');
-                cropBtn.classList.add('active-mode');
-                showToast('✂️ Tap "Apply Crop" to auto-crop');
+        // 4. DELETE PAGE - Remove page silently
+        deletePageBtn.addEventListener('click', function() {
+            if (pages.length === 0) return;
+
+            pages.splice(currentPageIndex, 1);
+
+            if (pages.length === 0) {
+                resultPanel.classList.remove('active');
+                showToast('🗑️ Page deleted. No pages left.');
+                startCamera();
+                return;
             }
-        });
 
-        // Apply Crop
-        applyCropBtn.addEventListener('click', function() {
-            if (!isCropMode || pages.length === 0) return;
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-
-                try {
-                    if (typeof Jscanify !== 'undefined') {
-                        const scanner = new Jscanify();
-                        const cropped = scanner.extractPaper(canvas, 5);
-                        if (cropped && cropped.width > 100 && cropped.height > 100) {
-                            pages[currentPageIndex] = cropped.toDataURL('image/png');
-                            updateResultPanel();
-                            editPreview.src = pages[currentPageIndex];
-                            showToast('✅ Crop applied!');
-                        } else {
-                            showToast('❌ No document detected', 'error');
-                        }
-                    }
-                } catch (e) { showToast('❌ Crop failed', 'error'); }
-
-                isCropMode = false;
-                cropControls.classList.remove('active');
-                cropBtn.classList.remove('active-mode');
-            };
-            img.src = pages[currentPageIndex];
-        });
-
-        // Cancel Crop
-        cancelCropBtn.addEventListener('click', function() {
-            isCropMode = false;
-            cropControls.classList.remove('active');
-            cropBtn.classList.remove('active-mode');
-            showToast('✂️ Crop cancelled');
+            currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+            updateResultPanel();
+            showToast('🗑️ Page deleted');
         });
 
         // ============================================
-        // BACK TO OPTIONS
+        // BACK TO OPTIONS (from Edit)
         // ============================================
         backToOptions.addEventListener('click', function() {
-            editScreen.classList.remove('active');
-            editScreen.style.display = 'none';
-            resultPanel.style.display = 'block';
+            editMode.classList.remove('active');
+            resultPanel.classList.add('active');
+            updateResultPanel();
             showToast('📄 Back to pages');
         });
+
+        // ============================================
+        // RENDER EDIT PAGES (Thumbnails)
+        // ============================================
+        function renderEditPages() {
+            editPages.innerHTML = '';
+            pages.forEach((dataUrl, index) => {
+                const div = document.createElement('div');
+                div.className = 'page-thumb' + (index === currentPageIndex ? ' active' : '');
+                div.innerHTML = `
+                    <img src="${dataUrl}" alt="Page ${index+1}" />
+                    <span class="page-num">${index+1}</span>
+                    <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                `;
+                div.addEventListener('click', function() {
+                    currentPageIndex = index;
+                    document.querySelectorAll('.page-thumb').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    editPreview.src = pages[currentPageIndex];
+                });
+                editPages.appendChild(div);
+            });
+        }
 
         // ============================================
         // FILTERS
@@ -1053,6 +1177,7 @@
                 ctx.putImageData(imageData, 0, 0);
                 pages[currentPageIndex] = canvas.toDataURL('image/png');
                 editPreview.src = pages[currentPageIndex];
+                renderEditPages();
             };
             img.src = pages[currentPageIndex];
         }
@@ -1073,41 +1198,39 @@
                 ctx.drawImage(img, -img.width / 2, -img.height / 2);
                 pages[currentPageIndex] = canvas.toDataURL('image/png');
                 editPreview.src = pages[currentPageIndex];
+                renderEditPages();
                 showToast('🔄 Rotated 90°');
             };
             img.src = pages[currentPageIndex];
         });
 
         // ============================================
-        // DELETE
+        // DELETE (in Edit Mode)
         // ============================================
-        deleteBtn.addEventListener('click', function() {
+        deleteEditBtn.addEventListener('click', function() {
             if (pages.length === 0) return;
             pages.splice(currentPageIndex, 1);
             if (pages.length === 0) {
                 showToast('No pages left');
-                editScreen.classList.remove('active');
-                editScreen.style.display = 'none';
-                resultPanel.style.display = 'none';
-                scanOverlay.style.display = 'flex';
+                editMode.classList.remove('active');
                 startCamera();
                 return;
             }
             currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
+            renderEditPages();
             editPreview.src = pages[currentPageIndex];
-            updateResultPanel();
             showToast('🗑️ Page deleted');
         });
 
         // ============================================
-        // SAVE
+        // SAVE CHANGES
         // ============================================
         saveBtn.addEventListener('click', function() {
             showToast('✅ Changes saved!');
         });
 
         // ============================================
-        // CREATE PDF
+        // CREATE PDF + THANK YOU
         // ============================================
         createPdfBtn.addEventListener('click', function() {
             if (pages.length === 0) { showToast('❌ No pages', 'error'); return; }
@@ -1130,17 +1253,29 @@
                     if (loaded === pages.length) {
                         pdf.save(`${name}.pdf`);
                         showToast(`✅ ${name}.pdf saved!`);
+
+                        // Show THANK YOU modal
+                        setTimeout(() => {
+                            thankYouModal.classList.add('active');
+                        }, 500);
+
+                        // Reset
                         pages = [];
                         currentPageIndex = 0;
-                        editScreen.classList.remove('active');
-                        editScreen.style.display = 'none';
-                        resultPanel.style.display = 'none';
-                        scanOverlay.style.display = 'flex';
+                        editMode.classList.remove('active');
+                        resultPanel.classList.remove('active');
                         startCamera();
                     }
                 };
                 img.src = dataUrl;
             });
+        });
+
+        // ============================================
+        // CLOSE THANK YOU
+        // ============================================
+        closeThankYou.addEventListener('click', function() {
+            thankYouModal.classList.remove('active');
         });
 
         // ============================================
@@ -1170,13 +1305,12 @@
                             currentPageIndex = pages.length - 1;
                             loaded++;
                             if (loaded === files.length) {
-                                resultPanel.style.display = 'block';
-                                editScreen.classList.remove('active');
-                                editScreen.style.display = 'none';
+                                cameraView.classList.remove('active');
+                                controls.classList.remove('active');
+                                resultPanel.classList.add('active');
                                 previewImage.src = pages[currentPageIndex];
                                 pageNum.textContent = currentPageIndex + 1;
                                 totalPages.textContent = pages.length;
-                                scanOverlay.style.display = 'none';
                                 stopCamera();
                                 showToast(`📸 Added ${files.length} images`);
                             }
@@ -1206,21 +1340,7 @@
         });
 
         // ============================================
-        // RESET
-        // ============================================
-        document.getElementById('resetBtn')?.addEventListener('click', function() {
-            pages = [];
-            currentPageIndex = 0;
-            resultPanel.style.display = 'none';
-            editScreen.classList.remove('active');
-            editScreen.style.display = 'none';
-            scanOverlay.style.display = 'flex';
-            startCamera();
-            showToast('🔄 Reset');
-        });
-
-        // ============================================
-        // CAPTURE BUTTON EVENT
+        // CAPTURE BUTTON
         // ============================================
         captureBtn.addEventListener('click', capture);
 
@@ -1229,8 +1349,11 @@
         // ============================================
         startCamera();
 
-        console.log('📱 Full Screen Scanner - Working');
-        console.log('📋 Four options: CONTINUE | DONE | RESCAN | CROP');
+        console.log('📱 Complete Scanner - All Fixes');
+        console.log('✅ RESCAN: Deletes page + opens camera');
+        console.log('✅ DELETE: Remove page silently');
+        console.log('✅ DONE: Edit mode with thumbnails');
+        console.log('✅ THANK YOU popup after download');
     </script>
 
 </body>
