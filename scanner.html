@@ -121,6 +121,31 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            background: #000;
+        }
+        .camera-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            color: rgba(255, 215, 0, 0.2);
+            z-index: 5;
+        }
+        .camera-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+        .camera-placeholder .text {
+            font-size: 0.8rem;
+            opacity: 0.3;
+            letter-spacing: 1px;
         }
         .scan-frame {
             position: absolute;
@@ -132,6 +157,7 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
+            z-index: 10;
         }
         .frame-corners {
             position: relative;
@@ -361,25 +387,21 @@
             color: #0a0a0a;
             box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
         }
-        .btn-continue:active { transform: scale(0.95); }
         .btn-done {
             background: linear-gradient(135deg, #ff1a1a, #cc0000);
             color: #fff;
             box-shadow: 0 4px 30px rgba(255, 26, 26, 0.2);
         }
-        .btn-done:active { transform: scale(0.95); }
         .btn-rescan {
             background: linear-gradient(135deg, #00b4d8, #0077b6);
             color: #fff;
             box-shadow: 0 4px 30px rgba(0, 180, 216, 0.15);
         }
-        .btn-rescan:active { transform: scale(0.95); }
         .btn-crop {
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
             border: 2px solid rgba(0, 255, 65, 0.15);
         }
-        .btn-crop:active { transform: scale(0.95); }
         .btn-crop.active-mode {
             border-color: #ffd700;
             background: rgba(255, 215, 0, 0.05);
@@ -401,7 +423,6 @@
             font-size: 11px;
             touch-action: manipulation;
         }
-        .options-nav button:active { transform: scale(0.95); }
         .options-nav .page-count {
             color: rgba(255, 215, 0, 0.2);
             font-size: 11px;
@@ -427,7 +448,6 @@
             font-family: inherit;
             touch-action: manipulation;
         }
-        .crop-controls .btn-crop-action:active { transform: scale(0.95); }
         .btn-apply-crop {
             background: linear-gradient(135deg, #00ff41, #00cc33);
             color: #0a0a0a;
@@ -471,7 +491,6 @@
             transition: 0.3s;
             touch-action: manipulation;
         }
-        .step-edit .edit-header .close-edit:active { transform: scale(0.9); }
         .step-edit .preview-container {
             background: rgba(0,0,0,0.3);
             border-radius: 12px;
@@ -505,16 +524,13 @@
             cursor: pointer;
             transition: 0.3s;
             font-family: inherit;
-            letter-spacing: 0.3px;
             touch-action: manipulation;
         }
-        .edit-toolbar button:active { transform: scale(0.95); }
         .edit-toolbar button.active {
             background: rgba(255, 215, 0, 0.12);
             border-color: rgba(255, 215, 0, 0.2);
             color: #ffd700;
         }
-        .edit-toolbar button.danger:active { color: #ff4444; }
         .edit-toolbar .btn-save-changes {
             background: rgba(0, 255, 65, 0.08);
             border-color: rgba(0, 255, 65, 0.15);
@@ -548,7 +564,6 @@
             font-size: 14px;
             font-weight: 700;
             font-family: inherit;
-            transition: 0.3s;
             outline: none;
             min-width: 60px;
         }
@@ -600,18 +615,15 @@
         }
         .toast.error { border-color: rgba(255,0,0,0.2); }
         .toast.success { border-color: rgba(0, 255, 65, 0.2); }
-
         @media (max-width: 480px) {
             .header { padding: 4px 0; }
             .header-content { padding: 0 8px; }
             .logo { font-size: 0.85rem; }
-            .logo i { font-size: 0.85rem; }
             .nav-links a { font-size: 0.6rem; padding: 3px 6px; }
             .page-counter { font-size: 0.6rem; padding: 2px 8px; }
             .scanner-controls { padding: 8px 12px 12px; }
             .capture-ring { width: 52px; height: 52px; }
             .capture-dot { width: 38px; height: 38px; }
-            .ctrl-btn { font-size: 16px; padding: 6px 10px; }
             .frame-corners { width: 85%; }
             .corner { width: 18px; height: 18px; }
             .frame-label { font-size: 8px; bottom: -26px; }
@@ -621,26 +633,17 @@
             .options-grid { gap: 6px; }
             .step-edit { padding: 10px 12px; }
             .edit-toolbar button { font-size: 9px; padding: 4px 10px; }
-            .result-handle { width: 30px; height: 3px; margin-top: 8px; }
-            .toast { font-size: 11px; padding: 8px 16px; top: 60px; }
         }
-
         @media (max-width: 360px) {
             .capture-ring { width: 44px; height: 44px; }
             .capture-dot { width: 32px; height: 32px; }
-            .btn-option { font-size: 0.55rem; min-height: 44px; }
-            .btn-option .icon-big { font-size: 0.9rem; }
-            .options-grid { gap: 4px; }
         }
-
         @media (orientation: landscape) and (max-height: 500px) {
             .header { padding: 2px 0; }
             .scanner-controls { padding: 4px 12px 8px; }
             .capture-ring { width: 40px; height: 40px; }
             .capture-dot { width: 30px; height: 30px; }
             .frame-corners { width: 60%; max-width: 300px; }
-            .result-panel { max-height: 80vh; }
-            .step-options .preview-mini img { max-height: 20vh; }
         }
     </style>
 </head>
@@ -671,8 +674,15 @@
         <!-- SCANNER -->
         <div class="scanner-area">
             <div class="camera-wrapper">
+                <!-- Camera Placeholder -->
+                <div class="camera-placeholder" id="cameraPlaceholder">
+                    <div class="icon">📷</div>
+                    <div class="text">Starting camera...</div>
+                </div>
+                
                 <video id="video" autoplay playsinline></video>
                 <canvas id="canvas" style="display:none;"></canvas>
+                
                 <div class="scan-frame" id="scanFrame">
                     <div class="frame-corners">
                         <span class="corner tl"></span>
@@ -845,7 +855,7 @@
         })();
 
         // ============================================
-        // MOBILE SCANNER - COMPLETE
+        // SCANNER - CAMERA FIXED
         // ============================================
         class MobileScanner {
             constructor() {
@@ -865,6 +875,7 @@
                 this.cropBox = document.getElementById('cropBox');
                 this.cropControls = document.getElementById('cropControls');
                 this.previewWrapper = document.getElementById('previewWrapper');
+                this.cameraPlaceholder = document.getElementById('cameraPlaceholder');
 
                 this.stream = null;
                 this.pages = [];
@@ -882,18 +893,15 @@
                 this.bindEvents();
                 this.checkGalleryMode();
                 
-                // Auto-start camera after DOM ready
-                setTimeout(() => this.startCamera(), 800);
+                // Start camera immediately
+                this.startCamera();
                 
                 console.log('📱 Mobile Scanner ready');
             }
 
             bindEvents() {
-                // Use touch events for mobile, click for desktop
-                const captureBtn = document.getElementById('captureBtn');
-                captureBtn.addEventListener('click', () => this.capture());
-                captureBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.capture(); });
-
+                document.getElementById('captureBtn').addEventListener('click', () => this.capture());
+                document.getElementById('captureBtn').addEventListener('touchend', (e) => { e.preventDefault(); this.capture(); });
                 document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
                 document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
                 document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
@@ -920,7 +928,6 @@
                 document.getElementById('saveEditBtn').addEventListener('click', () => this.saveEditChanges());
                 document.getElementById('createPdfBtn').addEventListener('click', () => this.makePDF());
 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !this.isProcessing) this.capture();
                     if (e.key === 'Escape') {
@@ -969,12 +976,13 @@
             }
 
             // ============================================
-            // CAMERA - MOBILE OPTIMIZED
+            // CAMERA - FIXED
             // ============================================
             async startCamera() {
                 try {
                     this.showToast('✦ Starting camera...');
-                    
+                    this.cameraPlaceholder.style.display = 'flex';
+
                     const constraints = {
                         video: {
                             facingMode: 'environment',
@@ -985,58 +993,41 @@
                     };
 
                     this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    this.video.srcObject = this.stream;
                     
+                    // Important: Set video source
+                    this.video.srcObject = this.stream;
+                    this.video.setAttribute('playsinline', '');
+                    
+                    // Wait for video to load
                     await new Promise((resolve) => {
                         this.video.onloadedmetadata = () => {
                             this.video.play();
                             resolve();
                         };
+                        // Fallback if onloadedmetadata doesn't fire
+                        setTimeout(resolve, 2000);
                     });
 
+                    // Hide placeholder, show video
+                    this.cameraPlaceholder.style.display = 'none';
+                    this.video.style.display = 'block';
+                    
                     document.getElementById('captureBtn').disabled = false;
                     document.getElementById('flashBtn').disabled = false;
+                    
                     this.showToast('✅ Camera ready');
                     this.hideToastAfter(1500);
 
                 } catch (err) {
                     console.error('Camera error:', err);
-                    this.showToast('❌ Camera access denied', 'error');
-                    this.showUploadFallback();
+                    this.showToast('❌ Camera access denied. Please allow camera permissions.', 'error');
+                    this.cameraPlaceholder.innerHTML = `
+                        <div class="icon">⚠️</div>
+                        <div class="text">Camera unavailable. Tap to retry.</div>
+                    `;
+                    this.cameraPlaceholder.style.cursor = 'pointer';
+                    this.cameraPlaceholder.onclick = () => this.startCamera();
                 }
-            }
-
-            showUploadFallback() {
-                const wrapper = document.querySelector('.camera-wrapper');
-                if (!wrapper) return;
-                wrapper.innerHTML = `
-                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;background:#0a0a0f;color:rgba(255,255,255,0.5);text-align:center;">
-                        <i class="fas fa-camera" style="font-size:40px;margin-bottom:12px;color:rgba(255,215,0,0.1);"></i>
-                        <h3 style="color:rgba(255,215,0,0.3);font-size:1rem;margin-bottom:6px;">Camera Unavailable</h3>
-                        <p style="font-size:0.8rem;margin-bottom:16px;">Upload an image instead</p>
-                        <input type="file" id="uploadFallback" accept="image/*" style="display:none;" />
-                        <button onclick="document.getElementById('uploadFallback').click()" style="padding:10px 28px;border-radius:60px;border:1px solid rgba(255,215,0,0.1);background:rgba(255,215,0,0.03);color:#ffd700;cursor:pointer;font-weight:600;font-size:0.9rem;">
-                            <i class="fas fa-upload"></i> Choose Image
-                        </button>
-                    </div>
-                `;
-                document.getElementById('uploadFallback').addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            this.canvas.width = img.width;
-                            this.canvas.height = img.height;
-                            this.ctx.drawImage(img, 0, 0);
-                            this.addPage(this.canvas);
-                            this.showToast('✅ Image loaded');
-                        };
-                        img.src = event.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
             }
 
             // ============================================
@@ -1044,6 +1035,11 @@
             // ============================================
             capture() {
                 if (this.isProcessing) return;
+                if (!this.video.videoWidth || this.video.videoWidth === 0) {
+                    this.showToast('❌ Camera not ready. Please wait.', 'error');
+                    return;
+                }
+                
                 this.isProcessing = true;
                 this.scanLoading.style.display = 'flex';
 
@@ -1086,7 +1082,7 @@
                     console.error('Capture error:', err);
                     this.scanLoading.style.display = 'none';
                     this.isProcessing = false;
-                    this.showToast('❌ Scan failed', 'error');
+                    this.showToast('❌ Scan failed: ' + err.message, 'error');
                 }
             }
 
@@ -1213,7 +1209,7 @@
             }
 
             // ============================================
-            // CROP MODE - MOBILE TOUCH FIXED
+            // CROP MODE
             // ============================================
             toggleCropMode() {
                 if (this.isCropMode) { this.exitCropMode(); }
@@ -1262,14 +1258,11 @@
                 const handles = box.querySelectorAll('.crop-handle');
 
                 handles.forEach(h => {
-                    // Mouse events
                     h.addEventListener('mousedown', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         this.startDrag(e.clientX, e.clientY, h.dataset.handle);
                     });
-
-                    // Touch events for mobile
                     h.addEventListener('touchstart', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -1278,26 +1271,17 @@
                     }, { passive: false });
                 });
 
-                // Mouse move/up
                 document.addEventListener('mousemove', (e) => {
                     if (!this.isDragging || !this.isCropMode) return;
                     this.moveDrag(e.clientX, e.clientY);
                 });
-
-                document.addEventListener('mouseup', () => {
-                    if (this.isDragging) { this.isDragging = false; }
-                });
-
-                // Touch move/up
+                document.addEventListener('mouseup', () => { if (this.isDragging) { this.isDragging = false; } });
                 document.addEventListener('touchmove', (e) => {
                     if (!this.isDragging || !this.isCropMode) return;
                     const touch = e.touches[0];
                     this.moveDrag(touch.clientX, touch.clientY);
                 }, { passive: true });
-
-                document.addEventListener('touchend', () => {
-                    if (this.isDragging) { this.isDragging = false; }
-                });
+                document.addEventListener('touchend', () => { if (this.isDragging) { this.isDragging = false; } });
             }
 
             startDrag(clientX, clientY, handle) {
@@ -1506,6 +1490,8 @@
                 const pdf = new jsPDF();
 
                 let loaded = 0;
+                const totalPages = this.pages.length;
+
                 this.pages.forEach((dataUrl, index) => {
                     const img = new Image();
                     img.onload = function() {
@@ -1514,7 +1500,7 @@
                         const imgHeight = (this.height / this.width) * imgWidth;
                         pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
                         loaded++;
-                        if (loaded === this.pages.length) {
+                        if (loaded === totalPages) {
                             pdf.save(`${name}.pdf`);
                             this.showToast(`✅ ${name}.pdf saved!`);
                             // Reset
@@ -1530,12 +1516,15 @@
                             this.exitCropMode();
                         }
                     }.bind(this);
+                    img.onerror = function() {
+                        this.showToast('❌ Error loading image', 'error');
+                    }.bind(this);
                     img.src = dataUrl;
                 }.bind(this));
             }
 
             // ============================================
-            // GALLERY - MOBILE
+            // GALLERY
             // ============================================
             openGallery() {
                 const input = document.createElement('input');
@@ -1614,10 +1603,9 @@
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait a moment for everything to load
             setTimeout(() => {
                 window.app = new MobileScanner();
-            }, 300);
+            }, 500);
         });
     </script>
 </body>
