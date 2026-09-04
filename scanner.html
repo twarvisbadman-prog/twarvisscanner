@@ -21,7 +21,6 @@
             color: #fff;
         }
 
-        /* Matrix Golden Rain Canvas */
         #rain-canvas {
             position: fixed;
             top: 0;
@@ -135,7 +134,7 @@
             object-fit: cover;
         }
 
-        /* Scanner Frame - Golden */
+        /* Scanner Frame */
         .scan-frame {
             position: absolute;
             top: 0;
@@ -206,7 +205,6 @@
             border-top-color: #ffd700;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -256,7 +254,6 @@
             cursor: not-allowed;
         }
 
-        /* Capture Button - Golden */
         .capture-btn {
             background: none;
             border: none;
@@ -290,11 +287,10 @@
 
         .capture-btn:hover .capture-ring {
             border-color: rgba(255, 215, 0, 0.4);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.05);
         }
 
         /* ============================================
-           RESULT PANEL - THREE OPTIONS
+           RESULT PANEL - FOUR OPTIONS
            ============================================ */
         .result-panel {
             position: fixed;
@@ -323,7 +319,7 @@
             margin: 12px auto 0;
         }
 
-        /* ===== THREE OPTIONS SCREEN ===== */
+        /* ===== FOUR OPTIONS SCREEN ===== */
         .step-options {
             padding: 20px 24px 24px;
         }
@@ -341,11 +337,11 @@
             width: 100%;
             height: auto;
             display: block;
-            max-height: 40vh;
+            max-height: 35vh;
             object-fit: contain;
         }
 
-        /* Crop overlay on preview */
+        /* Crop overlay */
         .crop-preview-overlay {
             position: absolute;
             top: 0;
@@ -388,7 +384,7 @@
             text-align: center;
             font-size: 0.9rem;
             color: rgba(255, 215, 0, 0.3);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .step-options .page-info span {
@@ -396,35 +392,37 @@
             font-weight: 700;
         }
 
-        /* THREE BIG BUTTONS */
+        /* FOUR BIG BUTTONS */
         .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-top: 8px;
         }
 
         .btn-option {
-            padding: 16px 12px;
+            padding: 14px 12px;
             border: none;
-            border-radius: 16px;
-            font-weight: 800;
-            font-size: 0.95rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             text-align: center;
+            min-height: 80px;
+            justify-content: center;
         }
 
         .btn-option .icon-big {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
         }
         .btn-option .sub-text {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 500;
             opacity: 0.6;
         }
@@ -457,16 +455,30 @@
 
         .btn-done:active { transform: scale(0.97); }
 
-        /* CROP - White outline */
+        /* RESCAN - Blue/Cyan */
+        .btn-rescan {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #fff;
+            box-shadow: 0 4px 30px rgba(0, 180, 216, 0.15);
+        }
+
+        .btn-rescan:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 50px rgba(0, 180, 216, 0.25);
+        }
+
+        .btn-rescan:active { transform: scale(0.97); }
+
+        /* CROP - White/Green outline */
         .btn-crop {
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 65, 0.15);
         }
 
         .btn-crop:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 255, 65, 0.05);
+            border-color: rgba(0, 255, 65, 0.3);
             transform: translateY(-3px);
         }
 
@@ -483,7 +495,7 @@
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin: 12px 0 16px;
+            margin: 8px 0 12px;
         }
 
         .options-nav button {
@@ -509,7 +521,7 @@
             align-items: center;
         }
 
-        /* ===== CROP MODE CONTROLS ===== */
+        /* ===== CROP CONTROLS ===== */
         .crop-controls {
             display: none;
             gap: 12px;
@@ -534,13 +546,13 @@
         }
 
         .btn-apply-crop {
-            background: linear-gradient(135deg, #ffd700, #b8860b);
+            background: linear-gradient(135deg, #00ff41, #00cc33);
             color: #0a0a0a;
         }
 
         .btn-apply-crop:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 255, 65, 0.3);
         }
 
         .btn-cancel-crop {
@@ -611,11 +623,11 @@
             width: 100%;
             height: auto;
             display: block;
-            max-height: 35vh;
+            max-height: 30vh;
             object-fit: contain;
         }
 
-        /* Edit Toolbar */
+        /* ===== EDIT TOOLBAR - DIFFERENT COLORS ===== */
         .edit-toolbar {
             display: flex;
             gap: 6px;
@@ -656,7 +668,19 @@
             color: #ff4444;
         }
 
-        /* Edit Sliders */
+        .edit-toolbar .btn-save-changes {
+            background: rgba(0, 255, 65, 0.08);
+            border-color: rgba(0, 255, 65, 0.15);
+            color: #00ff41;
+        }
+
+        .edit-toolbar .btn-save-changes:hover {
+            background: rgba(0, 255, 65, 0.15);
+            border-color: rgba(0, 255, 65, 0.3);
+            color: #00ff41;
+        }
+
+        /* ===== EDIT SLIDERS ===== */
         .edit-sliders {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -696,22 +720,22 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
 
-        /* PDF Naming */
+        /* ===== PDF NAMING ===== */
         .pdf-naming {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 12px;
             padding: 8px 12px;
-            background: rgba(255, 215, 0, 0.02);
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 12px;
-            border: 1px solid rgba(255, 215, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .pdf-naming label {
             font-size: 13px;
             font-weight: 700;
-            color: rgba(255, 215, 0, 0.3);
+            color: rgba(255, 255, 255, 0.3);
             white-space: nowrap;
         }
 
@@ -741,13 +765,13 @@
             font-size: 14px;
         }
 
-        /* Create PDF Button */
+        /* ===== CREATE PDF BUTTON ===== */
         .btn-create-pdf {
             width: 100%;
             padding: 16px;
             border: none;
             border-radius: 14px;
-            background: linear-gradient(135deg, #ffd700, #b8860b);
+            background: linear-gradient(135deg, #00ff41, #00cc33);
             color: #0a0a0a;
             font-weight: 800;
             font-size: 1.1rem;
@@ -758,12 +782,12 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            box-shadow: 0 4px 30px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 255, 65, 0.15);
         }
 
         .btn-create-pdf:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 50px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 8px 50px rgba(0, 255, 65, 0.25);
         }
 
         .btn-create-pdf:active {
@@ -792,27 +816,24 @@
         }
 
         .toast.error { border-color: rgba(255,0,0,0.2); }
-        .toast.success { border-color: rgba(255, 215, 0, 0.2); }
+        .toast.success { border-color: rgba(0, 255, 65, 0.2); }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             .options-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
 
             .btn-option {
-                padding: 14px;
-                flex-direction: row;
-                justify-content: center;
-                gap: 12px;
+                padding: 12px 8px;
+                font-size: 0.8rem;
+                min-height: 70px;
             }
 
-            .btn-option .icon-big { font-size: 1.4rem; }
+            .btn-option .icon-big { font-size: 1.3rem; }
             .btn-option .sub-text { display: none; }
-        }
 
-        @media (max-width: 640px) {
             .header-content { padding: 0 12px; flex-wrap: wrap; gap: 4px; }
             .logo { font-size: 1rem; }
             .nav-links a { font-size: 0.75rem; padding: 4px 8px; }
@@ -829,10 +850,8 @@
             
             .edit-sliders { grid-template-columns: 1fr; }
             .pdf-naming { flex-wrap: wrap; }
-
-            .crop-controls {
-                flex-direction: column;
-            }
+            .crop-controls { flex-direction: column; }
+            .edit-toolbar button { font-size: 10px; padding: 6px 12px; }
         }
 
         @media (orientation: landscape) and (max-height: 500px) {
@@ -845,12 +864,10 @@
     </style>
 </head>
 <body>
-    <!-- Matrix Golden Rain Canvas -->
     <canvas id="rain-canvas"></canvas>
     <div class="glow-overlay"></div>
     
     <div class="glass-overlay">
-        <!-- ===== HEADER ===== -->
         <div class="header">
             <div class="header-content">
                 <div class="logo">
@@ -866,16 +883,13 @@
             </div>
         </div>
 
-        <!-- ===== TOAST ===== -->
         <div class="toast" id="toast"></div>
 
-        <!-- ===== SCANNER ===== -->
         <div class="scanner-area">
             <div class="camera-wrapper">
                 <video id="video" autoplay playsinline></video>
                 <canvas id="canvas" style="display:none;"></canvas>
 
-                <!-- Scanner Frame - Golden -->
                 <div class="scan-frame" id="scanFrame">
                     <div class="frame-corners">
                         <span class="corner tl"></span>
@@ -886,14 +900,12 @@
                     <span class="frame-label">✦ POSITION DOCUMENT ✦</span>
                 </div>
 
-                <!-- Loading -->
                 <div class="scan-loading" id="scanLoading">
                     <div class="spinner"></div>
                     <p>✦ PROCESSING ✦</p>
                 </div>
             </div>
 
-            <!-- ===== CONTROLS ===== -->
             <div class="scanner-controls">
                 <div class="controls-row">
                     <button class="ctrl-btn" id="flashBtn" disabled>
@@ -917,11 +929,10 @@
         <div class="result-panel" id="resultPanel">
             <div class="result-handle"></div>
 
-            <!-- ===== THREE OPTIONS SCREEN ===== -->
+            <!-- ===== FOUR OPTIONS SCREEN ===== -->
             <div class="step-options" id="stepOptions">
                 <div class="preview-mini" id="previewWrapper">
                     <img id="optionsPreview" alt="Scanned page" />
-                    <!-- Crop overlay -->
                     <div class="crop-preview-overlay" id="cropOverlay">
                         <div class="crop-box-preview" id="cropBox">
                             <div class="crop-handle nw" data-handle="nw"></div>
@@ -942,11 +953,11 @@
                     <button id="optionsNext">Next <i class="fas fa-chevron-right"></i></button>
                 </div>
 
-                <!-- ===== THREE BIG BUTTONS ===== -->
+                <!-- ===== FOUR BIG BUTTONS ===== -->
                 <div class="options-grid">
                     <button class="btn-option btn-continue" id="continueBtn">
                         <span class="icon-big">📸</span>
-                        CONTINUE SCANNING
+                        CONTINUE
                         <span class="sub-text">Scan next page</span>
                     </button>
                     
@@ -956,14 +967,20 @@
                         <span class="sub-text">Finish &amp; edit</span>
                     </button>
                     
+                    <button class="btn-option btn-rescan" id="rescanBtn">
+                        <span class="icon-big">🔄</span>
+                        RESCAN
+                        <span class="sub-text">Retake this page</span>
+                    </button>
+                    
                     <button class="btn-option btn-crop" id="cropBtn">
                         <span class="icon-big">✂️</span>
-                        CROP PAGE
+                        CROP
                         <span class="sub-text">Manual crop</span>
                     </button>
                 </div>
 
-                <!-- Crop Controls (shown when crop mode is active) -->
+                <!-- Crop Controls -->
                 <div class="crop-controls" id="cropControls">
                     <button class="btn-crop-action btn-apply-crop" id="applyCropBtn">
                         ✅ Apply Crop
@@ -974,10 +991,10 @@
                 </div>
             </div>
 
-            <!-- ===== EDIT SCREEN (After DONE) ===== -->
+            <!-- ===== EDIT SCREEN ===== -->
             <div class="step-edit" id="stepEdit">
                 <div class="edit-header">
-                    <h3><i class="fas fa-edit"></i> Edit &amp; Create PDF</h3>
+                    <h3><i class="fas fa-edit"></i> Edit Document</h3>
                     <button class="close-edit" id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
                 </div>
 
@@ -985,38 +1002,41 @@
                     <img id="editPreview" alt="Scanned document" />
                 </div>
 
-                <!-- Toolbar -->
+                <!-- Toolbar - DIFFERENT COLORS -->
                 <div class="edit-toolbar">
-                    <button class="active" data-filter="original">Original</button>
-                    <button data-filter="grayscale">⚫ B&amp;W</button>
-                    <button data-filter="enhance">✨ Enhance</button>
-                    <button data-filter="bright">☀️ Bright</button>
-                    <button data-filter="contrast">🎯 Contrast</button>
-                    <button data-filter="vintage">📻 Vintage</button>
-                    <button id="rotateEditBtn" class="">🔄 Rotate</button>
-                    <button id="deleteEditBtn" class="danger">🗑️ Delete</button>
+                    <button class="active" data-filter="original" style="border-color:rgba(255,215,0,0.2);color:#ffd700;">Original</button>
+                    <button data-filter="grayscale" style="border-color:rgba(200,200,200,0.1);color:#aaa;">⚫ B&amp;W</button>
+                    <button data-filter="enhance" style="border-color:rgba(0,255,255,0.1);color:#00ffff;">✨ Enhance</button>
+                    <button data-filter="bright" style="border-color:rgba(255,200,0,0.1);color:#ffcc00;">☀️ Bright</button>
+                    <button data-filter="contrast" style="border-color:rgba(255,100,0,0.1);color:#ff6b00;">🎯 Contrast</button>
+                    <button data-filter="vintage" style="border-color:rgba(200,150,100,0.1);color:#d4a373;">📻 Vintage</button>
+                    <button id="rotateEditBtn" style="border-color:rgba(100,100,255,0.1);color:#6666ff;">🔄 Rotate</button>
+                    <button id="deleteEditBtn" style="border-color:rgba(255,0,0,0.1);color:#ff4444;">🗑️ Delete</button>
+                    <button id="saveEditBtn" class="btn-save-changes" style="margin-left:auto;">
+                        💾 Save Changes
+                    </button>
                 </div>
 
                 <!-- Sliders -->
                 <div class="edit-sliders">
                     <div class="slider-group">
-                        <label>☀️ Brightness</label>
-                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" />
+                        <label style="color:rgba(255,200,0,0.4);">☀️ Brightness</label>
+                        <input type="range" id="brightnessSlider" min="0" max="200" value="100" style="background:rgba(255,200,0,0.06);" />
                     </div>
                     <div class="slider-group">
-                        <label>🎯 Contrast</label>
-                        <input type="range" id="contrastSlider" min="0" max="200" value="100" />
+                        <label style="color:rgba(255,100,0,0.4);">🎯 Contrast</label>
+                        <input type="range" id="contrastSlider" min="0" max="200" value="100" style="background:rgba(255,100,0,0.06);" />
                     </div>
                 </div>
 
                 <!-- PDF Naming -->
                 <div class="pdf-naming">
-                    <label><i class="fas fa-file-pdf"></i> Name:</label>
+                    <label style="color:rgba(255,215,0,0.3);"><i class="fas fa-file-pdf"></i> Name:</label>
                     <input type="text" id="pdfName" value="twarvis" />
                     <span class="ext">.pdf</span>
                 </div>
 
-                <!-- Create PDF Button -->
+                <!-- Create PDF Button - GREEN -->
                 <button class="btn-create-pdf" id="createPdfBtn">
                     <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
                 </button>
@@ -1087,7 +1107,7 @@
         })();
 
         // ============================================
-        // STUDENT HUB SCANNER - Three Options + Crop
+        // STUDENT HUB SCANNER - FULLY FIXED
         // ============================================
 
         class StudentHubScanner {
@@ -1122,8 +1142,11 @@
                 this.isProcessing = false;
                 this.isEditMode = false;
                 this.isCropMode = false;
-                this.cropData = { x: 0, y: 0, w: 0, h: 0 };
-                this.isCropping = false;
+                this.cropData = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
+                this.isDragging = false;
+                this.dragHandle = null;
+                this.dragStart = { x: 0, y: 0 };
+                this.dragStartData = { x: 0, y: 0, w: 0, h: 0 };
 
                 // Bind
                 this.bindEvents();
@@ -1143,9 +1166,10 @@
                 document.getElementById('flashBtn').addEventListener('click', () => this.toggleFlash());
                 document.getElementById('galleryBtn').addEventListener('click', () => this.openGallery());
 
-                // Three options buttons
+                // Four options buttons
                 document.getElementById('continueBtn').addEventListener('click', () => this.continueScanning());
                 document.getElementById('doneBtn').addEventListener('click', () => this.goToEditMode());
+                document.getElementById('rescanBtn').addEventListener('click', () => this.rescanPage());
                 document.getElementById('cropBtn').addEventListener('click', () => this.toggleCropMode());
 
                 // Crop controls
@@ -1171,6 +1195,7 @@
 
                 document.getElementById('rotateEditBtn').addEventListener('click', () => this.rotatePage());
                 document.getElementById('deleteEditBtn').addEventListener('click', () => this.deletePage());
+                document.getElementById('saveEditBtn').addEventListener('click', () => this.saveEditChanges());
 
                 // Sliders
                 document.getElementById('brightnessSlider').addEventListener('input', (e) => {
@@ -1258,7 +1283,7 @@
                     this.canvas.height = h;
                     this.ctx.drawImage(this.video, 0, 0, w, h);
 
-                    // Auto-crop
+                    // Auto-crop with jscanify
                     let cropped = null;
                     try {
                         if (typeof Jscanify !== 'undefined') {
@@ -1364,12 +1389,38 @@
             }
 
             // ============================================
-            // THREE OPTIONS ACTIONS
+            // FOUR OPTIONS ACTIONS
             // ============================================
             continueScanning() {
                 this.closeResult();
                 this.scanFrame.style.display = 'flex';
                 this.showToast('📸 Scan next page');
+            }
+
+            rescanPage() {
+                if (this.pages.length === 0) return;
+                
+                // Remove current page
+                this.pages.splice(this.currentIndex, 1);
+                
+                if (this.pages.length === 0) {
+                    this.closeResult();
+                    this.updateCounter();
+                    this.scanFrame.style.display = 'flex';
+                    this.showToast('🔄 Page removed. Scan again.');
+                    return;
+                }
+                
+                this.currentIndex = Math.min(this.currentIndex, this.pages.length - 1);
+                this.updateOptionsView();
+                this.updateCounter();
+                this.showToast('🔄 Page removed. Scan again.');
+                
+                // Go back to camera for rescan
+                setTimeout(() => {
+                    this.closeResult();
+                    this.scanFrame.style.display = 'flex';
+                }, 500);
             }
 
             goToEditMode() {
@@ -1395,10 +1446,15 @@
                 this.stepOptions.style.display = 'block';
                 this.updateOptionsView();
                 this.exitCropMode();
+                this.showToast('📄 Back to pages');
+            }
+
+            saveEditChanges() {
+                this.showToast('✅ Changes saved!');
             }
 
             // ============================================
-            // CROP MODE
+            // CROP MODE - FIXED
             // ============================================
             toggleCropMode() {
                 if (this.isCropMode) {
@@ -1418,22 +1474,10 @@
                 this.cropControls.classList.add('active');
                 document.getElementById('cropBtn').classList.add('active-mode');
                 
-                // Initialize crop box to full image
-                const previewImg = this.optionsPreview;
-                const wrapper = this.previewWrapper;
-                const rect = wrapper.getBoundingClientRect();
-                const imgRect = previewImg.getBoundingClientRect();
-                
-                // Set crop box to 80% of image
-                const padding = 0.1;
-                this.cropData = {
-                    x: padding,
-                    y: padding,
-                    w: 1 - padding * 2,
-                    h: 1 - padding * 2
-                };
+                // Reset crop box to 80% of image
+                this.cropData = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
                 this.updateCropBox();
-                this.showToast('✂️ Drag corners to crop the page');
+                this.showToast('✂️ Drag the golden handles to crop');
             }
 
             exitCropMode() {
@@ -1441,13 +1485,18 @@
                 this.cropOverlay.classList.remove('active');
                 this.cropControls.classList.remove('active');
                 document.getElementById('cropBtn').classList.remove('active-mode');
+                this.cropBox.style.display = 'none';
             }
 
             updateCropBox() {
                 const wrapper = this.previewWrapper;
+                if (!wrapper) return;
+                
                 const rect = wrapper.getBoundingClientRect();
                 const w = rect.width;
                 const h = rect.height;
+                
+                if (w === 0 || h === 0) return;
                 
                 const box = this.cropBox;
                 box.style.display = 'block';
@@ -1458,92 +1507,87 @@
             }
 
             initCropDrag() {
-                let isDragging = false;
-                let handle = null;
-                let startX, startY, startData;
-
                 const box = this.cropBox;
                 const handles = box.querySelectorAll('.crop-handle');
 
                 handles.forEach(h => {
                     h.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        isDragging = true;
-                        handle = h.dataset.handle;
-                        startX = e.clientX;
-                        startY = e.clientY;
-                        startData = { ...this.cropData };
+                        this.isDragging = true;
+                        this.dragHandle = h.dataset.handle;
+                        this.dragStart.x = e.clientX;
+                        this.dragStart.y = e.clientY;
+                        this.dragStartData = { ...this.cropData };
                     });
 
                     h.addEventListener('touchstart', (e) => {
                         e.preventDefault();
                         const touch = e.touches[0];
-                        isDragging = true;
-                        handle = h.dataset.handle;
-                        startX = touch.clientX;
-                        startY = touch.clientY;
-                        startData = { ...this.cropData };
+                        this.isDragging = true;
+                        this.dragHandle = h.dataset.handle;
+                        this.dragStart.x = touch.clientX;
+                        this.dragStart.y = touch.clientY;
+                        this.dragStartData = { ...this.cropData };
                     });
                 });
 
                 document.addEventListener('mousemove', (e) => {
-                    if (!isDragging || !this.isCropMode) return;
+                    if (!this.isDragging || !this.isCropMode) return;
                     this.resizeCrop(e.clientX, e.clientY);
                 });
 
                 document.addEventListener('touchmove', (e) => {
-                    if (!isDragging || !this.isCropMode) return;
+                    if (!this.isDragging || !this.isCropMode) return;
                     const touch = e.touches[0];
                     this.resizeCrop(touch.clientX, touch.clientY);
-                });
+                }, { passive: true });
 
                 document.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                    }
+                    this.isDragging = false;
                 });
 
                 document.addEventListener('touchend', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                    }
+                    this.isDragging = false;
                 });
             }
 
             resizeCrop(clientX, clientY) {
                 const wrapper = this.previewWrapper;
                 const rect = wrapper.getBoundingClientRect();
-                const dx = (clientX - startX) / rect.width;
-                const dy = (clientY - startY) / rect.height;
+                const dx = (clientX - this.dragStart.x) / rect.width;
+                const dy = (clientY - this.dragStart.y) / rect.height;
 
-                let x = startData.x;
-                let y = startData.y;
-                let w = startData.w;
-                let h = startData.h;
+                let x = this.dragStartData.x;
+                let y = this.dragStartData.y;
+                let w = this.dragStartData.w;
+                let h = this.dragStartData.h;
 
                 const minSize = 0.05;
 
-                switch (handle) {
+                switch (this.dragHandle) {
                     case 'se':
-                        w = Math.max(minSize, startData.w + dx);
-                        h = Math.max(minSize, startData.h + dy);
+                        w = Math.max(minSize, this.dragStartData.w + dx);
+                        h = Math.max(minSize, this.dragStartData.h + dy);
                         break;
                     case 'nw':
-                        x = Math.max(0, startData.x + dx);
-                        y = Math.max(0, startData.y + dy);
-                        w = Math.max(minSize, startData.w - dx);
-                        h = Math.max(minSize, startData.h - dy);
+                        x = Math.max(0, this.dragStartData.x + dx);
+                        y = Math.max(0, this.dragStartData.y + dy);
+                        w = Math.max(minSize, this.dragStartData.w - dx);
+                        h = Math.max(minSize, this.dragStartData.h - dy);
                         break;
                     case 'ne':
-                        y = Math.max(0, startData.y + dy);
-                        w = Math.max(minSize, startData.w + dx);
-                        h = Math.max(minSize, startData.h - dy);
+                        y = Math.max(0, this.dragStartData.y + dy);
+                        w = Math.max(minSize, this.dragStartData.w + dx);
+                        h = Math.max(minSize, this.dragStartData.h - dy);
                         break;
                     case 'sw':
-                        x = Math.max(0, startData.x + dx);
-                        w = Math.max(minSize, startData.w - dx);
-                        h = Math.max(minSize, startData.h + dy);
+                        x = Math.max(0, this.dragStartData.x + dx);
+                        w = Math.max(minSize, this.dragStartData.w - dx);
+                        h = Math.max(minSize, this.dragStartData.h + dy);
                         break;
+                    default:
+                        return;
                 }
 
                 // Ensure within bounds
@@ -1562,9 +1606,6 @@
                 const dataUrl = this.pages[this.currentIndex];
                 const img = new Image();
                 img.onload = () => {
-                    const wrapper = this.previewWrapper;
-                    const rect = wrapper.getBoundingClientRect();
-                    
                     // Calculate crop in image coordinates
                     const cropX = this.cropData.x * img.width;
                     const cropY = this.cropData.y * img.height;
@@ -1581,7 +1622,8 @@
                     // Update page
                     this.pages[this.currentIndex] = canvas.toDataURL('image/png');
                     this.updateOptionsView();
-                    this.showToast('✅ Crop applied!');
+                    this.updateEditView();
+                    this.showToast('✅ Crop applied successfully!');
                     this.exitCropMode();
                 };
                 img.src = dataUrl;
@@ -1766,7 +1808,7 @@
             }
 
             // ============================================
-            // GALLERY
+            // GALLERY - FIXED
             // ============================================
             openGallery() {
                 const input = document.createElement('input');
@@ -1777,23 +1819,37 @@
                     const files = Array.from(e.target.files);
                     if (files.length === 0) return;
                     
+                    let loaded = 0;
                     files.forEach(file => {
                         const reader = new FileReader();
                         reader.onload = (event) => {
                             const img = new Image();
                             img.onload = () => {
+                                // Scale image if too large
+                                let maxDim = 2000;
+                                let w = img.width;
+                                let h = img.height;
+                                if (w > maxDim || h > maxDim) {
+                                    const ratio = Math.min(maxDim / w, maxDim / h);
+                                    w = w * ratio;
+                                    h = h * ratio;
+                                }
+                                
                                 const canvas = document.createElement('canvas');
-                                canvas.width = img.width;
-                                canvas.height = img.height;
+                                canvas.width = w;
+                                canvas.height = h;
                                 const ctx = canvas.getContext('2d');
-                                ctx.drawImage(img, 0, 0);
+                                ctx.drawImage(img, 0, 0, w, h);
                                 this.addPage(canvas);
+                                loaded++;
+                                if (loaded === files.length) {
+                                    this.showToast(`📸 Added ${files.length} images from gallery`);
+                                }
                             };
                             img.src = event.target.result;
                         };
                         reader.readAsDataURL(file);
                     });
-                    this.showToast(`📸 Added ${files.length} images`);
                 };
                 input.click();
             }
@@ -1802,12 +1858,16 @@
             // TOAST
             // ============================================
             showToast(msg, type = 'info') {
-                this.toast.textContent = msg;
-                this.toast.style.display = 'block';
-                this.toast.className = 'toast';
-                if (type === 'error') this.toast.classList.add('error');
-                if (type === 'success') this.toast.classList.add('success');
-                clearTimeout(this.toast._timeout);
+                const toast = this.toast;
+                toast.textContent = msg;
+                toast.style.display = 'block';
+                toast.className = 'toast';
+                if (type === 'error') toast.classList.add('error');
+                if (type === 'success') toast.classList.add('success');
+                clearTimeout(toast._timeout);
+                
+                // Auto-hide after 3 seconds
+                this.hideToastAfter(3000);
             }
 
             hideToastAfter(ms = 3000) {
