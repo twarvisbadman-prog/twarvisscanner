@@ -16,6 +16,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             color: #fff;
+            -webkit-tap-highlight-color: transparent;
         }
         #rain-canvas {
             position: fixed;
@@ -404,19 +405,25 @@
         }
         .gallery-result .image-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
             max-height: 50vh;
             overflow-y: auto;
             padding: 4px;
         }
-        .gallery-result .image-grid img {
-            width: 100%;
+        .gallery-result .image-grid .img-wrapper {
+            position: relative;
             aspect-ratio: 3/4;
-            object-fit: cover;
             border-radius: 12px;
+            overflow: hidden;
             border: 1px solid rgba(255,215,0,0.04);
+            background: rgba(0,0,0,0.3);
+        }
+        .gallery-result .image-grid .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .gallery-result .image-grid .remove-img {
             position: absolute;
@@ -430,9 +437,9 @@
             color: #fff;
             cursor: pointer;
             font-size: 12px;
-        }
-        .gallery-result .image-grid .img-wrapper {
-            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .gallery-result .pdf-actions {
             display: flex;
@@ -447,6 +454,7 @@
             background: rgba(255,255,255,0.02);
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.04);
+            flex-wrap: wrap;
         }
         .gallery-result .name-row label {
             color: rgba(255,255,255,0.3);
@@ -465,6 +473,7 @@
             font-weight: 700;
             font-family: inherit;
             outline: none;
+            min-width: 100px;
         }
         .gallery-result .name-row input:focus {
             border-color: rgba(255,215,0,0.2);
@@ -489,6 +498,11 @@
             justify-content: center;
             gap: 12px;
             box-shadow: 0 4px 30px rgba(0, 255, 65, 0.15);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .btn-make-pdf:active {
+            transform: scale(0.97);
         }
         .btn-make-pdf:hover {
             transform: translateY(-2px);
@@ -504,6 +518,11 @@
             cursor: pointer;
             transition: 0.3s;
             font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .btn-clear-gallery:active {
+            transform: scale(0.97);
         }
         .btn-clear-gallery:hover {
             background: rgba(255,0,0,0.1);
@@ -528,6 +547,16 @@
         }
         .toast-gallery.error { border-color: rgba(255,0,0,0.2); }
         .toast-gallery.success { border-color: rgba(0, 255, 65, 0.2); }
+
+        /* Mobile file input fix */
+        .file-input-hidden {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -605,7 +634,7 @@
             </div>
         </div>
 
-        <!-- ===== GALLERY RESULT PANEL - FIXED ===== -->
+        <!-- ===== GALLERY RESULT PANEL ===== -->
         <div class="gallery-result" id="galleryResult">
             <div class="result-card">
                 <h2><i class="fas fa-images" style="color:#00b4d8;"></i> Your Images</h2>
@@ -661,6 +690,9 @@
         </footer>
     </div>
 
+    <!-- Hidden file input for mobile -->
+    <input type="file" id="hiddenFileInput" class="file-input-hidden" accept="image/*" multiple />
+
     <script>
         // ============================================
         // MATRIX GOLDEN RAIN
@@ -709,9 +741,10 @@
         })();
 
         // ============================================
-        // GALLERY - COMPLETE WORKING SOLUTION
+        // GALLERY - COMPLETE WORKING SOLUTION FOR MOBILE
         // ============================================
         let galleryImages = [];
+        const hiddenInput = document.getElementById('hiddenFileInput');
 
         function showToastGallery(msg, type = 'info') {
             const toast = document.getElementById('toastGallery');
@@ -742,9 +775,9 @@
                 </div>
             `).join('');
 
-            // Remove image handlers
             grid.querySelectorAll('.remove-img').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     const idx = parseInt(this.dataset.index);
                     galleryImages.splice(idx, 1);
                     renderGalleryImages();
@@ -753,41 +786,44 @@
             });
         }
 
-        // ===== GALLERY BUTTON =====
+        // ===== GALLERY BUTTON - MOBILE FRIENDLY =====
         document.getElementById('galleryChoice').addEventListener('click', function(e) {
             e.preventDefault();
+            // Trigger hidden file input
+            hiddenInput.click();
+        });
+
+        // ===== HANDLE FILE SELECTION =====
+        hiddenInput.addEventListener('change', function(e) {
+            const files = Array.from(this.files);
+            if (files.length === 0) return;
             
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    galleryImages.push(event.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        renderGalleryImages();
+                        showToastGallery(`📸 Added ${files.length} images! Click "CREATE PDF"`, 'success');
+                        document.getElementById('galleryResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                };
+                reader.onerror = function() {
+                    showToastGallery('❌ Error reading image', 'error');
+                };
+                reader.readAsDataURL(file);
+            });
             
-            input.onchange = function(e) {
-                const files = Array.from(e.target.files);
-                if (files.length === 0) return;
-                
-                let loaded = 0;
-                files.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        galleryImages.push(event.target.result);
-                        loaded++;
-                        if (loaded === files.length) {
-                            renderGalleryImages();
-                            showToastGallery(`📸 Added ${files.length} images! Now click "CREATE PDF"`, 'success');
-                            // Scroll to gallery result
-                            document.getElementById('galleryResult').scrollIntoView({ behavior: 'smooth' });
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
-            };
-            
-            input.click();
+            // Reset input so same files can be selected again
+            this.value = '';
         });
 
         // ===== MAKE PDF FROM GALLERY =====
-        document.getElementById('makePdfFromGallery').addEventListener('click', function() {
+        document.getElementById('makePdfFromGallery').addEventListener('click', function(e) {
+            e.preventDefault();
+            
             if (galleryImages.length === 0) {
                 showToastGallery('❌ No images selected! Please choose images first.', 'error');
                 return;
@@ -821,12 +857,16 @@
                         showToastGallery(`✅ ${name}.pdf saved! 🎉`, 'success');
                     }
                 };
+                img.onerror = function() {
+                    showToastGallery('❌ Error loading image', 'error');
+                };
                 img.src = dataUrl;
             });
         });
 
         // ===== CLEAR GALLERY =====
-        document.getElementById('clearGallery').addEventListener('click', function() {
+        document.getElementById('clearGallery').addEventListener('click', function(e) {
+            e.preventDefault();
             if (galleryImages.length === 0) return;
             galleryImages = [];
             renderGalleryImages();
