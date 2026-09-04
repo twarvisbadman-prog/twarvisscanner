@@ -121,8 +121,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 24px 60px;
-            min-height: calc(100vh - 80px);
+            padding: 40px 24px 40px;
+            min-height: calc(100vh - 200px);
         }
 
         .hero-content {
@@ -272,18 +272,22 @@
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.1));
         }
 
-        /* GALLERY CARD - Red/White accent */
+        /* GALLERY CARD - Blue/Cyan accent */
         .choice-card.gallery-card {
-            border-color: rgba(255, 255, 255, 0.04);
+            border-color: rgba(0, 180, 216, 0.08);
         }
 
         .choice-card.gallery-card:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(255, 255, 255, 0.03);
+            border-color: rgba(0, 180, 216, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 180, 216, 0.05);
         }
 
         .choice-card.gallery-card .card-icon {
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.05));
+            filter: drop-shadow(0 0 30px rgba(0, 180, 216, 0.05));
+        }
+
+        .choice-card.gallery-card h3 {
+            color: #00b4d8;
         }
 
         /* ===== STATS BAR ===== */
@@ -315,19 +319,126 @@
             margin-top: 2px;
         }
 
-        /* ===== FOOTER ===== */
+        /* ===== FOOTER WITH SOCIAL LINKS ===== */
         .footer {
-            text-align: center;
-            padding: 20px 24px;
-            color: rgba(255, 215, 0, 0.05);
-            font-size: 0.75rem;
-            border-top: 1px solid rgba(255, 215, 0, 0.02);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.03);
+            padding: 30px 24px 20px;
             margin-top: 20px;
-            letter-spacing: 0.5px;
+            flex-shrink: 0;
         }
 
-        .footer span {
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 6px;
+        }
+
+        .footer-brand span {
+            color: rgba(255, 215, 0, 0.2);
+        }
+
+        .footer-tagline {
             color: rgba(255, 215, 0, 0.08);
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        /* Social Icons */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .social-link i {
+            font-size: 1.3rem;
+        }
+
+        .social-link:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        /* Instagram - Pink/Purple */
+        .social-link.instagram {
+            color: #e4405f;
+            border-color: rgba(228, 64, 95, 0.15);
+            background: rgba(228, 64, 95, 0.04);
+        }
+
+        .social-link.instagram:hover {
+            background: rgba(228, 64, 95, 0.12);
+            border-color: rgba(228, 64, 95, 0.3);
+            box-shadow: 0 8px 30px rgba(228, 64, 95, 0.15);
+        }
+
+        /* WhatsApp - Green */
+        .social-link.whatsapp {
+            color: #25d366;
+            border-color: rgba(37, 211, 102, 0.15);
+            background: rgba(37, 211, 102, 0.04);
+        }
+
+        .social-link.whatsapp:hover {
+            background: rgba(37, 211, 102, 0.12);
+            border-color: rgba(37, 211, 102, 0.3);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.15);
+        }
+
+        /* LinkedIn - Blue */
+        .social-link.linkedin {
+            color: #0a66c2;
+            border-color: rgba(10, 102, 194, 0.15);
+            background: rgba(10, 102, 194, 0.04);
+        }
+
+        .social-link.linkedin:hover {
+            background: rgba(10, 102, 194, 0.12);
+            border-color: rgba(10, 102, 194, 0.3);
+            box-shadow: 0 8px 30px rgba(10, 102, 194, 0.15);
+        }
+
+        /* Footer Credits */
+        .footer-credits {
+            color: rgba(255, 255, 255, 0.05);
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 215, 0, 0.02);
+        }
+
+        .footer-credits .heart {
+            color: #ff4444;
+        }
+
+        .footer-credits .name {
+            color: rgba(255, 215, 0, 0.1);
+            font-weight: 600;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -382,11 +493,23 @@
                 font-size: 0.8rem;
                 padding: 4px 12px;
             }
+
+            .social-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .social-link {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
             .hero {
-                padding: 20px 16px 40px;
+                padding: 20px 16px 30px;
             }
 
             .hero-title {
@@ -407,6 +530,15 @@
 
             .stat-item .number {
                 font-size: 1.2rem;
+            }
+
+            .footer {
+                padding: 20px 16px 16px;
+            }
+
+            .social-link {
+                padding: 8px 18px;
+                font-size: 0.8rem;
             }
         }
 
@@ -449,6 +581,14 @@
             animation: fadeUp 0.6s ease 0.5s forwards;
             opacity: 0;
         }
+
+        .social-link {
+            animation: fadeUp 0.6s ease 0.6s forwards;
+            opacity: 0;
+        }
+
+        .social-link:nth-child(2) { animation-delay: 0.7s; }
+        .social-link:nth-child(3) { animation-delay: 0.8s; }
     </style>
 </head>
 <body>
@@ -530,10 +670,56 @@
             </div>
         </div>
 
-        <!-- ===== FOOTER ===== -->
-        <div class="footer">
-            <span>✦</span> 2026 Student Hub — All processing is local. No data leaves your device. <span>✦</span>
-        </div>
+        <!-- ===== FOOTER WITH SOCIAL LINKS ===== -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    STUDENT HUB <span>✦</span>
+                </div>
+                <div class="footer-tagline">
+                    Smart Document Scanner for Students
+                </div>
+
+                <!-- Social Links -->
+                <div class="social-links">
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/twarvis_?igsi=aXF5YzA0enRwM2kx&utm_source=qr" 
+                       target="_blank" 
+                       class="social-link instagram"
+                       title="Follow me on Instagram">
+                        <i class="fab fa-instagram"></i>
+                        @twarvis_
+                    </a>
+
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/255740706007" 
+                       target="_blank" 
+                       class="social-link whatsapp"
+                       title="Chat with me on WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                        +255 740 706 007
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/in/twarvis-davinc-7a7066431?utm_source=share_via&utm_content=profile&utm_medium=member_ios" 
+                       target="_blank" 
+                       class="social-link linkedin"
+                       title="Connect with me on LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                        Twarvis Davinc
+                    </a>
+                </div>
+
+                <!-- Credits -->
+                <div class="footer-credits">
+                    <span>Developed with <span class="heart">❤</span> by <span class="name">Twarvis Davinc</span></span>
+                    <br />
+                    <span style="font-size:0.65rem;color:rgba(255,255,255,0.02);">
+                        All processing is local. No data is ever uploaded or stored.
+                    </span>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -598,12 +784,12 @@
         // ============================================
         document.getElementById('galleryChoice').addEventListener('click', function(e) {
             e.preventDefault();
-            // Open gallery directly on scanner page with mode parameter
             window.location.href = 'scanner.html?mode=gallery';
         });
 
         console.log('✦ Student Hub Home loaded');
         console.log('📸 Choose: Scan or Use Images');
+        console.log('✦ Follow me on social media!');
     </script>
 </body>
 </html>
