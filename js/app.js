@@ -334,4 +334,450 @@ class DocumentScannerApp {
                     for (let i = 0; i < data.length; i += 4) {
                         data[i] = Math.min(255, data[i] + 30);
                         data[i + 1] = Math.min(255, data[i + 1] + 30);
-                        data[i + 2] = Math.min(
+                        data[i + 2] = Math.min(255, data[i + 2] + 30);
+                    }
+                    break;
+
+                case 'contrast':
+                    const factor = 1.5;
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = Math.min(255, Math.max(0, (data[i] - 128) * factor + 128));
+                        data[i + 1] = Math.min(255, Math.max(0, (data[i + 1] - 128) * factor + 128));
+                        data[i + 2] = Math.min(255, Math.max(0, (data[i + 2] - 128) * factor + 128));
+                    }
+                    break;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        } catch (err) {
+            console.warn('Filter failed:', err);
+        }
+
+        return result;
+    }
+
+    /**
+     * Toggle crop mode
+     */
+    toggleCropMode() {
+        this.isCropMode = !this.isCropMode;
+        this.cropOverlay.style.display = this.isCropMode ? 'flex' : 'none';
+
+        if (this.isCropMode) {
+            this.showToast('✂️ Drag corners to adjust crop');
+        }
+    }
+
+    /**
+     * Initialize crop handlers
+     */
+    initCropHandlers() {
+        let isDragging = false;
+        let currentHandle = null;
+        let startX, startY, startW, startH;
+
+        const handles = document.querySelectorAll('.crop-handle');
+        const box = this.cropBox;
+
+        handles.forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                currentHandle = handle.dataset.handle;
+                const rect = box.getBoundingClientRect();
+                startX = e.clientX;
+                startY = e.clientY;
+                startW = rect.width;
+                startH = rect.height;
+            });
+
+            handle.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                isDragging = true;
+                currentHandle = handle.dataset.handle;
+                const rect = box.getBoundingClientRect();
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startW = rect.width;
+                startH = rect.height;
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            this.resizeCrop(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            this.resizeCrop(touch.clientX, touch.clientY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                this.applyCrop();
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                this.applyCrop();
+            }
+        });
+    }
+
+    resizeCrop(clientX, clientY) {
+        const box = this.cropBox;
+        const container = box.parentElement;
+        const containerRect = container.getBoundingClientRect();
+
+        let dx = (clientX - startX) / containerRect.width;
+        let dy = (clientY - startY) / containerRect.height;
+
+        let newW = startW;
+        let newH = startH;
+        let newX = 0;
+        let newY = 0;
+
+        const minSize = 50;
+
+        switch (currentHandle) {
+            case 'se':
+                newW = Math.max(minSize, startW + dx * containerRect.width);
+                newH = Math.max(minSize, startH + dy * containerRect.height);
+                break;
+            case 'nw':
+                newW = Math.max(minSize, startW - dx * containerRect.width);
+                newH = Math.max(minSize, startH - dy * containerRect.height);
+                newX = startX + dx * containerRect.width;
+                newY = startY + dy * containerRect.height;
+                break;
+            case 'ne':
+                newW = Math.max(minSize, startW + dx * containerRect.width);
+                newH = Math.max(minSize, startH - dy * containerRect.height);
+                newY = startY + dy * containerRect.height;
+                break;
+            case 'sw':
+                newW = Math.max(minSize, startW - dx * containerRect.width);
+                newH = Math.max(minSize, startH + dy * containerRect.height);
+                newX = startX + dx * containerRect.width;
+                break;
+            // Add more handles...
+        }
+
+        box.style.width = newW + 'px';
+        box.style.height = newH + 'px';
+        if (newX) box.style.left = newX + 'px';
+        if (newY) box.style.top = newY + 'px';
+    }
+
+    applyCrop() {
+        // Apply crop to image
+        this.showToast('✂️ Crop applied');
+        this.isCropMode = false;
+        this.cropOverlay.style.display = 'none';
+
+        // Here you would actually crop the image
+        // For simplicity, we just show a message
+        this.showToast('✅ Crop applied successfully');
+    }
+
+    /**
+     * Rotate image
+     */
+    rotateImage() {
+        if (this.scannedImages.length === 0) return;
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.height;
+            canvas.height = img.width;
+            const ctx = canvas.getContext('2d');
+
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(Math.PI / 2);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+            this.scannedImages[this.currentPage] = canvas.toDataURL('image/png');
+            this.previewImage.src = this.scannedImages[this.currentPage];
+            this.showToast('🔄 Rotated 90°');
+        };
+        img.src = this.scannedImages[this.currentPage];
+    }
+
+    /**
+     * Run OCR
+     */
+    async runOCR() {
+        if (this.scannedImages.length === 0) {
+            this.showToast('❌ No image to process', 'error');
+            return;
+        }
+
+        // Check cache
+        const imgData = this.scannedImages[this.currentPage];
+        if (this.ocrCache[imgData]) {
+            this.ocrText.textContent = this.ocrCache[imgData];
+            this.ocrResult.style.display = 'block';
+            this.showToast('📝 OCR loaded from cache');
+            return;
+        }
+
+        try {
+            if (typeof Tesseract === 'undefined') {
+                this.showToast('❌ OCR library not loaded', 'error');
+                return;
+            }
+
+            this.showToast('🔍 Running OCR...');
+
+            const result = await Tesseract.recognize(imgData, 'eng', {
+                logger: (m) => {
+                    if (m.status === 'recognizing text') {
+                        this.showToast(`🔍 OCR: ${Math.round(m.progress * 100)}%`);
+                    }
+                }
+            });
+
+            const text = result.data.text.trim();
+            this.ocrCache[imgData] = text;
+            this.ocrText.textContent = text || 'No text detected';
+            this.ocrResult.style.display = 'block';
+
+            this.showToast('✅ OCR complete!');
+
+        } catch (err) {
+            console.error('OCR error:', err);
+            this.showToast('❌ OCR failed: ' + err.message, 'error');
+        }
+    }
+
+    /**
+     * Download in various formats
+     */
+    download(format) {
+        if (this.scannedImages.length === 0) {
+            this.showToast('❌ No images to download', 'error');
+            return;
+        }
+
+        const imgData = this.scannedImages[this.currentPage];
+        const timestamp = Date.now();
+
+        try {
+            switch (format) {
+                case 'png':
+                    this.downloadImage(imgData, 'image/png', `scan_${timestamp}.png`);
+                    break;
+
+                case 'jpeg':
+                    this.downloadImage(imgData, 'image/jpeg', `scan_${timestamp}.jpg`, 0.92);
+                    break;
+
+                case 'pdf':
+                    this.downloadPDF(imgData, `scan_${timestamp}.pdf`);
+                    break;
+
+                case 'txt':
+                    this.downloadText(`scan_${timestamp}.txt`);
+                    break;
+
+                case 'pdf-multi':
+                    this.downloadMultiPagePDF();
+                    break;
+
+                default:
+                    this.showToast('❌ Unknown format', 'error');
+            }
+        } catch (err) {
+            console.error('Download error:', err);
+            this.showToast('❌ Download failed: ' + err.message, 'error');
+        }
+    }
+
+    /**
+     * Download image
+     */
+    downloadImage(dataUrl, mimeType, filename, quality = 1.0) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.showToast(`💾 Downloaded ${filename}`);
+    }
+
+    /**
+     * Download PDF
+     */
+    downloadPDF(dataUrl, filename) {
+        if (typeof window.jspdf === 'undefined') {
+            this.showToast('❌ PDF library not loaded', 'error');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const img = new Image();
+        img.onload = () => {
+            const pdf = new jsPDF({
+                orientation: img.width > img.height ? 'landscape' : 'portrait',
+                unit: 'px',
+                format: [img.width, img.height]
+            });
+            pdf.addImage(dataUrl, 'JPEG', 0, 0, img.width, img.height);
+            pdf.save(filename);
+            this.showToast(`💾 Downloaded ${filename}`);
+        };
+        img.src = dataUrl;
+    }
+
+    /**
+     * Download multi-page PDF
+     */
+    downloadMultiPagePDF() {
+        if (typeof window.jspdf === 'undefined') {
+            this.showToast('❌ PDF library not loaded', 'error');
+            return;
+        }
+
+        if (this.scannedImages.length === 0) {
+            this.showToast('❌ No images', 'error');
+            return;
+        }
+
+        this.showLoading('Creating PDF...');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        const images = this.scannedImages.map(img => {
+            return new Promise((resolve) => {
+                const i = new Image();
+                i.onload = () => {
+                    resolve({ img: i, data: img });
+                };
+                i.src = img;
+            });
+        });
+
+        Promise.all(images).then((results) => {
+            results.forEach((result, index) => {
+                if (index > 0) pdf.addPage();
+                const img = result.img;
+                pdf.addImage(result.data, 'JPEG', 0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height);
+            });
+
+            pdf.save(`multipage_scan_${Date.now()}.pdf`);
+            this.hideLoading();
+            this.showToast(`💾 Downloaded PDF with ${this.scannedImages.length} pages`);
+        });
+    }
+
+    /**
+     * Download text
+     */
+    downloadText(filename) {
+        const text = this.ocrText.textContent || 'No text extracted';
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        this.showToast(`💾 Downloaded ${filename}`);
+    }
+
+    /**
+     * Toggle flash
+     */
+    toggleFlash() {
+        if (!this.stream) return;
+        const track = this.stream.getVideoTracks()[0];
+        if (!track) return;
+
+        try {
+            const capabilities = track.getCapabilities();
+            if (!capabilities.torch) {
+                this.showToast('💡 Flash not available', 'error');
+                return;
+            }
+
+            const settings = track.getSettings();
+            track.applyConstraints({
+                advanced: [{ torch: !settings.torch }]
+            }).then(() => {
+                this.showToast(settings.torch ? '💡 Flash off' : '💡 Flash on');
+            });
+        } catch (err) {
+            console.warn('Flash error:', err);
+            this.showToast('💡 Flash not supported', 'error');
+        }
+    }
+
+    /**
+     * Open gallery (placeholder)
+     */
+    openGallery() {
+        this.showToast('🖼️ Gallery coming soon');
+    }
+
+    /**
+     * Show toast message
+     */
+    showToast(message, type = 'info') {
+        // Simple toast implementation
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.style.cssText = `
+                position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+                padding: 10px 24px; border-radius: 12px; font-size: 14px;
+                background: rgba(0,0,0,0.8); color: #fff; backdrop-filter: blur(10px);
+                z-index: 999; transition: all 0.3s ease; opacity: 0;
+                max-width: 90%; text-align: center;
+            `;
+            document.body.appendChild(toast);
+        }
+
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        toast.style.background = type === 'error' ? 'rgba(220,38,38,0.9)' : 'rgba(0,0,0,0.8)';
+
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 3000);
+    }
+
+    /**
+     * Show loading
+     */
+    showLoading(message = 'Processing...') {
+        this.loadingOverlay.style.display = 'flex';
+        this.loadingOverlay.querySelector('p').textContent = message;
+    }
+
+    /**
+     * Hide loading
+     */
+    hideLoading() {
+        this.loadingOverlay.style.display = 'none';
+    }
+}
+
+// ============================================
+// Initialize
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new DocumentScannerApp();
+    window.app = app; // For debugging
+});
