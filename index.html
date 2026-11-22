@@ -566,9 +566,7 @@
         <div class="nav-brand">
             <img src="logo.png" alt="Logo" onerror="this.style.display='none';" />
             <div class="brand-text">
-                <!-- The prefix which expands (T or TWARVIS) -->
                 <span id="typePrefix">T</span>
-                <!-- The static suffix that never changes -->
                 <span>-SCANNER</span>
                 <span class="cursor"></span>
             </div>
@@ -576,7 +574,7 @@
         <div class="nav-links">
             <a href="scanner.html">Scanner</a>
             <a href="pdfconvert.html">PDF Tools</a>
-            <a href="pdfconvert.html">Converter</a>
+            <a href="tools.html">Advanced Tools</a>
             <a href="about.html">About</a>
         </div>
         <div class="nav-icons">
@@ -623,7 +621,7 @@
         </div>
     </div>
 
-    <!-- MORE TOOLS SECTION -->
+    <!-- MORE TOOLS SECTION (Updated) -->
     <div class="more-tools-section">
         <h2 class="section-title"><i class="fas fa-tools" style="color: var(--gradient-end);"></i> More Conversion Tools</h2>
         <div class="tools-grid">
@@ -660,6 +658,24 @@
                 <div class="tool-info">
                     <h4>Image to PDF Maker</h4>
                     <p>Create PDFs from your photos</p>
+                </div>
+            </a>
+
+            <!-- NEW: Merge PDFs (from tools.html) -->
+            <a href="tools.html" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-object-group"></i></div>
+                <div class="tool-info">
+                    <h4>Merge PDFs</h4>
+                    <p>Combine multiple PDFs into one</p>
+                </div>
+            </a>
+
+            <!-- NEW: Compress PDF (from tools.html) -->
+            <a href="tools.html" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                <div class="tool-info">
+                    <h4>Compress PDF</h4>
+                    <p>Reduce PDF file size</p>
                 </div>
             </a>
         </div>
@@ -863,6 +879,11 @@
                     if (loaded === galleryImages.length) {
                         pdf.save(`${name}.pdf`);
                         showToast(`Saved ${name}.pdf`, 'success');
+                        
+                        // Add to history
+                        const history = JSON.parse(localStorage.getItem('pdfHistory')) || [];
+                        history.unshift({ name: `${name}.pdf`, date: new Date().toLocaleDateString() });
+                        localStorage.setItem('pdfHistory', JSON.stringify(history.slice(0, 5)));
                     }
                 };
                 img.src = dataUrl;
