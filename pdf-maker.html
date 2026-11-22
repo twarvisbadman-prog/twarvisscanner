@@ -3,45 +3,581 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>📄 CuteScan - PDF Maker</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Make PDF - T-Scanner</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-dark: #050505;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --gradient-start: #ff3b30;
+            --gradient-mid: #ff5e3a;
+            --gradient-end: #ff9500;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success: #00ff41;
+            --danger: #ff3b30;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Ambient Glow */
+        .glow-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% -20%, rgba(255, 94, 58, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: relative;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            border-radius: 4px;
+        }
+
+        .nav-brand .brand-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            font-family: 'Inter', monospace;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* Typewriter Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: var(--gradient-end);
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .nav-back {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+        .nav-back:hover {
+            color: var(--gradient-end);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .pdf-maker-page {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+
+        .page-header h1 .gradient-text {
+            background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            background: linear-gradient(145deg, #0f0f11, #050505);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 40px;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--gradient-end);
+            background: rgba(255, 149, 0, 0.03);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--success);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .upload-zone p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255, 94, 58, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 94, 58, 0.4);
+        }
+
+        /* Preview Grid */
+        .pdf-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .preview-card {
+            position: relative;
+            aspect-ratio: 3/4;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #000;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .preview-card img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger);
+        }
+
+        /* Controls Panel */
+        .pdf-controls {
+            background: #0f0f11;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 30px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .name-input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.02);
+            padding: 15px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .name-input-group label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .name-input-group input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            outline: none;
+            min-width: 50px;
+        }
+
+        .name-input-group .file-ext {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .pdf-action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #00cc33, var(--success));
+            color: #050505;
+            flex: 2;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            flex: 1;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 100px; left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.error { border-color: var(--danger); }
+        .toast.success { border-color: var(--success); }
+
+        /* Hidden input */
+        .file-input-hidden { display: none; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; }
+            .page-header h1 { font-size: 2.2rem; }
+            .upload-zone { padding: 40px 15px; }
+            .pdf-action-buttons { flex-direction: column; }
+            .name-input-group { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .name-input-group input { width: 100%; }
+        }
+    </style>
 </head>
 <body>
+    <div class="glow-bg"></div>
+    <div class="toast" id="toastMsg"></div>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="logo.png" alt="Logo" onerror="this.style.display='none';" />
+            <div class="brand-text">
+                <span id="typePrefix">T</span>
+                <span>-SCANNER</span>
+                <span class="cursor"></span>
+            </div>
+        </a>
+        <a href="index.html" class="nav-back">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
     <div class="pdf-maker-page">
-        <!-- Top Bar -->
-        <div class="top-bar-cute">
-            <a href="index.html" class="back-btn">←</a>
-            <span class="page-title">📄 Make PDF from Images</span>
+        
+        <div class="page-header">
+            <h1>Make PDF from <span class="gradient-text">Images</span></h1>
+            <p>Select photos from your gallery and convert them into a single PDF document.</p>
         </div>
 
-        <div class="pdf-maker-body">
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">📁</div>
-                <h3>Drop images here or tap to upload</h3>
-                <p>Select multiple images from your gallery</p>
-                <input type="file" id="fileInput" accept="image/*" multiple />
-                <button class="btn-cute-primary" onclick="document.getElementById('fileInput').click()">
-                    📸 Choose Images
-                </button>
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📁</div>
+            <h3>Drop images here or tap to upload</h3>
+            <p>Select multiple images from your gallery</p>
+            <input type="file" id="fileInput" class="file-input-hidden" accept="image/*" multiple />
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-camera"></i> Choose Images
+            </button>
+        </div>
+
+        <!-- Preview Grid -->
+        <div class="pdf-preview-grid" id="previewGrid"></div>
+
+        <!-- Controls -->
+        <div class="pdf-controls" id="pdfControls" style="display:none;">
+            <div class="name-input-group">
+                <label><i class="fas fa-file-pdf"></i> PDF Name:</label>
+                <input type="text" id="pdfNameInput" value="twarvis_doc" />
+                <span class="file-ext">.pdf</span>
             </div>
-
-            <div class="pdf-preview-grid" id="previewGrid"></div>
-
-            <div class="pdf-controls" id="pdfControls" style="display:none;">
-                <div class="name-input-group">
-                    <label>📄 PDF Name:</label>
-                    <input type="text" id="pdfNameInput2" value="tarvis" />
-                    <span class="file-ext">.pdf</span>
-                </div>
-                <div class="pdf-action-buttons">
-                    <button id="makePdfBtn" class="btn-cute-success">📄 Make PDF</button>
-                    <button id="clearImagesBtn" class="btn-cute-danger">🗑️ Clear All</button>
-                </div>
+            <div class="pdf-action-buttons">
+                <button id="makePdfBtn" class="btn btn-success">
+                    <i class="fas fa-download"></i> Make PDF
+                </button>
+                <button id="clearImagesBtn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="js/app.js"></script>
+    <script>
+        // ============================================
+        // TYPEWRITER EFFECT (Same as Home Page)
+        // ============================================
+        const typePrefix = document.getElementById('typePrefix');
+        const fullWord = "TWARVIS";
+        let currentLength = 1;
+        let isDeleting = false;
+
+        function runTypewriter() {
+            if (!isDeleting) {
+                if (currentLength < fullWord.length) {
+                    currentLength++;
+                    typePrefix.textContent = fullWord.substring(0, currentLength);
+                    setTimeout(runTypewriter, 200); 
+                } else {
+                    isDeleting = true;
+                    setTimeout(runTypewriter, 2000);
+                }
+            } else {
+                if (currentLength > 1) {
+                    currentLength--;
+                    typePrefix.textContent = fullWord.substring(0, currentLength);
+                    setTimeout(runTypewriter, 100);
+                } else {
+                    isDeleting = false;
+                    setTimeout(runTypewriter, 1500);
+                }
+            }
+        }
+        setTimeout(runTypewriter, 1000);
+
+        // ============================================
+        // PDF MAKER LOGIC
+        // ============================================
+        let selectedImages = [];
+        const fileInput = document.getElementById('fileInput');
+        const previewGrid = document.getElementById('previewGrid');
+        const pdfControls = document.getElementById('pdfControls');
+        const uploadZone = document.getElementById('uploadZone');
+
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toastMsg');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            toast.className = 'toast ' + type;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 4000);
+        }
+
+        // Handle Drag & Drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            if (files.length > 0) processFiles(files);
+        });
+
+        // Handle File Input
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(this.files);
+            if (files.length > 0) processFiles(files);
+            this.value = '';
+        });
+
+        function processFiles(files) {
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    selectedImages.push(event.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        renderPreview();
+                        showToast(`Added ${files.length} image(s)`, 'success');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPreview() {
+            if (selectedImages.length === 0) {
+                previewGrid.innerHTML = '';
+                pdfControls.style.display = 'none';
+                return;
+            }
+
+            pdfControls.style.display = 'block';
+            previewGrid.innerHTML = selectedImages.map((src, index) => `
+                <div class="preview-card">
+                    <img src="${src}" alt="Preview ${index + 1}" />
+                    <button class="remove-btn" data-index="${index}">✕</button>
+                </div>
+            `).join('');
+
+            // Add remove listeners
+            previewGrid.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = parseInt(this.dataset.index);
+                    selectedImages.splice(idx, 1);
+                    renderPreview();
+                });
+            });
+        }
+
+        // Make PDF
+        document.getElementById('makePdfBtn').addEventListener('click', function() {
+            if (selectedImages.length === 0) return;
+
+            if (typeof window.jspdf === 'undefined') {
+                showToast('PDF engine not loaded. Check connection.', 'error');
+                return;
+            }
+
+            showToast('Creating PDF...');
+            const { jsPDF } = window.jspdf;
+            const name = document.getElementById('pdfNameInput').value.trim() || 'document';
+            const pdf = new jsPDF();
+
+            let loaded = 0;
+            selectedImages.forEach((dataUrl, index) => {
+                const img = new Image();
+                img.onload = function() {
+                    if (index > 0) pdf.addPage();
+                    
+                    const imgWidth = pdf.internal.pageSize.width;
+                    const imgHeight = (this.height / this.width) * imgWidth;
+                    
+                    pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight);
+                    loaded++;
+                    
+                    if (loaded === selectedImages.length) {
+                        pdf.save(`${name}.pdf`);
+                        showToast(`Saved ${name}.pdf`, 'success');
+                    }
+                };
+                img.src = dataUrl;
+            });
+        });
+
+        // Clear All
+        document.getElementById('clearImagesBtn').addEventListener('click', function() {
+            selectedImages = [];
+            renderPreview();
+            showToast('All images cleared');
+        });
+    </script>
 </body>
 </html>
