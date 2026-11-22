@@ -107,10 +107,10 @@ button{font-family:inherit;cursor:pointer}
   <div id="prevBox"><img id="prevImg" alt=""></div>
   <div class="panel">
     <div class="row" id="filters">
-      <button class="chip" data-f="scan">Scan</button>
+      <button class="chip" data-f="original">Natural</button>
       <button class="chip" data-f="color">Color</button>
+      <button class="chip" data-f="scan">Gray</button>
       <button class="chip" data-f="bw">Black &amp; white</button>
-      <button class="chip" data-f="original">Original</button>
     </div>
     <div class="row">
       <button class="chip" id="recropBtn"><i class="fas fa-crop-simple"></i> Edges</button>
@@ -134,7 +134,7 @@ const $ = id => document.getElementById(id);
 const WATERMARK = 'tscanner.cc.cd';
 const LEVELS = { max:{side:1000,q:.4}, mid:{side:1400,q:.6}, low:{side:2000,q:.8} };
 
-let stream = null, pages = [], cur = 0, lastFilter = 'scan';
+let stream = null, pages = [], cur = 0, lastFilter = 'original';
 let pending = null;            // {src, corners, editIndex}
 
 function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none',2800); }
@@ -288,18 +288,14 @@ function rotate(c,n){
 function filter(c, mode){
   if(mode==='original') return c;
   const w=c.width,h=c.height, x=c.getContext('2d');
-  const sm=document.createElement('canvas'); sm.width=Math.max(8,Math.round(w/24)); sm.height=Math.max(8,Math.round(h/24));
-  const sx=sm.getContext('2d'); sx.imageSmoothingQuality='high'; sx.drawImage(c,0,0,sm.width,sm.height);
-  const bgc=document.createElement('canvas'); bgc.width=w; bgc.height=h;
-  const bx=bgc.getContext('2d'); bx.imageSmoothingQuality='high'; bx.drawImage(sm,0,0,w,h);
-  const img=x.getImageData(0,0,w,h), d=img.data, b=bx.getImageData(0,0,w,h).data;
-  const lv=n=>{ n=(n-105)/(232-105)*255; return n<0?0:n>255?255:n; };
+  const img=x.getImageData(0,0,w,h), d=img.data;
+  // gentle contrast only: no brightness boost, so text on white paper stays dark and readable
+  const lv=n=>{ n=(n-15)/(245-15)*255; return n<0?0:n>255?255:n; };
   for(let i=0;i<d.length;i+=4){
-    const bg=Math.max(40,0.299*b[i]+0.587*b[i+1]+0.114*b[i+2]);
-    if(mode==='color'){ d[i]=lv(d[i]/bg*255); d[i+1]=lv(d[i+1]/bg*255); d[i+2]=lv(d[i+2]/bg*255); }
+    if(mode==='color'){ d[i]=lv(d[i]); d[i+1]=lv(d[i+1]); d[i+2]=lv(d[i+2]); }
     else{
-      const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-      let n=lv(g/bg*255); if(mode==='bw') n=n<150?0:255;
+      let n=lv(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]);
+      if(mode==='bw') n=n<120?0:255;
       d[i]=d[i+1]=d[i+2]=n;
     }
   }
