@@ -12,485 +12,132 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --bg-dark: #050505;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --gradient-start: #ff3b30;
-            --gradient-mid: #ff5e3a;
-            --gradient-end: #ff9500;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --success: #00ff41;
-            --danger: #ff3b30;
+            --bg-dark: #050505; --text-main: #fff; --text-muted: #a1a1aa;
+            --gradient-start: #ff3b30; --gradient-end: #ff9500;
+            --border-color: rgba(255, 255, 255, 0.08); --success: #00ff41; --danger: #ff3b30;
             --panel-bg: rgba(15, 15, 17, 0.98);
         }
-
         html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            position: fixed;
-            top: 0; left: 0;
-            -webkit-tap-highlight-color: transparent;
+            width: 100%; height: 100%; overflow: hidden; background: var(--bg-dark);
+            color: var(--text-main); font-family: 'Inter', sans-serif;
+            position: fixed; top: 0; left: 0; -webkit-tap-highlight-color: transparent;
         }
 
-        /* ===== TOP NAV BAR ===== */
+        /* Top Nav */
         .top-nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 20px;
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(12px);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 20px; background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
         }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-main);
-        }
-
-        .nav-brand img { height: 28px; width: auto; border-radius: 4px; }
-
-        .brand-text {
-            font-size: 1.2rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1em;
-            background-color: var(--gradient-end);
-            margin-left: 2px;
-            animation: blink 0.8s infinite;
-        }
-
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+        .nav-brand img { height: 28px; width: auto; }
+        .brand-text { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; }
+        .cursor { display: inline-block; width: 2px; height: 1em; background: var(--gradient-end); margin-left: 2px; animation: blink 0.8s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .nav-back {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
+        .nav-back { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .nav-back:hover { color: var(--gradient-end); }
 
-        /* ===== CAMERA VIEW ===== */
-        #cameraView {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            background: #000;
-            display: none;
-        }
+        /* Camera View */
+        #cameraView { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #000; display: none; }
         #cameraView.active { display: block; }
-
-        #video {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .scan-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .frame-box {
-            width: 80%; max-width: 450px;
-            aspect-ratio: 3/4;
-            border: 2px solid rgba(255, 149, 0, 0.6);
-            border-radius: 12px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
-            position: relative;
-        }
-
-        .frame-box .corner {
-            position: absolute;
-            width: 30px; height: 30px;
-            border-color: var(--gradient-end);
-            border-style: solid;
-        }
+        #video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        /* Scan Overlay & Frame */
+        .scan-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .frame-box { width: 80%; max-width: 450px; aspect-ratio: 3/4; border: 2px solid var(--gradient-end); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); position: relative; transition: border-color 0.3s; }
+        .frame-box .corner { position: absolute; width: 30px; height: 30px; border-color: inherit; border-style: solid; }
         .frame-box .corner.tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; border-radius: 6px 0 0 0; }
         .frame-box .corner.tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; border-radius: 0 6px 0 0; }
         .frame-box .corner.bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; border-radius: 0 0 0 6px; }
         .frame-box .corner.br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; border-radius: 0 0 6px 0; }
+        .frame-label { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: rgba(255, 149, 0, 0.6); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
 
-        .frame-label {
-            position: absolute;
-            bottom: -40px; left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 149, 0, 0.6);
-            font-size: 12px; letter-spacing: 2px;
-            white-space: nowrap; text-transform: uppercase;
-        }
+        /* Status */
+        #status { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 10; color: var(--gradient-end); font-size: 14px; text-align: center; background: rgba(0, 0, 0, 0.7); padding: 8px 20px; border-radius: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 149, 0, 0.2); display: none; }
 
-        /* ===== STATUS ===== */
-        #status {
-            position: fixed;
-            top: 80px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            color: var(--gradient-end);
-            font-size: 14px; text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 8px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 149, 0, 0.2);
-            display: none;
-        }
-
-        /* ===== CONTROLS ===== */
-        .controls {
-            position: fixed;
-            bottom: 40px; left: 0; right: 0;
-            z-index: 10;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            padding: 0 20px;
-        }
+        /* Controls */
+        .controls { position: fixed; bottom: 40px; left: 0; right: 0; z-index: 10; display: none; justify-content: center; align-items: center; gap: 30px; padding: 0 20px; }
         .controls.active { display: flex; }
-
-        .ctrl-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 20px;
-            cursor: pointer;
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
-        }
+        .ctrl-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255, 255, 255, 0.6); font-size: 20px; cursor: pointer; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .ctrl-btn:active { transform: scale(0.9); }
-        .ctrl-btn:disabled { opacity: 0.2; }
+        .capture-btn { background: none; border: none; padding: 0; cursor: pointer; }
+        .capture-ring { width: 72px; height: 72px; border-radius: 50%; border: 4px solid rgba(255, 149, 0, 0.3); display: flex; align-items: center; justify-content: center; }
+        .capture-dot { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); box-shadow: 0 0 30px rgba(255, 94, 58, 0.4); }
 
-        .capture-btn {
-            background: none; border: none; padding: 0; cursor: pointer;
-        }
-        .capture-btn:active { transform: scale(0.9); }
-
-        .capture-ring {
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 149, 0, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
-        }
-        .capture-dot {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            box-shadow: 0 0 30px rgba(255, 94, 58, 0.4);
-            transition: 0.3s;
-        }
-
-        /* ============================================
-           RESULT PANEL
-           ============================================ */
-        #resultPanel {
-            display: none;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            max-height: 92vh;
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 24px 24px 0 0;
-            z-index: 100;
-            border-top: 1px solid var(--border-color);
-            overflow: hidden;
-            padding: 20px;
-            animation: slideUp 0.4s ease;
-        }
+        /* Result Panel */
+        #resultPanel { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-height: 92vh; background: var(--panel-bg); backdrop-filter: blur(20px); border-radius: 24px 24px 0 0; z-index: 100; border-top: 1px solid var(--border-color); padding: 20px; animation: slideUp 0.4s ease; }
         #resultPanel.active { display: block; }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        #resultPanel .preview-mini {
-            background: #000;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            margin-bottom: 14px;
-        }
-        #resultPanel .preview-mini img {
-            width: 100%; height: auto; display: block;
-            max-height: 30vh; object-fit: contain;
-        }
-
-        #resultPanel .page-info {
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        #resultPanel .preview-mini { background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 14px; }
+        #resultPanel .preview-mini img { width: 100%; height: auto; display: block; max-height: 30vh; object-fit: contain; }
+        #resultPanel .page-info { text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
         #resultPanel .page-info span { color: var(--gradient-end); font-weight: 700; }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .btn-option {
-            padding: 14px 10px;
-            border: none; border-radius: 14px;
-            font-weight: 700; font-size: 0.85rem;
-            cursor: pointer; transition: all 0.3s;
-            font-family: inherit;
-            display: flex; flex-direction: column;
-            align-items: center; gap: 4px;
-            text-align: center; min-height: 70px;
-            justify-content: center;
-        }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-option { padding: 14px 10px; border: none; border-radius: 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-height: 70px; justify-content: center; }
         .btn-option:active { transform: scale(0.95); }
         .btn-option .icon-big { font-size: 1.6rem; }
         .btn-option .sub-text { font-size: 0.6rem; font-weight: 500; opacity: 0.6; }
+        .btn-continue { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; }
+        .btn-done { background: linear-gradient(135deg, var(--success), #00cc33); color: #050505; }
+        .btn-rescan { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-delete-page { background: rgba(255, 59, 48, 0.1); color: var(--danger); border: 1px solid rgba(255, 59, 48, 0.2); }
 
-        .btn-continue {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(255, 94, 58, 0.3);
-        }
-        .btn-done {
-            background: linear-gradient(135deg, var(--success), #00cc33);
-            color: #050505;
-            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
-        }
-        .btn-rescan {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .btn-delete-page {
-            background: rgba(255, 59, 48, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(255, 59, 48, 0.2);
-        }
-
-        /* ============================================
-           EDIT MODE
-           ============================================ */
-        #editMode {
-            display: none;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            max-height: 92vh;
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 24px 24px 0 0;
-            z-index: 150;
-            border-top: 1px solid var(--border-color);
-            overflow: hidden;
-            padding: 20px;
-            animation: slideUp 0.4s ease;
-        }
+        /* Edit Mode */
+        #editMode { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-height: 92vh; background: var(--panel-bg); backdrop-filter: blur(20px); border-radius: 24px 24px 0 0; z-index: 150; border-top: 1px solid var(--border-color); padding: 20px; animation: slideUp 0.4s ease; }
         #editMode.active { display: block; }
-
-        #editMode .edit-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 14px;
-        }
-        #editMode .edit-header h3 {
-            color: var(--text-main); font-size: 1.1rem; font-weight: 700;
-        }
-        #editMode .edit-header button {
-            background: none; border: none;
-            color: var(--text-muted); font-size: 14px;
-            cursor: pointer; padding: 4px 8px;
-        }
-        #editMode .edit-header button:hover { color: #fff; }
-
-        .edit-pages {
-            display: flex; gap: 10px;
-            overflow-x: auto;
-            padding: 8px 0 14px;
-            margin-bottom: 14px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .edit-pages::-webkit-scrollbar { height: 4px; }
-        .edit-pages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-
-        .page-thumb {
-            flex-shrink: 0;
-            width: 80px; height: 100px;
-            border-radius: 10px; overflow: hidden;
-            border: 2px solid transparent;
-            cursor: pointer; transition: 0.3s;
-            position: relative; background: #111;
-        }
+        .edit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .edit-header h3 { font-size: 1.1rem; font-weight: 700; }
+        .edit-header button { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; }
+        .edit-header button:hover { color: #fff; }
+        
+        .edit-pages { display: flex; gap: 10px; overflow-x: auto; padding: 8px 0 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 14px; }
+        .page-thumb { flex-shrink: 0; width: 80px; height: 100px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; cursor: pointer; position: relative; background: #111; }
         .page-thumb.active { border-color: var(--gradient-end); }
         .page-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .page-thumb .page-num {
-            position: absolute; bottom: 4px; right: 6px;
-            font-size: 10px; color: rgba(255,255,255,0.6);
-            background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px;
-        }
-
-        .edit-preview-container {
-            background: #000; border-radius: 16px;
-            overflow: hidden; border: 1px solid var(--border-color);
-            margin-bottom: 14px;
-        }
-        .edit-preview-container img {
-            width: 100%; height: auto; display: block;
-            max-height: 30vh; object-fit: contain;
-        }
-
-        .edit-toolbar {
-            display: flex; gap: 6px;
-            padding: 6px 0 12px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-        .edit-toolbar button {
-            padding: 8px 16px; border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background: rgba(255,255,255,0.02);
-            color: var(--text-muted);
-            font-size: 12px; font-weight: 700;
-            cursor: pointer; transition: 0.3s;
-            font-family: inherit;
-        }
-        .edit-toolbar button.active {
-            background: rgba(255, 149, 0, 0.1);
-            border-color: rgba(255, 149, 0, 0.3);
-            color: var(--gradient-end);
-        }
+        .page-thumb .page-num { position: absolute; bottom: 4px; right: 6px; font-size: 10px; color: rgba(255,255,255,0.6); background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; }
+        
+        .edit-preview-container { background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 14px; }
+        .edit-preview-container img { width: 100%; height: auto; display: block; max-height: 30vh; object-fit: contain; }
+        
+        /* Toolbar */
+        .edit-toolbar { display: flex; gap: 6px; padding: 6px 0 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; }
+        .edit-toolbar button { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; }
+        .edit-toolbar button.active { background: rgba(255, 149, 0, 0.1); border-color: rgba(255, 149, 0, 0.3); color: var(--gradient-end); }
         .edit-toolbar button.danger:hover { color: var(--danger); border-color: rgba(255,59,48,0.3); }
-        .edit-toolbar .btn-save {
-            background: rgba(0, 255, 65, 0.1);
-            border-color: rgba(0, 255, 65, 0.2);
-            color: var(--success);
-        }
-
-        .pdf-naming {
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 12px; padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px; border: 1px solid var(--border-color);
-            flex-wrap: wrap;
-        }
-        .pdf-naming label {
-            font-size: 13px; font-weight: 700;
-            color: var(--text-muted); white-space: nowrap;
-        }
-        .pdf-naming input {
-            flex: 1; padding: 8px 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 10px; color: var(--text-main);
-            font-size: 16px; font-weight: 700;
-            font-family: inherit; outline: none; min-width: 80px;
-        }
+        .edit-toolbar .btn-save { background: rgba(0, 255, 65, 0.1); border-color: rgba(0, 255, 65, 0.2); color: var(--success); }
+        
+        /* PDF Naming & Compression Options */
+        .pdf-options { background: rgba(255,255,255,0.02); border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+        .pdf-naming { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .pdf-naming label { font-size: 13px; font-weight: 700; color: var(--text-muted); }
+        .pdf-naming input { flex: 1; padding: 8px 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); font-size: 16px; font-weight: 700; outline: none; }
         .pdf-naming input:focus { border-color: var(--gradient-end); }
-        .pdf-naming .ext { color: var(--text-muted); font-weight: 600; font-size: 14px; }
+        .compression-toggle { display: flex; align-items: center; justify-content: space-between; }
+        .compression-toggle label { font-size: 13px; font-weight: 700; color: var(--text-muted); }
+        .toggle-switch { position: relative; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        .btn-create-pdf {
-            width: 100%; padding: 16px;
-            border: none; border-radius: 14px;
-            background: linear-gradient(135deg, var(--success), #00cc33);
-            color: #050505;
-            font-weight: 800; font-size: 1.1rem;
-            cursor: pointer; transition: all 0.3s;
-            font-family: inherit;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
-        }
-        .btn-create-pdf:active { transform: scale(0.97); }
+        .btn-create-pdf { width: 100%; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, var(--success), #00cc33); color: #050505; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2); }
 
-        /* ============================================
-           THANK YOU MODAL
-           ============================================ */
-        #thankYouModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            z-index: 500;
-            align-items: center;
-            justify-content: center;
-        }
+        /* Thank You */
+        #thankYouModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); z-index: 500; align-items: center; justify-content: center; }
         #thankYouModal.active { display: flex; }
-
-        .thank-you-box {
-            background: #111;
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 400px; width: 90%;
-            text-align: center;
-            animation: popIn 0.4s ease;
-        }
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
+        .thank-you-box { background: #111; border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; max-width: 400px; width: 90%; text-align: center; }
         .thank-you-box .emoji { font-size: 3rem; margin-bottom: 15px; }
         .thank-you-box h2 { color: var(--gradient-end); font-size: 1.6rem; margin-bottom: 10px; }
-        .thank-you-box p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
-        .thank-you-box .btn-close-thanks {
-            padding: 14px 40px;
-            border: none; border-radius: 50px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            color: #fff; font-weight: 700; font-size: 1rem;
-            cursor: pointer; font-family: inherit;
-            box-shadow: 0 4px 20px rgba(255, 94, 58, 0.3);
-        }
+        .thank-you-box p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+        .thank-you-box .btn-close-thanks { padding: 14px 40px; border: none; border-radius: 50px; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            top: 80px; left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: #222;
-            color: #fff; font-size: 13px; font-weight: 600;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-            max-width: 90%; text-align: center;
-        }
+        /* Toast */
+        .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 12px; background: #222; color: #fff; font-size: 13px; font-weight: 600; z-index: 2000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border-color); max-width: 90%; text-align: center; }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             .frame-box { width: 85%; }
             .capture-ring { width: 64px; height: 64px; }
@@ -507,186 +154,132 @@
     </style>
 </head>
 <body>
-
-    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <!-- TOP NAVIGATION BAR -->
     <nav class="top-nav">
         <a href="index.html" class="nav-brand">
             <img src="logo.png" alt="Logo" onerror="this.style.display='none';" />
-            <div class="brand-text">
-                <span id="typePrefix">T</span>
-                <span>-SCANNER</span>
-                <span class="cursor"></span>
-            </div>
+            <div class="brand-text"><span id="typePrefix">T</span><span>-SCANNER</span><span class="cursor"></span></div>
         </a>
-        <a href="index.html" class="nav-back">
-            <i class="fas fa-home"></i> Home
-        </a>
+        <a href="index.html" class="nav-back"><i class="fas fa-home"></i> Home</a>
     </nav>
 
-    <!-- ===== FULL SCREEN CAMERA ===== -->
+    <!-- CAMERA VIEW -->
     <div id="cameraView" class="active">
         <video id="video" autoplay muted playsinline></video>
         <div class="scan-overlay" id="scanOverlay">
-            <div class="frame-box">
-                <span class="corner tl"></span>
-                <span class="corner tr"></span>
-                <span class="corner bl"></span>
-                <span class="corner br"></span>
+            <div class="frame-box" id="frameBox">
+                <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
                 <span class="frame-label">✦ POSITION DOCUMENT ✦</span>
             </div>
         </div>
     </div>
 
-    <!-- STATUS -->
     <div id="status">📷 Starting camera...</div>
 
-    <!-- CONTROLS -->
+    <!-- CAMERA CONTROLS -->
     <div class="controls active" id="controls">
-        <button class="ctrl-btn" id="flashBtn" disabled><i class="fas fa-bolt"></i></button>
+        <button class="ctrl-btn" id="frameStyleBtn" title="Change Frame Color"><i class="fas fa-palette"></i></button>
         <button class="capture-btn" id="captureBtn" disabled>
-            <div class="capture-ring">
-                <div class="capture-dot"></div>
-            </div>
+            <div class="capture-ring"><div class="capture-dot"></div></div>
         </button>
-        <button class="ctrl-btn" id="galleryBtn"><i class="fas fa-images"></i></button>
+        <button class="ctrl-btn" id="galleryBtn" title="Upload Images"><i class="fas fa-images"></i></button>
     </div>
 
-    <!-- ===== RESULT PANEL ===== -->
+    <!-- RESULT PANEL -->
     <div id="resultPanel">
-        <div class="preview-mini">
-            <img id="previewImage" alt="Scanned page" />
-        </div>
-        <div class="page-info">
-            Page <span id="pageNum">1</span> of <span id="totalPages">1</span>
-        </div>
+        <div class="preview-mini"><img id="previewImage" alt="Scanned page" /></div>
+        <div class="page-info">Page <span id="pageNum">1</span> of <span id="totalPages">1</span></div>
         <div class="options-grid">
-            <button class="btn-option btn-continue" id="continueBtn">
-                <span class="icon-big">📸</span>
-                CONTINUE
-                <span class="sub-text">Scan next page</span>
-            </button>
-            <button class="btn-option btn-done" id="doneBtn">
-                <span class="icon-big">✅</span>
-                DONE
-                <span class="sub-text">Finish &amp; edit</span>
-            </button>
-            <button class="btn-option btn-rescan" id="rescanBtn">
-                <span class="icon-big">🔄</span>
-                RESCAN
-                <span class="sub-text">Retake this page</span>
-            </button>
-            <button class="btn-option btn-delete-page" id="deletePageBtn">
-                <span class="icon-big">🗑️</span>
-                DELETE
-                <span class="sub-text">Remove this page</span>
-            </button>
+            <button class="btn-option btn-continue" id="continueBtn"><span class="icon-big">📸</span> CONTINUE <span class="sub-text">Scan next page</span></button>
+            <button class="btn-option btn-done" id="doneBtn"><span class="icon-big">✅</span> DONE <span class="sub-text">Finish &amp; edit</span></button>
+            <button class="btn-option btn-rescan" id="rescanBtn"><span class="icon-big">🔄</span> RESCAN <span class="sub-text">Retake this page</span></button>
+            <button class="btn-option btn-delete-page" id="deletePageBtn"><span class="icon-big">🗑️</span> DELETE <span class="sub-text">Remove this page</span></button>
         </div>
     </div>
 
-    <!-- ===== EDIT MODE ===== -->
+    <!-- EDIT MODE -->
     <div id="editMode">
         <div class="edit-header">
             <h3><i class="fas fa-edit"></i> Edit Document</h3>
             <button id="backToOptions"><i class="fas fa-arrow-left"></i> Back</button>
         </div>
-
         <div class="edit-pages" id="editPages"></div>
-
-        <div class="edit-preview-container">
-            <img id="editPreview" alt="Document" />
-        </div>
-
+        <div class="edit-preview-container"><img id="editPreview" alt="Document" /></div>
+        
         <div class="edit-toolbar">
             <button class="active" data-filter="original">Original</button>
             <button data-filter="grayscale">⚫ B&amp;W</button>
             <button data-filter="enhance">✨ Enhance</button>
-            <button data-filter="vintage">📻 Vintage</button>
             <button id="rotateBtn">🔄 Rotate</button>
             <button id="deleteEditBtn" class="danger">🗑️ Delete</button>
             <button id="saveBtn" class="btn-save">💾 Save</button>
         </div>
 
-        <div class="pdf-naming">
-            <label><i class="fas fa-file-pdf"></i> Name:</label>
-            <input type="text" id="pdfName" value="twarvis_doc" />
-            <span class="ext">.pdf</span>
+        <div class="pdf-options">
+            <div class="pdf-naming">
+                <label><i class="fas fa-file-pdf"></i> Name:</label>
+                <input type="text" id="pdfName" value="twarvis_doc" />
+                <span>.pdf</span>
+            </div>
+            <div class="compression-toggle">
+                <label><i class="fas fa-compress-arrows-alt"></i> Compress Images (Low Size)</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="compressToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
 
-        <button class="btn-create-pdf" id="createPdfBtn">
-            <i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD
-        </button>
+        <button class="btn-create-pdf" id="createPdfBtn"><i class="fas fa-file-pdf"></i> CREATE PDF &amp; DOWNLOAD</button>
     </div>
 
-    <!-- ===== THANK YOU MODAL ===== -->
+    <!-- THANK YOU MODAL -->
     <div id="thankYouModal">
         <div class="thank-you-box">
             <div class="emoji">🎉</div>
             <h2>Thank You!</h2>
-            <p>
-                Thanks for using T-Scanner!<br />
-                Your document is ready.
-            </p>
+            <p>Your document is ready. Thanks for using T-Scanner!</p>
             <button class="btn-close-thanks" id="closeThankYou">Continue</button>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // TYPEWRITER EFFECT
-        // ============================================
+        // TYPEWRITER
         const typePrefix = document.getElementById('typePrefix');
         const fullWord = "TWARVIS";
-        let currentLength = 1;
-        let isDeleting = false;
-
+        let currentLength = 1, isDeleting = false;
         function runTypewriter() {
             if (!isDeleting) {
-                if (currentLength < fullWord.length) {
-                    currentLength++;
-                    typePrefix.textContent = fullWord.substring(0, currentLength);
-                    setTimeout(runTypewriter, 200); 
-                } else {
-                    isDeleting = true;
-                    setTimeout(runTypewriter, 2000);
-                }
+                if (currentLength < fullWord.length) { currentLength++; typePrefix.textContent = fullWord.substring(0, currentLength); setTimeout(runTypewriter, 200); }
+                else { isDeleting = true; setTimeout(runTypewriter, 2000); }
             } else {
-                if (currentLength > 1) {
-                    currentLength--;
-                    typePrefix.textContent = fullWord.substring(0, currentLength);
-                    setTimeout(runTypewriter, 100);
-                } else {
-                    isDeleting = false;
-                    setTimeout(runTypewriter, 1500);
-                }
+                if (currentLength > 1) { currentLength--; typePrefix.textContent = fullWord.substring(0, currentLength); setTimeout(runTypewriter, 100); }
+                else { isDeleting = false; setTimeout(runTypewriter, 1500); }
             }
         }
         setTimeout(runTypewriter, 1000);
 
-        // ============================================
-        // SCANNER LOGIC (Kept Intact from original)
-        // ============================================
+        // SCANNER LOGIC
         const video = document.getElementById('video');
         const statusDiv = document.getElementById('status');
         const captureBtn = document.getElementById('captureBtn');
-        const flashBtn = document.getElementById('flashBtn');
         const galleryBtn = document.getElementById('galleryBtn');
+        const frameStyleBtn = document.getElementById('frameStyleBtn');
         const cameraView = document.getElementById('cameraView');
         const controls = document.getElementById('controls');
         const scanOverlay = document.getElementById('scanOverlay');
-
+        const frameBox = document.getElementById('frameBox');
+        
         const resultPanel = document.getElementById('resultPanel');
         const previewImage = document.getElementById('previewImage');
         const pageNum = document.getElementById('pageNum');
         const totalPages = document.getElementById('totalPages');
-
         const continueBtn = document.getElementById('continueBtn');
         const doneBtn = document.getElementById('doneBtn');
         const rescanBtn = document.getElementById('rescanBtn');
         const deletePageBtn = document.getElementById('deletePageBtn');
-
+        
         const editMode = document.getElementById('editMode');
         const editPreview = document.getElementById('editPreview');
         const editPages = document.getElementById('editPages');
@@ -696,10 +289,10 @@
         const saveBtn = document.getElementById('saveBtn');
         const createPdfBtn = document.getElementById('createPdfBtn');
         const pdfNameInput = document.getElementById('pdfName');
-
+        const compressToggle = document.getElementById('compressToggle');
+        
         const thankYouModal = document.getElementById('thankYouModal');
         const closeThankYou = document.getElementById('closeThankYou');
-
         const toast = document.getElementById('toast');
 
         let stream = null;
@@ -707,10 +300,11 @@
         let currentPageIndex = 0;
         let currentFilter = 'original';
         let isProcessing = false;
+        let frameColors = ['#ff9500', '#00b4d8', '#00ff41', '#ff3b30', '#a78bfa'];
+        let currentFrameColorIndex = 0;
 
         function showToast(msg, type = 'info') {
-            toast.textContent = msg;
-            toast.style.display = 'block';
+            toast.textContent = msg; toast.style.display = 'block';
             toast.className = 'toast';
             if (type === 'error') toast.style.borderColor = 'rgba(255,0,0,0.3)';
             if (type === 'success') toast.style.borderColor = 'rgba(0,255,65,0.3)';
@@ -719,28 +313,18 @@
         }
 
         function setStatus(msg, color = 'var(--gradient-end)') {
-            statusDiv.textContent = msg;
-            statusDiv.style.color = color;
-            statusDiv.style.display = 'block';
+            statusDiv.textContent = msg; statusDiv.style.color = color; statusDiv.style.display = 'block';
         }
-
-        function hideStatus() {
-            statusDiv.style.display = 'none';
-        }
+        function hideStatus() { statusDiv.style.display = 'none'; }
 
         function stopCamera() {
-            if (stream) {
-                stream.getTracks().forEach(t => t.stop());
-                stream = null;
-                video.srcObject = null;
-            }
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; video.srcObject = null; }
         }
 
         async function startCamera() {
             try {
                 stopCamera();
                 captureBtn.disabled = true;
-                flashBtn.disabled = true;
                 resultPanel.classList.remove('active');
                 editMode.classList.remove('active');
                 cameraView.classList.add('active');
@@ -748,46 +332,22 @@
                 scanOverlay.style.display = 'flex';
                 hideStatus();
 
-                if (location.protocol !== 'https:' &&
-                    location.hostname !== 'localhost' &&
-                    location.hostname !== '127.0.0.1') {
-                    setStatus('⚠️ Camera requires HTTPS or localhost.', 'var(--danger)');
-                    return;
+                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                    setStatus('⚠️ Camera requires HTTPS or localhost.', 'var(--danger)'); return;
                 }
 
                 setStatus('📷 Starting camera...');
-
-                let constraints = {
-                    audio: false,
-                    video: {
-                        facingMode: { ideal: 'environment' },
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    }
-                };
-
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (e) {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: { width: { ideal: 1920 }, height: { ideal: 1080 } }
-                    });
-                }
-
+                let constraints = { audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } };
+                try { stream = await navigator.mediaDevices.getUserMedia(constraints); }
+                catch (e) { stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { width: { ideal: 1920 }, height: { ideal: 1080 } } }); }
+                
                 video.srcObject = stream;
-
-                await new Promise((resolve) => {
-                    if (video.readyState >= 1) { resolve(); } else { video.onloadedmetadata = () => resolve(); }
-                });
-
+                await new Promise((resolve) => { if (video.readyState >= 1) { resolve(); } else { video.onloadedmetadata = () => resolve(); } });
                 await video.play();
 
                 captureBtn.disabled = false;
-                flashBtn.disabled = false;
                 setStatus('✅ Tap the circle to scan', 'var(--success)');
                 setTimeout(hideStatus, 2000);
-
             } catch (error) {
                 console.error('Camera error:', error);
                 captureBtn.disabled = true;
@@ -796,16 +356,10 @@
                 else if (error.name === 'NotFoundError') msg += 'No camera found.';
                 else msg += error.message;
                 setStatus(msg, 'var(--danger)');
-
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = '🔄 Retry Camera';
-                retryBtn.style.cssText =
-                    'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:20;padding:12px 30px;background:#222;color:white;border:1px solid #444;border-radius:30px;font-size:16px;cursor:pointer;';
-                retryBtn.onclick = () => { retryBtn.remove(); startCamera(); };
-                document.body.appendChild(retryBtn);
             }
         }
 
+        // Capture and Compression Logic
         function capture() {
             if (isProcessing) return;
             if (!stream) { showToast('❌ Camera not running', 'error'); return; }
@@ -818,7 +372,6 @@
             try {
                 const width = video.videoWidth;
                 const height = video.videoHeight;
-
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
@@ -836,7 +389,8 @@
                     }
                 } catch (e) { console.warn('Auto-crop failed', e); }
 
-                const imageData = finalCanvas.toDataURL('image/png');
+                // Compress image immediately upon capture
+                const imageData = compressImage(finalCanvas);
 
                 pages.push(imageData);
                 currentPageIndex = pages.length - 1;
@@ -851,7 +405,6 @@
                 stopCamera();
                 hideStatus();
                 showToast('✅ Page scanned!');
-
             } catch (error) {
                 console.error('Capture error:', error);
                 showToast('❌ Capture failed: ' + error.message, 'error');
@@ -859,6 +412,29 @@
                 isProcessing = false;
                 captureBtn.disabled = false;
             }
+        }
+
+        // Helper function to compress image
+        function compressImage(canvas) {
+            // Downscale to max width 1200px for low file size
+            const maxWidth = 1200;
+            let targetWidth = canvas.width;
+            let targetHeight = canvas.height;
+
+            if (targetWidth > maxWidth) {
+                const ratio = maxWidth / targetWidth;
+                targetWidth = maxWidth;
+                targetHeight = canvas.height * ratio;
+            }
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = targetWidth;
+            tempCanvas.height = targetHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+            // Return JPEG with 0.6 quality (highly compressed)
+            return tempCanvas.toDataURL('image/jpeg', 0.6);
         }
 
         function updateResultPanel() {
@@ -869,14 +445,19 @@
             }
         }
 
-        // --- OPTIONS ---
-        continueBtn.addEventListener('click', function() {
-            resultPanel.classList.remove('active');
-            startCamera();
-            showToast('📸 Scan next page');
+        // Frame Color Toggle
+        frameStyleBtn.addEventListener('click', () => {
+            currentFrameColorIndex = (currentFrameColorIndex + 1) % frameColors.length;
+            const color = frameColors[currentFrameColorIndex];
+            frameBox.style.borderColor = color;
+            frameBox.querySelectorAll('.corner').forEach(c => c.style.borderColor = color);
+            frameBox.querySelector('.frame-label').style.color = color.replace(')', ', 0.6)').replace('rgb', 'rgba');
+            showToast(`Frame color changed!`);
         });
 
-        doneBtn.addEventListener('click', function() {
+        // OPTIONS
+        continueBtn.addEventListener('click', () => { resultPanel.classList.remove('active'); startCamera(); showToast('📸 Scan next page'); });
+        doneBtn.addEventListener('click', () => {
             if (pages.length === 0) { showToast('❌ No pages to edit', 'error'); return; }
             resultPanel.classList.remove('active');
             editMode.classList.add('active');
@@ -884,62 +465,31 @@
             editPreview.src = pages[currentPageIndex];
             showToast('✏️ Edit your document');
         });
-
-        rescanBtn.addEventListener('click', function() {
+        rescanBtn.addEventListener('click', () => {
             if (pages.length === 0) return;
             pages.splice(currentPageIndex, 1);
-
-            if (pages.length === 0) {
-                resultPanel.classList.remove('active');
-                showToast('🔄 No pages left. Scan again.');
-                startCamera();
-                return;
-            }
-
+            if (pages.length === 0) { resultPanel.classList.remove('active'); startCamera(); showToast('🔄 No pages left. Scan again.'); return; }
             currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
             updateResultPanel();
             showToast('🔄 Page removed. Camera opening...');
-
-            setTimeout(() => {
-                resultPanel.classList.remove('active');
-                startCamera();
-                showToast('📸 Scan replacement page');
-            }, 500);
+            setTimeout(() => { resultPanel.classList.remove('active'); startCamera(); showToast('📸 Scan replacement page'); }, 500);
         });
-
-        deletePageBtn.addEventListener('click', function() {
+        deletePageBtn.addEventListener('click', () => {
             if (pages.length === 0) return;
             pages.splice(currentPageIndex, 1);
-
-            if (pages.length === 0) {
-                resultPanel.classList.remove('active');
-                showToast('🗑️ Page deleted. No pages left.');
-                startCamera();
-                return;
-            }
-
+            if (pages.length === 0) { resultPanel.classList.remove('active'); startCamera(); showToast('🗑️ Page deleted. No pages left.'); return; }
             currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
-            updateResultPanel();
-            showToast('🗑️ Page deleted');
+            updateResultPanel(); showToast('🗑️ Page deleted');
         });
 
-        // --- EDIT MODE ---
-        backToOptions.addEventListener('click', function() {
-            editMode.classList.remove('active');
-            resultPanel.classList.add('active');
-            updateResultPanel();
-            showToast('📄 Back to pages');
-        });
-
+        // EDIT MODE
+        backToOptions.addEventListener('click', () => { editMode.classList.remove('active'); resultPanel.classList.add('active'); updateResultPanel(); });
         function renderEditPages() {
             editPages.innerHTML = '';
             pages.forEach((dataUrl, index) => {
                 const div = document.createElement('div');
                 div.className = 'page-thumb' + (index === currentPageIndex ? ' active' : '');
-                div.innerHTML = `
-                    <img src="${dataUrl}" alt="Page ${index+1}" />
-                    <span class="page-num">${index+1}</span>
-                `;
+                div.innerHTML = `<img src="${dataUrl}" alt="Page ${index+1}" /><span class="page-num">${index+1}</span>`;
                 div.addEventListener('click', function() {
                     currentPageIndex = index;
                     document.querySelectorAll('.page-thumb').forEach(el => el.classList.remove('active'));
@@ -968,40 +518,26 @@
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imageData.data;
-
                 for (let i = 0; i < data.length; i += 4) {
                     let r = data[i], g = data[i + 1], b = data[i + 2];
                     switch (currentFilter) {
-                        case 'grayscale':
-                            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-                            r = g = b = gray;
-                            break;
-                        case 'enhance':
-                            r = Math.min(255, r * 1.1 + 5);
-                            g = Math.min(255, g * 1.1 + 5);
-                            b = Math.min(255, b * 1.1 + 5);
-                            break;
-                        case 'vintage':
-                            r = Math.min(255, r * 1.1 + 10);
-                            g = Math.min(255, g * 0.9 + 5);
-                            b = Math.min(255, b * 0.8 + 5);
-                            break;
+                        case 'grayscale': const gray = 0.299 * r + 0.587 * g + 0.114 * b; r = g = b = gray; break;
+                        case 'enhance': r = Math.min(255, r * 1.1 + 5); g = Math.min(255, g * 1.1 + 5); b = Math.min(255, b * 1.1 + 5); break;
                         default: break;
                     }
                     data[i] = r; data[i + 1] = g; data[i + 2] = b;
                 }
                 ctx.putImageData(imageData, 0, 0);
-                pages[currentPageIndex] = canvas.toDataURL('image/png');
+                pages[currentPageIndex] = canvas.toDataURL('image/jpeg', 0.6);
                 editPreview.src = pages[currentPageIndex];
                 renderEditPages();
             };
             img.src = pages[currentPageIndex];
         }
 
-        rotateBtn.addEventListener('click', function() {
+        rotateBtn.addEventListener('click', () => {
             if (pages.length === 0) return;
             const img = new Image();
             img.onload = function() {
@@ -1012,7 +548,7 @@
                 ctx.translate(canvas.width / 2, canvas.height / 2);
                 ctx.rotate(Math.PI / 2);
                 ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                pages[currentPageIndex] = canvas.toDataURL('image/png');
+                pages[currentPageIndex] = canvas.toDataURL('image/jpeg', 0.6);
                 editPreview.src = pages[currentPageIndex];
                 renderEditPages();
                 showToast('🔄 Rotated 90°');
@@ -1020,33 +556,27 @@
             img.src = pages[currentPageIndex];
         });
 
-        deleteEditBtn.addEventListener('click', function() {
+        deleteEditBtn.addEventListener('click', () => {
             if (pages.length === 0) return;
             pages.splice(currentPageIndex, 1);
-            if (pages.length === 0) {
-                showToast('No pages left');
-                editMode.classList.remove('active');
-                startCamera();
-                return;
-            }
+            if (pages.length === 0) { showToast('No pages left'); editMode.classList.remove('active'); startCamera(); return; }
             currentPageIndex = Math.min(currentPageIndex, pages.length - 1);
-            renderEditPages();
-            editPreview.src = pages[currentPageIndex];
+            renderEditPages(); editPreview.src = pages[currentPageIndex];
             showToast('🗑️ Page deleted');
         });
 
-        saveBtn.addEventListener('click', function() {
-            showToast('✅ Changes saved!');
-        });
+        saveBtn.addEventListener('click', () => { showToast('✅ Changes saved!'); });
 
-        createPdfBtn.addEventListener('click', function() {
+        // Create PDF logic
+        createPdfBtn.addEventListener('click', () => {
             if (pages.length === 0) { showToast('❌ No pages', 'error'); return; }
             if (typeof window.jspdf === 'undefined') { showToast('❌ PDF library not loaded', 'error'); return; }
 
             showToast('📄 Creating PDF...');
             const { jsPDF } = window.jspdf;
-            const name = pdfNameInput.value.trim() || 'twarvis';
+            const name = pdfNameInput.value.trim() || 'twarvis_doc';
             const pdf = new jsPDF();
+            const isCompressed = compressToggle.checked;
 
             let loaded = 0;
             pages.forEach((dataUrl, index) => {
@@ -1055,20 +585,23 @@
                     if (index > 0) pdf.addPage();
                     const imgWidth = pdf.internal.pageSize.width;
                     const imgHeight = (this.height / this.width) * imgWidth;
-                    pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+                    
+                    // Use JPEG for compression, PNG for original (but we already compressed to JPEG)
+                    pdf.addImage(dataUrl, 'JPEG', 0, 0, imgWidth, imgHeight);
                     loaded++;
+                    
                     if (loaded === pages.length) {
                         pdf.save(`${name}.pdf`);
-                        showToast(`✅ ${name}.pdf saved!`);
+                        showToast(`✅ ${name}.pdf saved!`, 'success');
+                        
+                        // Add to history
+                        const history = JSON.parse(localStorage.getItem('pdfHistory')) || [];
+                        history.unshift({ name: `${name}.pdf`, date: new Date().toLocaleDateString() });
+                        localStorage.setItem('pdfHistory', JSON.stringify(history.slice(0, 5))); // Keep last 5
 
-                        setTimeout(() => {
-                            thankYouModal.classList.add('active');
-                        }, 500);
-
-                        pages = [];
-                        currentPageIndex = 0;
-                        editMode.classList.remove('active');
-                        resultPanel.classList.remove('active');
+                        setTimeout(() => { thankYouModal.classList.add('active'); }, 500);
+                        pages = []; currentPageIndex = 0;
+                        editMode.classList.remove('active'); resultPanel.classList.remove('active');
                         startCamera();
                     }
                 };
@@ -1076,15 +609,12 @@
             });
         });
 
-        closeThankYou.addEventListener('click', function() {
-            thankYouModal.classList.remove('active');
-        });
+        closeThankYou.addEventListener('click', () => { thankYouModal.classList.remove('active'); });
 
-        galleryBtn.addEventListener('click', function() {
+        // Gallery Upload
+        galleryBtn.addEventListener('click', () => {
             const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
+            input.type = 'file'; input.accept = 'image/*'; input.multiple = true;
             input.onchange = function(e) {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
@@ -1095,23 +625,22 @@
                         const img = new Image();
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
+                            canvas.width = img.width; canvas.height = img.height;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0);
-                            const dataUrl = canvas.toDataURL('image/png');
+                            
+                            // Compress gallery images too
+                            const dataUrl = compressImage(canvas);
                             pages.push(dataUrl);
                             currentPageIndex = pages.length - 1;
                             loaded++;
                             if (loaded === files.length) {
-                                cameraView.classList.remove('active');
-                                controls.classList.remove('active');
+                                cameraView.classList.remove('active'); controls.classList.remove('active');
                                 resultPanel.classList.add('active');
                                 previewImage.src = pages[currentPageIndex];
                                 pageNum.textContent = currentPageIndex + 1;
                                 totalPages.textContent = pages.length;
-                                stopCamera();
-                                showToast(`📸 Added ${files.length} images`);
+                                stopCamera(); showToast(`📸 Added ${files.length} images`);
                             }
                         };
                         img.src = event.target.result;
@@ -1122,23 +651,8 @@
             input.click();
         });
 
-        flashBtn.addEventListener('click', function() {
-            if (!stream) return;
-            const track = stream.getVideoTracks()[0];
-            if (!track) return;
-            try {
-                const settings = track.getSettings();
-                track.applyConstraints({ advanced: [{ torch: !settings.torch }] })
-                    .then(() => showToast(settings.torch ? '💡 Flash off' : '💡 Flash on'));
-            } catch (err) {
-                showToast('💡 Flash not supported', 'error');
-            }
-        });
-
         captureBtn.addEventListener('click', capture);
-
         startCamera();
     </script>
-
 </body>
 </html>
