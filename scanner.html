@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,6 +31,7 @@ button{font-family:inherit;cursor:pointer}
 .shutter span{display:block;width:100%;height:100%;border-radius:50%;background:#fff}
 .shutter:active span{transform:scale(.9)}
 .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--accent);color:#000;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:4;transition:opacity .25s}
 #msg{position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:8px 16px;border-radius:8px;font-size:13px;display:none;z-index:6;text-align:center;max-width:90%}
 
 /* crop */
@@ -73,6 +76,7 @@ button{font-family:inherit;cursor:pointer}
     <a class="home" href="index.html"><i class="fas fa-house"></i> Home</a>
   </div>
   <video id="video" autoplay muted playsinline></video>
+  <div id="flash"></div>
   <div id="msg"></div>
   <div class="bar">
     <button class="round" id="galleryBtn" title="Choose photos"><i class="fas fa-image"></i></button>
@@ -157,16 +161,27 @@ async function startCamera(){
 }
 function stopCamera(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
 
-// takes exactly what is visible on the full screen
+// takes exactly what is visible; camera stays open so you can keep shooting
 function capture(){
   const v=$('video'), vw=v.videoWidth, vh=v.videoHeight;
   if(!vw) return toast('Camera is not ready yet');
   const W=innerWidth, H=innerHeight, s=Math.max(W/vw,H/vh);
   const sw=W/s, sh=H/s, sx=(vw-sw)/2, sy=(vh-sh)/2;
-  const k=Math.min(1,2200/Math.max(sw,sh));
+  const k=Math.min(1,1800/Math.max(sw,sh));
   const c=document.createElement('canvas'); c.width=Math.round(sw*k); c.height=Math.round(sh*k);
   c.getContext('2d').drawImage(v,sx,sy,sw,sh,0,0,c.width,c.height);
-  stopCamera(); openCrop(c, null, null);
+  addPage(c);
+  const f=$('flash'); f.style.transition='none'; f.style.opacity=.8;
+  requestAnimationFrame(()=>{ f.style.transition='opacity .25s'; f.style.opacity=0; });
+  toast('Page '+pages.length+' saved');
+}
+// pages are stored as compressed JPEG so hundreds of pages will not fill the phone memory
+function addPage(c){
+  pages.push({data:c.toDataURL('image/jpeg',.85), corners:autoDetect(c), filter:lastFilter, rot:0, thumb:null});
+  updateBadge();
+}
+function loadSrc(p){
+  return new Promise(r=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); c.width=i.width; c.height=i.height; c.getContext('2d').drawImage(i,0,0); r(c); }; i.src=p.data; });
 }
 
 /* ---------- crop editor ---------- */
@@ -209,12 +224,9 @@ cv.addEventListener('pointercancel',()=>drag=-1);
 
 $('autoBtn').onclick=()=>{ pending.corners=autoDetect(pending.src); drawCrop(); };
 $('fullBtn').onclick=()=>{ const s=pending.src; pending.corners=[{x:0,y:0},{x:s.width,y:0},{x:s.width,y:s.height},{x:0,y:s.height}]; drawCrop(); };
-$('cropCancel').onclick=()=>{ if(pending.editIndex!==null) showReview(); else if(pages.length){ startCamera(); } else startCamera(); };
+$('cropCancel').onclick=()=>showReview();
 $('cropDone').onclick=()=>{
-  const {src,corners,editIndex}=pending;
-  if(editIndex!==null){ pages[editIndex].corners=corners; cur=editIndex; }
-  else { pages.push({src,corners,filter:lastFilter,rot:0}); cur=pages.length-1; }
-  updateBadge(); showReview();
+  const p=pages[pending.editIndex]; p.corners=pending.corners; p.thumb=null; cur=pending.editIndex; showReview();
 };
 
 // finds the bright paper area against a darker background
@@ -306,33 +318,42 @@ function stamp(c){
   x.font=`500 ${s}px Inter, Arial, sans-serif`; x.textAlign='right'; x.textBaseline='bottom';
   x.fillStyle='rgba(110,110,110,.75)'; x.fillText(WATERMARK,c.width-m,c.height-m*.8);
 }
-function render(p, side){
-  let c=warp(p.src,p.corners,side);
+function render(src, p, side){
+  let c=warp(src,p.corners,side);
   c=rotate(c,p.rot); c=filter(c,p.filter); stamp(c); return c;
 }
 
 /* ---------- review ---------- */
-function showReview(){
+let rvToken=0;
+async function showReview(){
   stopCamera(); show('rev');
   if(!pages.length){ startCamera(); return; }
   cur=Math.min(cur,pages.length-1);
+  const token=++rvToken;
   $('revTitle').textContent=`Page ${cur+1} of ${pages.length}`;
-  const T=$('thumbs'); T.innerHTML='';
+  const T=$('thumbs'); T.innerHTML=''; const imgs=[];
   pages.forEach((p,i)=>{
     const d=document.createElement('div'); d.className='th'+(i===cur?' on':'');
-    const im=new Image(); im.src=render(p,160).toDataURL('image/jpeg',.6);
+    const im=new Image(); if(p.thumb) im.src=p.thumb;
     const n=document.createElement('i'); n.textContent=i+1;
-    d.append(im,n); d.onclick=()=>{cur=i;showReview();}; T.appendChild(d);
+    d.append(im,n); d.onclick=()=>{cur=i;showReview();}; T.appendChild(d); imgs.push(im);
   });
-  $('prevImg').src=render(pages[cur],1300).toDataURL('image/jpeg',.8);
+  const on=T.children[cur]; if(on) on.scrollIntoView({inline:'center',block:'nearest'});
   document.querySelectorAll('#filters .chip').forEach(b=>b.classList.toggle('on',b.dataset.f===pages[cur].filter));
+  const src=await loadSrc(pages[cur]); if(token!==rvToken) return;
+  $('prevImg').src=render(src,pages[cur],1300).toDataURL('image/jpeg',.8);
+  for(let i=0;i<pages.length;i++){
+    const p=pages[i]; if(p.thumb) continue;
+    const s2=(i===cur)?src:await loadSrc(p); if(token!==rvToken) return;
+    p.thumb=render(s2,p,160).toDataURL('image/jpeg',.6); imgs[i].src=p.thumb;
+  }
 }
 document.querySelectorAll('#filters .chip').forEach(b=>b.onclick=()=>{
-  pages[cur].filter=b.dataset.f; lastFilter=b.dataset.f; showReview();
+  pages[cur].filter=b.dataset.f; pages[cur].thumb=null; lastFilter=b.dataset.f; showReview();
 });
-$('rotBtn').onclick=()=>{ pages[cur].rot=(pages[cur].rot+1)%4; showReview(); };
+$('rotBtn').onclick=()=>{ pages[cur].rot=(pages[cur].rot+1)%4; pages[cur].thumb=null; showReview(); };
 $('delBtn').onclick=()=>{ pages.splice(cur,1); updateBadge(); showReview(); };
-$('recropBtn').onclick=()=>{ const p=pages[cur]; openCrop(p.src, p.corners.map(c=>({...c})), cur); };
+$('recropBtn').onclick=async()=>{ const p=pages[cur], s=await loadSrc(p); openCrop(s, p.corners.map(c=>({...c})), cur); };
 $('addMore').onclick=startCamera;
 $('pagesBtn').onclick=()=>{ if(!pages.length) return toast('No pages yet'); showReview(); };
 $('shutBtn').onclick=capture;
@@ -341,16 +362,15 @@ $('galleryBtn').onclick=()=>{
   const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true;
   inp.onchange=async()=>{
     const files=[...inp.files]; if(!files.length) return;
-    stopCamera();
+    stopCamera(); const first=pages.length; toast('Adding photos...');
     for(const f of files){
       const img=await new Promise(r=>{ const i=new Image(); i.onload=()=>r(i); i.src=URL.createObjectURL(f); });
-      const k=Math.min(1,2200/Math.max(img.width,img.height));
+      const k=Math.min(1,1800/Math.max(img.width,img.height));
       const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-      pages.push({src:c,corners:autoDetect(c),filter:lastFilter,rot:0});
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(img.src);
+      addPage(c);
     }
-    updateBadge(); cur=pages.length-files.length; openCrop(pages[cur].src, pages[cur].corners.map(c=>({...c})), cur);
-    toast(files.length>1 ? 'Photos added. Check the edges on each page.' : 'Photo added');
+    cur=first; showReview(); toast(files.length+' photo(s) added. Use Edges to adjust any page.');
   };
   inp.click();
 };
@@ -365,7 +385,9 @@ $('makeBtn').onclick=async()=>{
     const L=LEVELS[$('quality').value], { jsPDF }=window.jspdf;
     let pdf=null;
     for(let i=0;i<pages.length;i++){
-      const c=render(pages[i],L.side), data=c.toDataURL('image/jpeg',L.q);
+      btn.textContent=`Page ${i+1} of ${pages.length}...`;
+      const src=await loadSrc(pages[i]);
+      const c=render(src,pages[i],L.side), data=c.toDataURL('image/jpeg',L.q);
       const land=c.width>c.height, pw=land?297:210, ph=pw*c.height/c.width;
       const fmt=[Math.min(pw,ph),Math.max(pw,ph)], ori=land?'l':'p';
       if(!pdf) pdf=new jsPDF({unit:'mm',format:fmt,orientation:ori,compress:true}); else pdf.addPage(fmt,ori);
