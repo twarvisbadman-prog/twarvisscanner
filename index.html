@@ -116,6 +116,18 @@
             gap: 20px;
             color: var(--text-main);
             font-size: 1.1rem;
+            align-items: center;
+        }
+
+        .nav-icons .info-btn {
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform 0.2s, color 0.2s;
+            font-size: 1.1rem;
+        }
+        .nav-icons .info-btn:hover {
+            color: var(--gradient-end);
+            transform: scale(1.1);
         }
 
         .profile-btn {
@@ -212,7 +224,7 @@
             gap: 30px;
             max-width: 1000px;
             margin: 0 auto;
-            padding: 0 20px 80px;
+            padding: 0 20px 40px;
             position: relative;
             z-index: 10;
         }
@@ -251,6 +263,72 @@
             color: var(--text-muted);
             line-height: 1.5;
             margin-bottom: 30px;
+        }
+
+        /* --- MORE TOOLS SECTION --- */
+        .more-tools-section {
+            max-width: 1000px;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .tool-card {
+            background: linear-gradient(145deg, #0f0f11, #050505);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .tool-card:hover {
+            border-color: rgba(255, 149, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .tool-card .tool-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 149, 0, 0.1);
+            border-radius: 14px;
+            color: var(--gradient-end);
+        }
+
+        .tool-card .tool-info h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tool-card .tool-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         /* --- GALLERY RESULT PANEL --- */
@@ -461,6 +539,7 @@
             .btn { width: 100%; max-width: 300px; justify-content: center; }
             .feature-grid { grid-template-columns: 1fr; }
             .notes-banner { flex-direction: column; text-align: center; padding: 30px 20px; }
+            .tools-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -495,13 +574,16 @@
             </div>
         </div>
         <div class="nav-links">
-            <a href="#">Scanner</a>
-            <a href="#">PDF Tools</a>
-            <a href="#">Converter</a>
-            <a href="#">About</a>
+            <a href="scanner.html">Scanner</a>
+            <a href="pdfconvert.html">PDF Tools</a>
+            <a href="pdfconvert.html">Converter</a>
+            <a href="about.html">About</a>
         </div>
         <div class="nav-icons">
-            <i class="fas fa-user profile-btn" id="profileBtn"></i>
+            <a href="about.html" class="info-btn" title="About & Guide">
+                <i class="fas fa-info-circle"></i>
+            </a>
+            <i class="fas fa-user profile-btn" id="profileBtn" title="Profile"></i>
         </div>
     </nav>
 
@@ -524,7 +606,7 @@
         </div>
     </header>
 
-    <!-- FEATURE CARDS -->
+    <!-- MAIN FEATURE CARDS -->
     <div class="feature-grid">
         <a href="scanner.html" class="feature-card" style="text-decoration: none; color: inherit;">
             <span class="card-icon">📸</span>
@@ -538,6 +620,48 @@
             <h3>Image to PDF</h3>
             <p>Select existing photos from your gallery and convert them into a clean, multi-page PDF document.</p>
             <div style="margin-top: auto; color: var(--gradient-end); font-weight: 700; font-size: 0.9rem;">CONVERT TO PDF →</div>
+        </div>
+    </div>
+
+    <!-- MORE TOOLS SECTION -->
+    <div class="more-tools-section">
+        <h2 class="section-title"><i class="fas fa-tools" style="color: var(--gradient-end);"></i> More Conversion Tools</h2>
+        <div class="tools-grid">
+            <!-- Word to PDF -->
+            <a href="pdfconvert.html?tool=word-to-pdf" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-file-word"></i></div>
+                <div class="tool-info">
+                    <h4>Word to PDF</h4>
+                    <p>Convert .docx files to PDF</p>
+                </div>
+            </a>
+
+            <!-- PDF to Word -->
+            <a href="pdfconvert.html?tool=pdf-to-word" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-file-pdf"></i></div>
+                <div class="tool-info">
+                    <h4>PDF to Word</h4>
+                    <p>Convert PDF to editable text</p>
+                </div>
+            </a>
+
+            <!-- File Converter -->
+            <a href="pdfconvert.html?tool=converter" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="tool-info">
+                    <h4>File Converter</h4>
+                    <p>Change file extensions</p>
+                </div>
+            </a>
+
+            <!-- NEW: Image to PDF Maker -->
+            <a href="pdf-maker.html" class="tool-card">
+                <div class="tool-icon"><i class="fas fa-images"></i></div>
+                <div class="tool-info">
+                    <h4>Image to PDF Maker</h4>
+                    <p>Create PDFs from your photos</p>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -588,44 +712,32 @@
         // CUSTOM TYPEWRITER EFFECT
         // ============================================
         const typePrefix = document.getElementById('typePrefix');
-        
-        // The full word we want to type out (expanding from the "T")
         const fullWord = "TWARVIS";
-        const baseLetter = "T";
-        
-        let currentLength = 1; // Start with just "T" (length 1)
+        let currentLength = 1;
         let isDeleting = false;
 
         function runTypewriter() {
             if (!isDeleting) {
-                // TYPING PHASE (Expanding)
                 if (currentLength < fullWord.length) {
                     currentLength++;
                     typePrefix.textContent = fullWord.substring(0, currentLength);
-                    // Speed up slightly as it gets longer
                     setTimeout(runTypewriter, 200); 
                 } else {
-                    // Finished typing "TWARVIS", pause, then start deleting
                     isDeleting = true;
                     setTimeout(runTypewriter, 2000);
                 }
             } else {
-                // DELETING PHASE (Shrinking back to T)
                 if (currentLength > 1) {
                     currentLength--;
                     typePrefix.textContent = fullWord.substring(0, currentLength);
                     setTimeout(runTypewriter, 100);
                 } else {
-                    // Finished deleting, pause, then start typing again
                     isDeleting = false;
                     setTimeout(runTypewriter, 1500);
                 }
             }
         }
-
-        // Start the animation after a short delay on load
         setTimeout(runTypewriter, 1000);
-
 
         // ============================================
         // PROFILE ICON LOGIC
