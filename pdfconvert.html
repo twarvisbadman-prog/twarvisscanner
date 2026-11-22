@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PDF Tools - T-Scanner</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-dark: #050505;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --gradient-start: #ff3b30;
+            --gradient-mid: #ff5e3a;
+            --gradient-end: #ff9500;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --panel-bg: rgba(15, 15, 17, 0.98);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Ambient Glow */
+        .glow-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% -20%, rgba(255, 94, 58, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: relative;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            border-radius: 4px;
+        }
+
+        .nav-brand .brand-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            font-family: 'Inter', monospace;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: var(--gradient-end);
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--gradient-end);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            align-items: center;
+        }
+
+        .nav-icons .info-btn {
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform 0.2s, color 0.2s;
+        }
+        .nav-icons .info-btn:hover { color: var(--gradient-end); transform: scale(1.1); }
+
+        /* --- MAIN CONTENT --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px 80px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-section h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+
+        .header-section h1 .gradient-text {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-section p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- TOOL SELECTOR --- */
+        .tool-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tool-tab {
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .tool-tab:hover {
+            background: rgba(255, 149, 0, 0.05);
+            color: var(--gradient-end);
+        }
+
+        .tool-tab.active {
+            background: rgba(255, 149, 0, 0.1);
+            border-color: var(--gradient-end);
+            color: var(--gradient-end);
+            box-shadow: 0 4px 20px rgba(255, 94, 58, 0.2);
+        }
+
+        /* --- WORKSPACE PANEL --- */
+        .workspace {
+            display: none;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 50px 40px;
+            text-align: center;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .workspace.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .workspace-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--gradient-end);
+        }
+
+        .workspace h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .workspace p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.01);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--gradient-end);
+            background: rgba(255, 149, 0, 0.03);
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .upload-area h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .upload-area span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255, 94, 58, 0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 94, 58, 0.4);
+        }
+
+        /* Placeholder Badge */
+        .badge-placeholder {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 10;
+        }
+        .footer a { color: var(--gradient-end); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; }
+            .nav-links { display: none; }
+            .header-section h1 { font-size: 2.2rem; }
+            .workspace { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-bg"></div>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="logo.png" alt="Logo" onerror="this.style.display='none';" />
+            <div class="brand-text">
+                <span id="typePrefix">T</span>
+                <span>-SCANNER</span>
+                <span class="cursor"></span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a href="scanner.html">Scanner</a>
+            <a href="pdfconvert.html" class="active">PDF Tools</a>
+            <a href="pdfconvert.html">Converter</a>
+            <a href="about.html">About</a>
+        </div>
+        <div class="nav-icons">
+            <a href="about.html" class="info-btn" title="About & Guide">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        
+        <div class="header-section">
+            <h1>PDF & <span class="gradient-text">Conversion</span> Tools</h1>
+            <p>Choose a tool below to convert your files. All processing happens locally in your browser.</p>
+        </div>
+
+        <!-- Tool Selector Tabs -->
+        <div class="tool-selector">
+            <a href="pdfconvert.html?tool=word-to-pdf" class="tool-tab" id="tab-word-to-pdf">
+                <i class="fas fa-file-word"></i> Word to PDF
+            </a>
+            <a href="pdfconvert.html?tool=pdf-to-word" class="tool-tab" id="tab-pdf-to-word">
+                <i class="fas fa-file-pdf"></i> PDF to Word
+            </a>
+            <a href="pdfconvert.html?tool=converter" class="tool-tab" id="tab-converter">
+                <i class="fas fa-exchange-alt"></i> File Converter
+            </a>
+            <!-- NEW LINK TO YOUR PDF MAKER -->
+            <a href="pdf-maker.html" class="tool-tab" style="border-color: rgba(0, 255, 65, 0.2); color: #00ff41;">
+                <i class="fas fa-images"></i> Image to PDF Maker
+            </a>
+        </div>
+
+        <!-- Word to PDF Workspace -->
+        <div class="workspace" id="workspace-word-to-pdf">
+            <div class="workspace-icon"><i class="fas fa-file-word"></i></div>
+            <h2>Word to PDF</h2>
+            <p>Convert your .docx documents into clean, shareable PDF files.</p>
+            <div class="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop .docx here</h3>
+                <span>or click to browse</span>
+            </div>
+            <button class="btn btn-primary" onclick="alert('Word to PDF conversion engine is coming soon!')">
+                <i class="fas fa-cogs"></i> Convert Now
+            </button>
+            <div class="badge-placeholder">Coming Soon</div>
+        </div>
+
+        <!-- PDF to Word Workspace -->
+        <div class="workspace" id="workspace-pdf-to-word">
+            <div class="workspace-icon"><i class="fas fa-file-pdf"></i></div>
+            <h2>PDF to Word</h2>
+            <p>Extract text from PDF files and save them as editable .docx documents.</p>
+            <div class="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop .pdf here</h3>
+                <span>or click to browse</span>
+            </div>
+            <button class="btn btn-primary" onclick="alert('PDF to Word conversion engine is coming soon!')">
+                <i class="fas fa-cogs"></i> Convert Now
+            </button>
+            <div class="badge-placeholder">Coming Soon</div>
+        </div>
+
+        <!-- File Converter Workspace -->
+        <div class="workspace" id="workspace-converter">
+            <div class="workspace-icon"><i class="fas fa-exchange-alt"></i></div>
+            <h2>File Converter</h2>
+            <p>Change file extensions between common formats (e.g., JPG to PNG, TXT to PDF).</p>
+            <div class="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop your file here</h3>
+                <span>or click to browse</span>
+            </div>
+            <button class="btn btn-primary" onclick="alert('File Converter engine is coming soon!')">
+                <i class="fas fa-cogs"></i> Convert Now
+            </button>
+            <div class="badge-placeholder">Coming Soon</div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>Developed by <a href="#">Twarvis Davinc</a></p>
+        <p style="font-size: 0.8rem; margin-top: 10px;">100% Local Processing. Your files never leave your device.</p>
+    </div>
+
+    <script>
+        // ============================================
+        // TYPEWRITER EFFECT
+        // ============================================
+        const typePrefix = document.getElementById('typePrefix');
+        const fullWord = "TWARVIS";
+        let currentLength = 1;
+        let isDeleting = false;
+
+        function runTypewriter() {
+            if (!isDeleting) {
+                if (currentLength < fullWord.length) {
+                    currentLength++;
+                    typePrefix.textContent = fullWord.substring(0, currentLength);
+                    setTimeout(runTypewriter, 200); 
+                } else {
+                    isDeleting = true;
+                    setTimeout(runTypewriter, 2000);
+                }
+            } else {
+                if (currentLength > 1) {
+                    currentLength--;
+                    typePrefix.textContent = fullWord.substring(0, currentLength);
+                    setTimeout(runTypewriter, 100);
+                } else {
+                    isDeleting = false;
+                    setTimeout(runTypewriter, 1500);
+                }
+            }
+        }
+        setTimeout(runTypewriter, 1000);
+
+        // ============================================
+        // TOOL SELECTOR LOGIC
+        // ============================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const tool = urlParams.get('tool') || 'word-to-pdf'; // Default to word-to-pdf
+
+        // Hide all workspaces
+        document.querySelectorAll('.workspace').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tool-tab').forEach(el => el.classList.remove('active'));
+
+        // Show the selected one
+        const activeWorkspace = document.getElementById('workspace-' + tool);
+        const activeTab = document.getElementById('tab-' + tool);
+
+        if (activeWorkspace) activeWorkspace.classList.add('active');
+        if (activeTab) activeTab.classList.add('active');
+    </script>
+</body>
+</html>
