@@ -3,267 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>T-Scanner - Scan documents and make PDFs</title>
-<meta name="description" content="Scan documents with your phone camera and turn photos into small, clean PDFs. Everything runs on your device.">
+<title>T-Scanner - Scan, merge, convert and compress PDFs</title>
+<meta name="description" content="Free document toolkit. Scan with your camera, turn photos into PDFs, merge and compress. Everything runs on your device.">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#faf9f7;--card:#fff;--text:#1c1c1e;--mute:#6b6b72;--line:#e6e4df;--accent:#e8590c;--accent-d:#c94a07;--soft:#f3f1ec}
-@media (prefers-color-scheme:dark){:root{--bg:#121214;--card:#1b1b1e;--text:#f1f1f2;--mute:#9b9ba3;--line:#2c2c31;--accent:#ff8a3d;--accent-d:#ff9d5c;--soft:#222226}}
+:root{--bg:#09090a;--card:#131315;--card2:#1a1a1d;--text:#f3f3f4;--mute:#9a9aa3;--line:#26262b;--a1:#ef4b3f;--a2:#f29a38;--grad:linear-gradient(120deg,var(--a1),var(--a2))}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-tap-highlight-color:transparent}
-a{color:inherit}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;opacity:.35;mask-image:radial-gradient(ellipse at 50% 0,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at 50% 0,#000 20%,transparent 75%);animation:drift 24s linear infinite}
+@keyframes drift{to{background-position:44px 44px}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:-1;opacity:.28;pointer-events:none}
+.o1{width:320px;height:320px;background:var(--a1);top:-80px;left:-100px;animation:fl 14s ease-in-out infinite}
+.o2{width:280px;height:280px;background:var(--a2);top:340px;right:-120px;animation:fl 18s ease-in-out infinite reverse}
+@keyframes fl{50%{transform:translate(40px,50px)}}
+a{color:inherit;text-decoration:none}
 .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:2px solid var(--a2);outline-offset:3px}
 
-header.top{border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:20}
+header.top{position:sticky;top:0;z-index:20;background:rgba(9,9,10,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:18px;letter-spacing:-.2px}
-.brand img{height:26px;width:auto;border-radius:4px}
+.brand{font:800 18px 'Sora',sans-serif;letter-spacing:-.3px;display:flex;align-items:center;gap:9px}
+.brand img{height:26px;border-radius:5px}
 nav.links{display:flex;gap:26px}
-nav.links a{text-decoration:none;font-size:14px;font-weight:500;color:var(--mute)}
+nav.links a{font-size:14px;font-weight:500;color:var(--mute);transition:color .15s}
 nav.links a:hover{color:var(--text)}
-.top-actions{display:flex;gap:10px;align-items:center}
+.acts{display:flex;gap:6px}
+.ic-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.ic-btn:hover{background:var(--card2)}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:8px;border:1px solid transparent;font:600 14px 'Inter',sans-serif;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
-.btn.pri{background:var(--accent);color:#fff}
-.btn.pri:hover{background:var(--accent-d)}
-.btn.sec{background:var(--card);border-color:var(--line);color:var(--text)}
-.btn.sec:hover{border-color:var(--mute)}
-.btn.sm{padding:8px 14px;font-size:13px}
-.btn:disabled{opacity:.55;cursor:default}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:999px;border:1.5px solid transparent;font:600 15px 'Inter',sans-serif;cursor:pointer;transition:transform .15s,box-shadow .2s,background .15s;color:#fff}
+.btn.pri{background:var(--grad);box-shadow:0 8px 28px rgba(239,75,63,.28)}
+.btn.pri:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(239,75,63,.4)}
+.btn.out{border-color:var(--a2);color:var(--a2);background:transparent}
+.btn.out:hover{background:rgba(242,154,56,.1)}
+.btn.sm{padding:9px 16px;font-size:13px}
+.btn.gh{border-color:var(--line);background:var(--card2);color:var(--text)}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
 
-.hero{padding:72px 0 48px}
-.hero h1{font-size:clamp(32px,5.2vw,52px);line-height:1.12;font-weight:800;letter-spacing:-1.2px;max-width:700px}
-.hero p{margin-top:18px;max-width:560px;color:var(--mute);font-size:18px}
-.hero .cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap}
-.facts{display:flex;gap:28px;flex-wrap:wrap;margin-top:34px;color:var(--mute);font-size:14px}
-.facts span i{color:var(--accent);margin-right:7px}
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:center;padding:64px 0 56px}
+.hero h1{font:800 clamp(34px,6vw,58px)/1.06 'Sora',sans-serif;letter-spacing:-1.8px}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:block}
+.hero p{margin-top:18px;color:var(--mute);font-size:17px;max-width:480px}
+.cta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+.facts{display:flex;gap:20px;flex-wrap:wrap;margin-top:28px;font-size:13px;color:var(--mute)}
+.facts i{color:var(--a2);margin-right:6px}
+.in{opacity:0;transform:translateY(18px);animation:up .7s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes up{to{opacity:1;transform:none}}
 
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-bottom:56px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;text-decoration:none;display:block;transition:border-color .15s}
-.card:hover{border-color:var(--accent)}
-.card .ic{width:44px;height:44px;border-radius:10px;background:var(--soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px}
-.card h3{font-size:19px;font-weight:700;margin-bottom:6px}
-.card p{color:var(--mute);font-size:15px}
-.card .go{display:inline-block;margin-top:14px;font-size:14px;font-weight:600;color:var(--accent)}
+/* scan graphic */
+.stage{position:relative;height:340px;display:flex;align-items:center;justify-content:center}
+.paper{position:relative;width:200px;height:272px;border-radius:10px;background:#1b1b1f;border:1px solid var(--line);overflow:hidden;transform:rotate(-4deg);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.lines{position:absolute;inset:0;padding:26px 22px;display:flex;flex-direction:column;gap:11px}
+.lines b{display:block;height:7px;border-radius:4px;background:#33333a}
+.lines b:nth-child(1){width:55%;height:11px}
+.lines b:nth-child(4){width:80%}.lines b:nth-child(6){width:65%}.lines b:nth-child(8){width:90%}.lines b:nth-child(10){width:45%}
+.lines.raw{filter:blur(1.2px);transform:skewX(-3deg)}
+.paper .clean{position:absolute;inset:0;background:#fbfaf7;clip-path:inset(0 0 100% 0);animation:reveal 4.4s ease-in-out infinite}
+.clean .lines b{background:#2b2b30}.clean .lines b:nth-child(1){background:var(--a1)}
+.beam{position:absolute;left:-6px;right:-6px;height:3px;background:var(--grad);box-shadow:0 0 22px 6px rgba(242,154,56,.55);top:0;animation:beam 4.4s ease-in-out infinite}
+@keyframes beam{0%{top:0;opacity:0}8%{opacity:1}50%,60%{top:100%;opacity:1}68%,100%{top:100%;opacity:0}}
+@keyframes reveal{0%{clip-path:inset(0 0 100% 0)}50%,80%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 0 100% 0)}}
+.chip{position:absolute;padding:7px 12px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:12px;font-weight:600;display:flex;gap:7px;align-items:center;animation:bob 5s ease-in-out infinite}
+.chip i{color:var(--a2)}
+.c1{top:30px;right:6px}.c2{bottom:56px;left:0;animation-delay:-1.5s}.c3{bottom:14px;right:22px;animation-delay:-3s}
+@keyframes bob{50%{transform:translateY(-10px)}}
+
+/* sections */
+.sh{margin-bottom:20px}
+.sh h2{font:800 26px 'Sora',sans-serif;letter-spacing:-.6px}
+.sh p{color:var(--mute);margin-top:4px;font-size:15px}
+section{padding-bottom:60px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tool{position:relative;display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;overflow:hidden;transition:transform .2s,border-color .2s}
+.tool::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,0),rgba(242,154,56,.14),transparent 55%);opacity:0;transition:opacity .25s}
+.tool:hover{transform:translateY(-4px);border-color:var(--a2)}
+.tool:hover::after{opacity:1}
+.tool .ic{width:46px;height:46px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;margin-bottom:16px;position:relative;z-index:1}
+.tool h3{font-size:16px;font-weight:700;margin-bottom:4px;position:relative;z-index:1}
+.tool p{font-size:13.5px;color:var(--mute);position:relative;z-index:1}
+.tag{position:absolute;top:16px;right:16px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;z-index:1}
+.tag.on{background:rgba(52,199,89,.14);color:#4cd37b}
+.tag.on::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#4cd37b;margin-right:5px;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.soon .tool{border-style:dashed;background:transparent;opacity:.75}
+.soon .tool:hover{transform:none;border-color:var(--line)}
+.soon .tool .ic{background:var(--card2);color:var(--mute)}
+.tag.sn{background:var(--card2);color:var(--mute)}
+.soon .grid{grid-template-columns:repeat(3,1fr)}
 
 /* maker */
-section.maker{padding:8px 0 64px}
-.sec-head{margin-bottom:18px}
-.sec-head h2{font-size:26px;font-weight:800;letter-spacing:-.5px}
-.sec-head p{color:var(--mute);margin-top:4px}
-.maker-box{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.drop{padding:34px 20px;text-align:center;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
-.drop:hover,.drop.over{background:var(--soft)}
-.drop i{font-size:26px;color:var(--accent);margin-bottom:10px}
-.drop strong{display:block;font-size:16px}
-.drop small{color:var(--mute)}
-.layout{display:none;grid-template-columns:1fr 300px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.drop{padding:46px 20px;text-align:center;cursor:pointer;transition:background .2s;border:2px dashed transparent;margin:10px;border-radius:12px}
+.drop:hover,.drop.over{background:rgba(242,154,56,.06);border-color:var(--a2)}
+.drop i{font-size:30px;margin-bottom:12px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;animation:bob 3s ease-in-out infinite}
+.drop strong{display:block;font-size:17px}.drop small{color:var(--mute)}
+.layout{display:none;grid-template-columns:1fr 290px}
 .layout.on{display:grid}
-.list{max-height:520px;overflow-y:auto;border-right:1px solid var(--line)}
-.item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--line)}
-.item:last-child{border-bottom:none}
-.item .num{width:22px;text-align:center;color:var(--mute);font-size:13px;font-weight:600}
-.thumb{width:52px;height:68px;border-radius:4px;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
-.thumb img{max-width:100%;max-height:100%;transition:transform .2s}
-.item .nm{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item .nm small{display:block;color:var(--mute);font-size:12px}
-.tools{display:flex;gap:2px}
-.ib{width:34px;height:34px;border:none;background:none;border-radius:6px;color:var(--mute);cursor:pointer;font-size:14px}
-.ib:hover{background:var(--soft);color:var(--text)}
-.ib.del:hover{color:#d92d20}
-.ib:disabled{opacity:.3;cursor:default}
+.list{max-height:500px;overflow-y:auto;border-right:1px solid var(--line)}
+.item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);animation:up .35s forwards;opacity:0}
+.item .num{width:20px;text-align:center;color:var(--mute);font-size:13px;font-weight:600}
+.thumb{width:50px;height:66px;border-radius:6px;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+.thumb img{max-width:100%;max-height:100%;transition:transform .25s}
+.nm{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm small{display:block;color:var(--mute);font-size:12px}
+.tools{display:flex}
+.ib{width:34px;height:34px;border:none;background:none;border-radius:8px;color:var(--mute);cursor:pointer}
+.ib:hover{background:var(--card2);color:var(--text)}.ib.del:hover{color:#ff5a4d}.ib:disabled{opacity:.25;cursor:default}
 .side{padding:18px;display:flex;flex-direction:column;gap:14px}
-.side label{font-size:12px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
-.field{display:flex;align-items:center;gap:6px}
-.side input[type=text],.side select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:500 15px 'Inter',sans-serif}
-.side input:focus,.side select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.side label.l{font-size:12px;font-weight:600;color:var(--mute);display:block;margin-bottom:6px}
+.field{display:flex;align-items:center;gap:6px;color:var(--mute)}
+.side input[type=text],.side select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:500 15px 'Inter',sans-serif}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
-.chk input{accent-color:var(--accent);width:16px;height:16px}
-.summary{font-size:13px;color:var(--mute);padding-top:2px}
-.bar{height:4px;background:var(--soft);border-radius:2px;overflow:hidden;display:none}
-.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+.chk input{accent-color:var(--a1);width:16px;height:16px}
+.summary{font-size:13px;color:var(--mute)}
+.bar{height:4px;background:var(--card2);border-radius:2px;overflow:hidden;display:none}
+.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .15s}
+.row2{display:flex;gap:8px}.row2 .btn{flex:1}
 
-.tools-sec{padding-bottom:64px}
-.tlist{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.tl{display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:10px;text-decoration:none}
-.tl:hover{border-color:var(--accent)}
-.tl i{width:38px;height:38px;border-radius:8px;background:var(--soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
-.tl b{display:block;font-size:15px}
-.tl span{font-size:13px;color:var(--mute)}
-
-.notes{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:64px}
-.notes h3{font-size:19px;margin-bottom:4px}
-.notes p{color:var(--mute);max-width:520px;font-size:15px}
-
-footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mute);font-size:13px}
+.notes{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:56px}
+.notes h3{font-size:17px}.notes p{color:var(--mute);font-size:14px}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--mute);font-size:13px}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-footer a{color:var(--text);text-decoration:none;font-weight:600}
+footer a{color:var(--text);font-weight:600}
 
-dialog{margin:auto;border:1px solid var(--line);border-radius:12px;padding:26px;background:var(--card);color:var(--text);max-width:380px;width:90%}
-dialog::backdrop{background:rgba(0,0,0,.5)}
-dialog h3{font-size:18px;margin-bottom:8px}
-dialog p{color:var(--mute);font-size:14px;margin-bottom:18px}
-dialog .row{display:flex;gap:10px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:8px;font-size:14px;font-weight:500;z-index:50;display:none;max-width:90%;text-align:center}
+dialog{margin:auto;border:1px solid var(--line);border-radius:16px;padding:26px;background:var(--card);color:var(--text);max-width:380px;width:90%}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h3{margin-bottom:8px}dialog p{color:var(--mute);font-size:14px;margin-bottom:18px}
+dialog .row2{gap:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:14px;font-weight:500;z-index:80;display:none;max-width:90%;text-align:center}
 
-@media(max-width:820px){
+/* tour */
+.tour{position:fixed;inset:0;z-index:60;display:none}
+.tour.on{display:block}
+.hl{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.78),0 0 0 2px var(--a2);transition:all .4s cubic-bezier(.2,.7,.2,1);pointer-events:none}
+.tip{position:fixed;left:16px;right:16px;bottom:18px;margin:auto;max-width:420px;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:up .35s forwards;opacity:0}
+.tip h4{font:800 18px 'Sora',sans-serif;margin-bottom:6px}
+.tip p{color:var(--mute);font-size:14px}
+.tip .nav{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .3s}.dots i.on{background:var(--a2);width:20px;border-radius:4px}
+.skip{background:none;border:none;color:var(--mute);font:500 13px 'Inter';cursor:pointer;margin-right:10px}
+
+@media(max-width:860px){
   nav.links{display:none}
-  .cards,.tlist{grid-template-columns:1fr}
+  .hero{grid-template-columns:1fr;padding:40px 0 36px;text-align:left}
+  .stage{height:300px;order:-1}
+  .grid{grid-template-columns:1fr 1fr}
+  .soon .grid{grid-template-columns:1fr 1fr}
   .layout.on{grid-template-columns:1fr}
-  .list{border-right:none;border-bottom:1px solid var(--line);max-height:420px}
-  .hero{padding:44px 0 32px}.hero p{font-size:16px}
+  .list{border-right:none;border-bottom:1px solid var(--line);max-height:380px}
 }
+@media(max-width:520px){.grid,.soon .grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.in,.item,.tip{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div class="orb o1"></div><div class="orb o2"></div>
 <div class="toast" id="toast"></div>
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="index.html"><img src="logo.png" alt="" onerror="this.style.display='none'">T-Scanner</a>
+    <a class="brand" href="index.html"><img src="logo.png" alt="" onerror="this.style.display='none'">TWARVIS-SCANNER</a>
     <nav class="links">
-      <a href="scanner.html">Scanner</a>
-      <a href="#maker">Image to PDF</a>
-      <a href="pdfconvert.html">Converters</a>
-      <a href="tools.html">PDF tools</a>
+      <a href="scanner.html">Scan</a>
+      <a href="#maker">Photos to PDF</a>
+      <a href="tools.html">Merge &amp; compress</a>
+      <a href="#soon">Coming soon</a>
       <a href="about.html">About</a>
     </nav>
-    <div class="top-actions"><button class="btn sec sm" id="signBtn">Sign in</button></div>
+    <div class="acts">
+      <button class="ic-btn" id="helpBtn" aria-label="Take the tour" title="Take the tour"><i class="fas fa-circle-question"></i></button>
+      <a class="ic-btn" href="about.html" aria-label="About"><i class="fas fa-circle-info"></i></a>
+      <button class="ic-btn" id="signBtn" aria-label="Account"><i class="fas fa-user"></i></button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="hero">
-    <h1>Scan documents and make PDFs, right from your phone.</h1>
-    <p>Take photos of paper, crop to the page, and get a clean PDF that is small enough to send anywhere. Your files stay on your device.</p>
-    <div class="cta">
-      <a class="btn pri" href="scanner.html"><i class="fas fa-camera"></i> Open scanner</a>
-      <a class="btn sec" href="#maker"><i class="fas fa-file-image"></i> Photos to PDF</a>
+  <section class="hero" style="padding-bottom:56px">
+    <div>
+      <h1 class="in" style="animation-delay:.05s">Your free<em>document toolkit</em></h1>
+      <p class="in" style="animation-delay:.2s">Scan paper with your camera, turn photos into PDFs, merge files and shrink them to a size you can send anywhere. Nothing leaves your device.</p>
+      <div class="cta in" style="animation-delay:.35s" id="heroCta">
+        <a class="btn pri" href="scanner.html"><i class="fas fa-camera"></i> Open live scanner</a>
+        <a class="btn out" href="#maker"><i class="fas fa-images"></i> Upload images</a>
+      </div>
+      <div class="facts in" style="animation-delay:.5s">
+        <span><i class="fas fa-check"></i>Free</span><span><i class="fas fa-check"></i>No account</span><span><i class="fas fa-check"></i>Works offline once loaded</span>
+      </div>
     </div>
-    <div class="facts">
-      <span><i class="fas fa-check"></i>Free to use</span>
-      <span><i class="fas fa-check"></i>No upload, no account</span>
-      <span><i class="fas fa-check"></i>Works on any phone browser</span>
+    <div class="stage in" style="animation-delay:.3s" aria-hidden="true">
+      <div class="paper">
+        <div class="lines raw"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>
+        <div class="clean"><div class="lines"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div></div>
+        <div class="beam"></div>
+      </div>
+      <span class="chip c1"><i class="fas fa-file-pdf"></i>PDF ready</span>
+      <span class="chip c2"><i class="fas fa-compress"></i>-82% size</span>
+      <span class="chip c3"><i class="fas fa-lock"></i>On device</span>
     </div>
   </section>
 
-  <div class="cards">
-    <a class="card" href="scanner.html">
-      <div class="ic"><i class="fas fa-camera"></i></div>
-      <h3>Scan with camera</h3>
-      <p>Full-screen camera, take as many pages as you need, and adjust the edges of each page before saving.</p>
-      <span class="go">Start scanning</span>
-    </a>
-    <a class="card" href="#maker">
-      <div class="ic"><i class="fas fa-file-image"></i></div>
-      <h3>Photos to PDF</h3>
-      <p>Pick photos from your gallery, put them in order, choose the size, and download one PDF.</p>
-      <span class="go">Make a PDF</span>
-    </a>
-  </div>
-
-  <section class="maker" id="maker">
-    <div class="sec-head">
-      <h2>Photos to PDF</h2>
-      <p>Add as many images as you like. Reorder, rotate or remove them, then create your PDF.</p>
+  <section id="tools">
+    <div class="sh"><h2>Ready to use</h2><p>Four tools, all working right now.</p></div>
+    <div class="grid">
+      <a class="tool" href="scanner.html"><span class="tag on">Live</span><div class="ic"><i class="fas fa-camera"></i></div><h3>Scan document</h3><p>Full-screen camera, adjustable crop, clean black-and-white pages.</p></a>
+      <a class="tool" href="#maker"><span class="tag on">Live</span><div class="ic"><i class="fas fa-file-image"></i></div><h3>Photos to PDF</h3><p>Pick images, set the order, download one small PDF.</p></a>
+      <a class="tool" href="tools.html"><span class="tag on">Live</span><div class="ic"><i class="fas fa-object-group"></i></div><h3>Merge PDFs</h3><p>Combine several PDF files into a single document.</p></a>
+      <a class="tool" href="tools.html"><span class="tag on">Live</span><div class="ic"><i class="fas fa-compress"></i></div><h3>Compress PDF</h3><p>Reduce the file size so it sends fast on any network.</p></a>
     </div>
-    <div class="maker-box">
-      <div class="drop" id="drop">
-        <i class="fas fa-cloud-arrow-up"></i>
-        <strong>Choose photos</strong>
-        <small>or drop them here. JPG, PNG, WebP</small>
-      </div>
+  </section>
+
+  <section id="maker">
+    <div class="sh"><h2>Photos to PDF</h2><p>Add as many images as you need. Reorder, rotate, then create.</p></div>
+    <div class="box">
+      <div class="drop" id="drop"><i class="fas fa-cloud-arrow-up"></i><strong>Choose photos</strong><small>or drop them here. JPG, PNG, WebP</small></div>
       <div class="layout" id="layout">
         <div class="list" id="list"></div>
         <div class="side">
-          <div>
-            <label for="pdfName">File name</label>
-            <div class="field"><input type="text" id="pdfName" value="twarvis_doc"><span style="color:var(--mute)">.pdf</span></div>
-          </div>
-          <div>
-            <label for="pageMode">Page size</label>
-            <select id="pageMode">
-              <option value="fit">Same as the image</option>
-              <option value="a4">A4 with margins</option>
-            </select>
-          </div>
-          <div>
-            <label for="quality">File size</label>
-            <select id="quality">
-              <option value="max">Smallest</option>
-              <option value="mid" selected>Balanced</option>
-              <option value="low">Best quality</option>
-            </select>
-          </div>
+          <div><label class="l" for="pdfName">File name</label><div class="field"><input type="text" id="pdfName" value="twarvis_doc">.pdf</div></div>
+          <div><label class="l" for="pageMode">Page size</label><select id="pageMode"><option value="fit">Same as the image</option><option value="a4">A4 with margins</option></select></div>
+          <div><label class="l" for="quality">File size</label><select id="quality"><option value="max">Smallest</option><option value="mid" selected>Balanced</option><option value="low">Best quality</option></select></div>
           <label class="chk"><input type="checkbox" id="mark" checked> Small site name on each page</label>
           <div class="summary" id="summary"></div>
           <div class="bar" id="bar"><i id="barFill"></i></div>
           <button class="btn pri" id="makeBtn"><i class="fas fa-download"></i> Create PDF</button>
-          <div style="display:flex;gap:8px">
-            <button class="btn sec sm" id="addBtn" style="flex:1"><i class="fas fa-plus"></i> Add more</button>
-            <button class="btn sec sm" id="clearBtn" style="flex:1">Clear all</button>
-          </div>
+          <div class="row2"><button class="btn gh sm" id="addBtn"><i class="fas fa-plus"></i> Add more</button><button class="btn gh sm" id="clearBtn">Clear all</button></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="tools-sec">
-    <div class="sec-head"><h2>Other tools</h2></div>
-    <div class="tlist">
-      <a class="tl" href="pdfconvert.html?tool=word-to-pdf"><i class="fas fa-file-word"></i><div><b>Word to PDF</b><span>Convert .docx files</span></div></a>
-      <a class="tl" href="pdfconvert.html?tool=pdf-to-word"><i class="fas fa-file-pdf"></i><div><b>PDF to Word</b><span>Get editable text</span></div></a>
-      <a class="tl" href="pdfconvert.html?tool=converter"><i class="fas fa-right-left"></i><div><b>File converter</b><span>Change file types</span></div></a>
-      <a class="tl" href="pdf-maker.html"><i class="fas fa-images"></i><div><b>Image to PDF maker</b><span>Full editor</span></div></a>
-      <a class="tl" href="tools.html"><i class="fas fa-object-group"></i><div><b>Merge PDFs</b><span>Combine several files</span></div></a>
-      <a class="tl" href="tools.html"><i class="fas fa-compress"></i><div><b>Compress PDF</b><span>Reduce file size</span></div></a>
+  <section id="soon" class="soon">
+    <div class="sh"><h2>Coming soon</h2><p>We are building these next.</p></div>
+    <div class="grid">
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-file-word"></i></div><h3>Word to PDF</h3><p>Convert .docx files.</p></div>
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-file-pdf"></i></div><h3>PDF to Word</h3><p>Get editable text back.</p></div>
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-scissors"></i></div><h3>Split PDF</h3><p>Pull out the pages you need.</p></div>
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-font"></i></div><h3>Scan to text</h3><p>Copy text from a scanned page.</p></div>
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-signature"></i></div><h3>Sign PDF</h3><p>Add your signature to a file.</p></div>
+      <div class="tool"><span class="tag sn">Soon</span><div class="ic"><i class="fas fa-lock"></i></div><h3>Protect PDF</h3><p>Lock a file with a password.</p></div>
     </div>
   </section>
 
   <div class="notes">
-    <div>
-      <h3>Looking for study notes?</h3>
-      <p>The Notes Zone has free student resources, past papers and study material.</p>
-    </div>
-    <a class="btn pri" href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Visit Notes Zone</a>
+    <div><h3>Looking for study notes?</h3><p>The Notes Zone has free student resources and past papers.</p></div>
+    <a class="btn pri sm" href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Visit Notes Zone</a>
   </div>
 </main>
 
-<footer>
-  <div class="wrap">
-    <span>Built by <a href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Twarvis Davinc</a></span>
-    <span>Files are processed on your device and never uploaded.</span>
-  </div>
-</footer>
+<footer><div class="wrap"><span>Built by <a href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Twarvis Davinc</a></span><span>Files are processed on your device and never uploaded.</span></div></footer>
 
 <dialog id="signDlg">
   <h3>Accounts are coming soon</h3>
-  <p>Sign in is not ready yet. You do not need an account to use any tool here. You can create one on the main portal.</p>
-  <div class="row">
-    <a class="btn pri" style="flex:1" href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Open portal</a>
-    <button class="btn sec" id="signClose">Close</button>
-  </div>
+  <p>You do not need an account to use any tool here. You can create one on the main portal.</p>
+  <div class="row2"><a class="btn pri" href="https://twarvis.cc.cd/" target="_blank" rel="noopener">Open portal</a><button class="btn gh" id="signClose">Close</button></div>
 </dialog>
 
+<div class="tour" id="tour"><div class="hl" id="hl"></div><div class="tip" id="tip"></div></div>
 <input type="file" id="file" accept="image/*" multiple hidden>
 
 <script>
 const $=id=>document.getElementById(id);
 const WATERMARK='tscanner.cc.cd';
 const LEVELS={max:{side:1000,q:.45},mid:{side:1500,q:.65},low:{side:2200,q:.85}};
-let items=[];   // {data, thumb, rot, name, w, h}
+let items=[];
 
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3200);}
-
 $('signBtn').onclick=()=>$('signDlg').showModal();
 $('signClose').onclick=()=>$('signDlg').close();
 
-const drop=$('drop'), fileIn=$('file');
-drop.onclick=()=>fileIn.click(); $('addBtn').onclick=()=>fileIn.click();
+// soft glow that follows the pointer on tool cards
+document.querySelectorAll('.tool').forEach(c=>c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');}));
+
+/* ---------- Photos to PDF ---------- */
+const drop=$('drop'),fileIn=$('file');
+drop.onclick=()=>fileIn.click();$('addBtn').onclick=()=>fileIn.click();
 ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
 drop.addEventListener('drop',ev=>addFiles([...ev.dataTransfer.files]));
@@ -278,8 +297,6 @@ function scaleTo(img,side,rot){
   x.translate(c.width/2,c.height/2);x.rotate(rot*Math.PI/2);x.drawImage(img,-w/2,-h/2,w,h);
   return c;
 }
-
-// images are kept as compressed JPEG, so large batches do not exhaust phone memory
 async function addFiles(files){
   files=files.filter(f=>f.type.startsWith('image/'));
   if(!files.length) return toast('Please choose image files');
@@ -292,11 +309,11 @@ async function addFiles(files){
       n++;
     }catch(e){}
     URL.revokeObjectURL(url);
-    if(files.length>4 && n%4===0){ $('summary').textContent=`Adding ${n} of ${files.length}...`; await new Promise(r=>setTimeout(r)); }
+    if(files.length>4&&n%4===0){$('summary').textContent=`Adding ${n} of ${files.length}...`;await new Promise(r=>setTimeout(r));}
   }
-  render(); toast(n+' image'+(n===1?'':'s')+' added');
+  render();toast(n+' image'+(n===1?'':'s')+' added');
 }
-
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function render(){
   const has=items.length>0;
   $('layout').classList.toggle('on',has);
@@ -317,7 +334,6 @@ function render(){
   });
   $('summary').textContent=has?`${items.length} page${items.length===1?'':'s'} ready`:'';
 }
-function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function act(i,a){
   if(a==='up'&&i>0)[items[i-1],items[i]]=[items[i],items[i-1]];
   if(a==='down'&&i<items.length-1)[items[i+1],items[i]]=[items[i],items[i+1]];
@@ -337,15 +353,13 @@ $('makeBtn').onclick=async()=>{
     let pdf=null;
     for(let i=0;i<items.length;i++){
       $('summary').textContent=`Page ${i+1} of ${items.length}`;
-      const img=await loadImg(items[i].data), c=scaleTo(img,L.side,items[i].rot);
-      const data=c.toDataURL('image/jpeg',L.q), land=c.width>c.height;
+      const img=await loadImg(items[i].data),c=scaleTo(img,L.side,items[i].rot);
+      const data=c.toDataURL('image/jpeg',L.q),land=c.width>c.height;
       let pw,ph,ix,iy,iw,ih;
       if(mode==='a4'){
         pw=land?297:210;ph=land?210:297;const m=10,s=Math.min((pw-2*m)/c.width,(ph-2*m)/c.height);
         iw=c.width*s;ih=c.height*s;ix=(pw-iw)/2;iy=(ph-ih)/2;
-      }else{
-        pw=land?297:210;ph=pw*c.height/c.width;iw=pw;ih=ph;ix=0;iy=0;
-      }
+      }else{pw=land?297:210;ph=pw*c.height/c.width;iw=pw;ih=ph;ix=0;iy=0;}
       const fmt=[Math.min(pw,ph),Math.max(pw,ph)],ori=pw>ph?'l':'p';
       if(!pdf)pdf=new jsPDF({unit:'mm',format:fmt,orientation:ori,compress:true});else pdf.addPage(fmt,ori);
       pdf.addImage(data,'JPEG',ix,iy,iw,ih,undefined,'FAST');
@@ -361,6 +375,40 @@ $('makeBtn').onclick=async()=>{
   }catch(e){console.error(e);toast('Could not create the PDF');}
   btn.disabled=false;setTimeout(()=>bar.style.display='none',800);
 };
+
+/* ---------- Guided tour (first visit) ---------- */
+const STEPS=[
+  {h:'Welcome to T-Scanner',p:'A free toolkit for your documents. Let’s take 30 seconds to see what it does.'},
+  {s:'#heroCta',h:'Scan or upload',p:'Open the live scanner to use your camera, or upload photos you already have.'},
+  {s:'#tools',h:'Four tools, ready now',p:'Scan, make a PDF from photos, merge PDFs and compress them. Tap any card to start.'},
+  {s:'#maker',h:'Photos to PDF',p:'Add images here, drag them into order, pick a file size, then create your PDF.'},
+  {s:'#soon',h:'More on the way',p:'Word to PDF, split, sign and more are coming. You can replay this tour any time with the ? button.'}
+];
+let ti=0;
+function seen(){try{return localStorage.getItem('tsTour')==='1'}catch(e){return false}}
+function mark(){try{localStorage.setItem('tsTour','1')}catch(e){}}
+function showStep(){
+  const st=STEPS[ti],hl=$('hl'),tip=$('tip');
+  const place=()=>{
+    const el=st.s&&document.querySelector(st.s);
+    if(el){const r=el.getBoundingClientRect(),p=8;Object.assign(hl.style,{left:r.left-p+'px',top:r.top-p+'px',width:r.width+p*2+'px',height:r.height+p*2+'px'});}
+    else Object.assign(hl.style,{left:innerWidth/2+'px',top:innerHeight/2+'px',width:'0px',height:'0px'});
+  };
+  const el=st.s&&document.querySelector(st.s);
+  if(el)el.scrollIntoView({block:'center',behavior:'smooth'});
+  tip.style.animation='none';tip.offsetHeight;tip.style.animation='';
+  const last=ti===STEPS.length-1;
+  tip.innerHTML=`<h4>${st.h}</h4><p>${st.p}</p><div class="nav"><div class="dots">${STEPS.map((_,i)=>`<i class="${i===ti?'on':''}"></i>`).join('')}</div><div>${last?'':'<button class="skip" id="tSkip">Skip</button>'}<button class="btn pri sm" id="tNext">${last?'Start using it':'Next'}</button></div></div>`;
+  $('tNext').onclick=()=>{if(last)endTour();else{ti++;showStep();}};
+  if($('tSkip'))$('tSkip').onclick=endTour;
+  place();setTimeout(place,450);
+}
+function startTour(){ti=0;$('tour').classList.add('on');document.body.style.overflow='hidden';showStep();}
+function endTour(){$('tour').classList.remove('on');document.body.style.overflow='';mark();window.scrollTo({top:0,behavior:'smooth'});}
+addEventListener('resize',()=>{if($('tour').classList.contains('on'))showStep();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('tour').classList.contains('on'))endTour();});
+$('helpBtn').onclick=startTour;
+if(!seen())setTimeout(startTour,1400);
 </script>
 </body>
 </html>
